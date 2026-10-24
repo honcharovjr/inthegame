@@ -107,7 +107,7 @@ One recorded play (FR-10).
 | id | uuid, PK | |
 | game_id | uuid, not null | References `games(id)` |
 | created_by | uuid, not null | References `profiles(id)` |
-| group_id | uuid | Optional. References `groups(id)` (see section 8, question 1) |
+| group_id | uuid | Optional, chosen at creation. References `groups(id)` |
 | played_at | timestamptz, not null | Date and time of the play. Default `now()` |
 | result_type | text, not null | `winner`, `ranking` or `points` (FR-11) |
 | status | text, not null | `confirmed`, default `confirmed`. Kept for the backlog (spec section 9). Other values are added by a later migration |
@@ -225,7 +225,7 @@ Listed so the MVP schema does not block them. Each needs its own approval and mi
 
 ## 8. Open questions
 
-1. **Session and group link.** Proposal: a session has one optional `group_id` chosen at creation. Alternative: a session is visible to every group that contains all its registered participants, with no column. The proposal is simpler and cheaper for RLS, but a session belongs to one group only. Decide
+1. **Session and group link.** Decided: a session has one optional `group_id` chosen at creation. A session belongs to one group only
 2. **Account deletion.** Proposal: set the nickname to a fixed placeholder, clear the avatar, delete the `auth.users` row, keep the `profiles` row. This needs `profiles.id` not to cascade from `auth.users`, or a separate delete flow. Decide before the Pilot phase
 3. **Game types.** Confirm the list in 3.3, or give your own
 4. **Team results (FR-12).** Is `team_no` on the participant enough for P2 (Assumption), or do you want a teams table now?
