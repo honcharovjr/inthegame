@@ -1,13 +1,48 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Surfaces and text */
+  --color-bg: #eaf7f7;
+  --color-surface: #fafefe;
+  --color-ink: #0e2d2e;
+  --color-muted: #48696a;
+  --color-chip: #d9eeee;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Main colour: turquoise */
+  --color-primary: #2fd6d6;
+  --color-primary-deep: #0a6466;
+  --color-primary-tint: #d3f6f6;
+
+  /* Accent pair: coral and lemon (pair to be confirmed) */
+  --color-coral: #ff7f66;
+  --color-coral-tint: #ffe0d8;
+  --color-coral-ink: #a63a22;
+  --color-lemon: #f6e27a;
+  --color-lemon-ink: #5f4b00;
+
+  /* Supporting tints for game types and tags */
+  --color-sky-tint: #d3e6ff;
+  --color-sky-ink: #1f4f8f;
+  --color-violet-tint: #e2dcf7;
+  --color-violet-ink: #4a3d8f;
+
+  /* Radii */
+  --radius-chip: 14px;
+  --radius-row: 26px;
+  --radius-card: 28px;
+  --radius-pill: 999px;
+
+  /* Depth and glow. No borders anywhere: shape comes from fill and shadow */
+  --shadow-card: 0 1px 2px rgba(14, 45, 46, 0.05),
+    0 12px 32px rgba(14, 45, 46, 0.08);
+  --shadow-button: 0 10px 22px rgba(10, 100, 102, 0.28);
+  --glow-primary: 0 0 16px rgba(47, 214, 214, 0.8);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
 }
 
 html {
@@ -24,9 +59,9 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -42,8 +77,8 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
 }

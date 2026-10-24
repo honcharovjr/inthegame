@@ -2,4 +2,13 @@
   max-width: 40rem;
   margin: 0 auto;
   padding: 4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.main h1 {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
