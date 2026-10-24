@@ -4,6 +4,7 @@
   padding: 4rem 1.5rem;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-5);
 }
 
@@ -11,4 +12,23 @@
   font-size: 40px;
   font-weight: 800;
   letter-spacing: -0.03em;
+}
+
+.problem {
+  padding: 10px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--color-coral-tint);
+  color: var(--color-coral-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.signOut {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 22px;
+  background: var(--color-primary-tint);
+  color: var(--color-primary-deep);
+  font-weight: 700;
+  cursor: pointer;
 }
