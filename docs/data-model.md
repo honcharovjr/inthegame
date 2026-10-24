@@ -35,12 +35,13 @@ One row per registered user. Created by a trigger on sign-up (Assumption: trigge
 
 | Column | Type | Notes |
 |---|---|---|
-| id | uuid, PK | Equals `auth.users.id` for now. Under review, see section 8, question 2 |
+| id | uuid, PK | Own id, default `gen_random_uuid()` |
+| user_id | uuid, unique | References `auth.users(id)` on delete set null. Null after the account is deleted |
 | nickname | text, not null | 2 to 30 characters |
 | avatar_url | text | Optional, points to Storage |
 | created_at | timestamptz, not null | Default `now()` |
 
-Account deletion (FR-05, Pilot): the row is anonymized, not removed, so sessions of other players stay consistent. Details in section 8.
+Account deletion (FR-05, Pilot): the auth user is deleted, `user_id` becomes null, and the row is anonymized (placeholder nickname, no avatar) instead of removed, so sessions of other players stay consistent.
 
 ### 3.2 guests
 
@@ -228,7 +229,7 @@ Listed so the MVP schema does not block them. Each needs its own approval and mi
 ## 8. Open questions
 
 1. **Session and group link.** Decided: a session has one optional `group_id` chosen at creation. A session belongs to one group only
-2. **Account deletion.** Section 3.1 now says `profiles.id` cascades from `auth.users`, which would delete the profile and break other players' sessions. Options: (a) recommended: `profiles` gets its own `id` plus a nullable `user_id` that references `auth.users` with `on delete set null`, so deletion anonymizes and the row stays; (b) keep the cascade and accept that deleted players vanish from shared sessions. Decide before the first migration, because it changes the key
+2. **Account deletion.** Decided: `profiles` has its own `id` and a nullable `user_id` with `on delete set null`. Deleting an account anonymizes the profile and the row stays
 3. **Game types.** Confirm the list in 3.3, or give your own
 4. **Team results (FR-12).** Is `team_no` on the participant enough for P2 (Assumption), or do you want a teams table now?
 5. **Guest ratings.** Stored like any player (docs/rating.md, Assumption). Hiding them on leaderboards is a query filter, not a schema change
