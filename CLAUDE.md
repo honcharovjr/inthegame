@@ -78,7 +78,10 @@ scripts/          helper scripts (Python or Node)
 
 ## Commands
 
-To be filled after the project is scaffolded (dev server, build, lint, test).
+- `npm run dev`: dev server
+- `npm run build`: production build
+- `npm run lint`: lint
+- Test command: to be added with the test runner
 
 ## Working rules for Claude
 
