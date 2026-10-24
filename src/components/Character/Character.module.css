@@ -1,0 +1,11 @@
+.character {
+  display: block;
+}
+
+.face {
+  fill: var(--color-ink);
+}
+
+.mouth {
+  stroke: var(--color-ink);
+}
