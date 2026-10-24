@@ -31,11 +31,11 @@ A participant is either a registered player or a guest, never both.
 
 ### 3.1 profiles
 
-One row per registered user. `id` equals `auth.users.id`. Created by a trigger on sign-up (Assumption: trigger, not client code).
+One row per registered user. Created by a trigger on sign-up (Assumption: trigger, not client code).
 
 | Column | Type | Notes |
 |---|---|---|
-| id | uuid, PK | References `auth.users(id)` on delete cascade |
+| id | uuid, PK | Equals `auth.users.id` for now. Under review, see section 8, question 2 |
 | nickname | text, not null | 2 to 30 characters |
 | avatar_url | text | Optional, points to Storage |
 | created_at | timestamptz, not null | Default `now()` |
@@ -107,7 +107,7 @@ One recorded play (FR-10).
 | id | uuid, PK | |
 | game_id | uuid, not null | References `games(id)` |
 | created_by | uuid, not null | References `profiles(id)` |
-| group_id | uuid | Optional. References `groups(id)` (see section 8, question 1) |
+| group_id | uuid | Optional, chosen at creation. References `groups(id)` |
 | played_at | timestamptz, not null | Date and time of the play. Default `now()` |
 | result_type | text, not null | `winner`, `ranking` or `points` (FR-11) |
 | status | text, not null | `confirmed`, default `confirmed`. Kept for the backlog (spec section 9). Other values are added by a later migration |
@@ -133,6 +133,7 @@ Constraints:
 
 - Exactly one of `profile_id` and `guest_id` is set (check constraint)
 - A player appears once per session: unique (`session_id`, `profile_id`) and unique (`session_id`, `guest_id`), each partial on not null
+- `place` must be at least 1
 - `score` is required when the session `result_type` is `points`. Enforced in application code and tests, because a check constraint cannot see the parent row
 
 ### 3.8 ratings
@@ -178,11 +179,11 @@ Helper functions are `security definer` with a fixed `search_path`, so policies 
 
 | Table | Read | Insert | Update | Delete |
 |---|---|---|---|---|
-| profiles | Self, and members of a shared group | By sign-up trigger only | Self | None (anonymize, see section 8) |
+| profiles | Self, members of a shared group, and co-participants of a session the caller can see | By sign-up trigger only | Self | None (anonymize, see section 8) |
 | guests | Owner, and members of groups where the guest took part in a session | Owner (`owner_id` = caller) | Owner | Owner, if the guest has no sessions (Assumption) |
 | games | Catalog games: any logged-in user. Custom games: author and members of the author's groups | Logged-in user, only as custom game with `created_by` = caller | Author, custom only | Author, custom only, if unused (Assumption) |
 | groups | Members | Logged-in user, with `owner_id` = caller | Owner | Owner |
-| group_members | Members of the same group | Server-side join function only | None | Self (leave), and owner for others (P4, FR-27) |
+| group_members | Members of the same group | Server-side join function only | None | Server-side leave function only. It blocks the owner while other members remain (US-G3). Owner removing others is P4 (FR-27) |
 | sessions | Creator, participants, members of the session's group | Logged-in user, with `created_by` = caller | Creator | Creator |
 | session_participants | Same as the parent session | Creator of the parent session | Creator of the parent session | Creator of the parent session |
 | ratings | Same visibility as the player's profile or guest | Server-side only | Server-side only | Server-side only |
@@ -191,6 +192,7 @@ Helper functions are `security definer` with a fixed `search_path`, so policies 
 Notes:
 
 - "Server-side only" means no client policy for that command. The service role key bypasses RLS and is never exposed to the browser
+- Avatar files in Storage need their own bucket policies: anyone logged in can read, only the owner can write their own file
 - After a session is edited or deleted, ratings of that game are rebuilt (docs/rating.md section 5)
 
 ## 6. Indexes
@@ -225,8 +227,8 @@ Listed so the MVP schema does not block them. Each needs its own approval and mi
 
 ## 8. Open questions
 
-1. **Session and group link.** Proposal: a session has one optional `group_id` chosen at creation. Alternative: a session is visible to every group that contains all its registered participants, with no column. The proposal is simpler and cheaper for RLS, but a session belongs to one group only. Decide
-2. **Account deletion.** Proposal: set the nickname to a fixed placeholder, clear the avatar, delete the `auth.users` row, keep the `profiles` row. This needs `profiles.id` not to cascade from `auth.users`, or a separate delete flow. Decide before the Pilot phase
+1. **Session and group link.** Decided: a session has one optional `group_id` chosen at creation. A session belongs to one group only
+2. **Account deletion.** Section 3.1 now says `profiles.id` cascades from `auth.users`, which would delete the profile and break other players' sessions. Options: (a) recommended: `profiles` gets its own `id` plus a nullable `user_id` that references `auth.users` with `on delete set null`, so deletion anonymizes and the row stays; (b) keep the cascade and accept that deleted players vanish from shared sessions. Decide before the first migration, because it changes the key
 3. **Game types.** Confirm the list in 3.3, or give your own
 4. **Team results (FR-12).** Is `team_no` on the participant enough for P2 (Assumption), or do you want a teams table now?
 5. **Guest ratings.** Stored like any player (docs/rating.md, Assumption). Hiding them on leaderboards is a query filter, not a schema change
