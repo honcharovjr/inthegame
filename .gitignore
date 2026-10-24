@@ -6,3 +6,17 @@
 .idea/
 .vscode/
 .claude/settings.local.json
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# vercel
+.vercel
+
+# testing
+/coverage
