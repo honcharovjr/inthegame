@@ -10,6 +10,17 @@ Web platform for logging board and card game sessions. Any session, even a casua
 - Free at launch, no monetization in scope
 - Developer: one person (project author), who reviews every change
 
+## Documentation
+
+Read the relevant file before implementing a feature. If docs and code conflict, ask before choosing.
+
+- `docs/spec.md`: technical specification, requirements (FR-xx), phases, decisions
+- `docs/user-stories.md`: user stories with acceptance criteria
+- `docs/data-model.md`: tables, relations, access rules
+- `docs/rating.md`: rating algorithm and test cases
+
+Current scope: MVP, which is phases P1 and P2. Do not build features from later phases unless asked.
+
 ## Stack
 
 - Frontend: Next.js (React), JavaScript
@@ -48,9 +59,9 @@ Profile, guest profile, game (catalog), session (a played match), session partic
 
 1. Initiation and requirements: charter, technical specification, prototype
 2. Development phase 1: session creation, start of the catalog
-3. Development phase 2: rating and statistics
+3. Development phase 2: rating, statistics and minimal groups (create, invite link, join, leave, group history)
 4. Development phase 3: character customization and profile
-5. Development phase 4: groups, social feed, table tools (scoreboard, timers, dice, team generator)
+5. Development phase 4: group management, social feed, table tools (scoreboard, timers, dice, team generator)
 6. Pilot release: test tournament
 7. Final: report and improvement backlog
 
@@ -74,13 +85,26 @@ To be filled after the project is scaffolded (dev server, build, lint, test).
 - For any non-trivial task, propose a plan first and wait for approval before changing files
 - Keep tasks small: one feature, one commit. Use a separate branch per feature, no direct commits to main
 - Do not add new dependencies without asking
+- Do not create tables or columns beyond docs/data-model.md without asking
 - Write tests for rating and statistics logic
 - Code, comments, commit messages and UI text are in English
 - If requirements are unclear or a decision is missing, ask instead of guessing. State uncertainty explicitly
 - Do not claim that free-tier limits or prices are current. They must be checked on the service websites
 
+## Response format
+
+- Lead with the answer or the next action. No preamble, no recap
+- Anything I need to do is a numbered list, one action per step, each step at most two lines. Commands go in code blocks
+- At most 7 steps at once. If more are needed, give the first part and say what comes next
+- No long explanations. Explain why only when I ask
+- Bold only the one thing I must not miss
+- After code changes, give at most 5 bullets: what changed and what to check
+- When I must decide, give at most 3 options and put the recommended one first
+- State uncertainty in one short line
+- End with exactly one question or one "Next:" line
+
 ## Open decisions
 
 - Styling approach (plain CSS, CSS modules or Tailwind)
 - TypeScript or JavaScript only (JavaScript is the current choice)
-- Exact list of achievements and rating algorithm (to be written in docs/)
+- Exact list of achievements (to be written in docs/). The rating algorithm is drafted in docs/rating.md
