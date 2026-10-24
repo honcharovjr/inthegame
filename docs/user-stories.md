@@ -1,6 +1,6 @@
 # User stories: In the Game
 
-Version 0.1, draft. Each story links to a requirement in docs/spec.md. Priority: Must, Should, Could. Phase: P1 to P4, Pilot.
+Version 0.2, draft. Each story links to a requirement in docs/spec.md. Priority: Must, Should, Could. Phase: P1 to P4, Pilot.
 
 ## Epic A: Accounts and profiles
 
@@ -116,17 +116,17 @@ Acceptance: locked items show how to unlock them; earning an achievement unlocks
 
 ## Epic G: Groups and social
 
-**US-G1** (FR-26, P4, Must)
+**US-G1** (FR-26, P2, Must)
 As a player, I want to create a group, so that my friends and I share sessions and leaderboards.
 Acceptance: group has a name; the creator becomes the owner.
 
-**US-G2** (FR-26, P4, Must)
+**US-G2** (FR-26, P2, Must)
 As a group owner, I want to invite people by link, so that joining is easy.
 Acceptance: link joins the group after login; the owner can disable the link.
 
-**US-G3** (FR-26, FR-27, P4, Must)
-As a player, I want to leave a group, and as an owner I want to remove a member, so that membership stays under control.
-Acceptance: leaving keeps my past sessions; removal is limited to the owner.
+**US-G3** (FR-26, P2, Must)
+As a player, I want to leave a group, so that I control which groups I belong to.
+Acceptance: leaving keeps my past sessions; an owner cannot leave while other members remain (Assumption).
 
 **US-G4** (FR-28, P4, Must)
 As a group member, I want a feed of group activity, so that I see what my friends played and earned.
@@ -135,6 +135,14 @@ Acceptance: shows new sessions and achievements, newest first; only group member
 **US-G5** (FR-29, P4, Could)
 As a group member, I want to react to feed items, so that I can cheer on friends.
 Acceptance: one reaction per user per item; can be removed.
+
+**US-G6** (FR-38, P2, Must)
+As a group member, I want to see the session history of my group, so that I can follow what we played together.
+Acceptance: list sorted by date; shows game, participants and result; visible only to group members.
+
+**US-G7** (FR-27, P4, Must)
+As a group owner, I want to remove a member, so that I keep the group under control.
+Acceptance: only the owner can remove; the removed member's past sessions stay in the history.
 
 ## Epic H: Table tools
 
@@ -171,6 +179,26 @@ Acceptance: link or form reachable from the main navigation.
 **US-I4** (FR-37, Pilot, Must)
 As the project author, I want to hold a test tournament with seed data, so that I can validate the product with real users.
 Acceptance: the tournament takes place; sessions are logged through the app; feedback and metrics are collected for the final report.
+
+## Epic J: Backlog after MVP
+
+Not scheduled. These stories depend on open questions about timeouts, disputes and guests.
+
+**US-J1** (FR-39, Backlog, Could)
+As a group owner, I want to create teams in my group and assign roles such as team leader, so that responsibility for results is clear.
+Acceptance: the owner creates teams and assigns or changes roles; every team has at least one leader.
+
+**US-J2** (FR-40, Backlog, Could)
+As a team leader, I want to confirm a session result, so that only verified results affect ratings and stats.
+Acceptance: a new session is pending until the leader confirms; ratings and stats update only for confirmed sessions; only a leader can confirm.
+
+**US-J3** (FR-41, Backlog, Could)
+As a group owner, I want a setting where one team leader proposes the result and the other teams confirm it, so that all sides agree.
+Acceptance: the setting is per group; the proposal appears in the other leaders' UI; the session is confirmed when all other sides confirm; a rejection marks it disputed.
+
+**US-J4** (FR-42, Backlog, Could)
+As a player, I want clear rules for sessions that nobody confirms, so that results do not hang forever.
+Acceptance: timeout, dispute handling and handling of guests are defined and implemented. The rules are an open question.
 
 ## Definition of done (draft)
 

@@ -1,6 +1,6 @@
 # Technical specification: In the Game
 
-Version 0.1, draft. Items marked "Assumption" or listed in section 9 are not confirmed and need a decision.
+Version 0.2, draft. Items marked "Assumption" or listed in section 9 are not confirmed and need a decision.
 
 ## 1. Purpose and scope
 
@@ -31,7 +31,8 @@ Audience: friend groups, FIT students, game clubs; later a public service. Start
 | Visitor | Not logged in. Sees the landing page and the registration form |
 | Player | Registered user. Logs sessions, sees own stats, joins groups |
 | Group owner | A player who created a group. Can invite and remove members |
-| Maintainer | The project author. Manages the catalog and achievements directly in the database in early phases (Assumption) |
+| Maintainer | The project author. Manages the catalog and achievements directly in the database in early phases |
+| Team leader (backlog) | A role inside a team, planned after the MVP. Confirms or proposes session results |
 
 A guest profile is a participant record, not a login role.
 
@@ -66,7 +67,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-11 | Result types: winner only, ranking by place, points per participant | Must | P1 |
 | FR-12 | Team result type | Should | P2 |
 | FR-13 | Fast entry: recent games and recent participants are suggested. Target is under 1 minute from start to saved session | Must | P1 |
-| FR-14 | Session history for a player and for a group. A creator can edit and delete own sessions | Must | P1 |
+| FR-14 | Session history for a player. A creator can edit and delete own sessions | Must | P1 |
 | FR-15 | Optional note on a session | Could | P2 |
 
 ### 4.4 Statistics and rating
@@ -93,10 +94,11 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
-| FR-26 | Create a group, invite by link, join and leave | Must | P4 |
+| FR-26 | Create a group, invite by link, join and leave (minimal groups) | Must | P2 |
 | FR-27 | Group roles: owner and member. The owner can remove members | Must | P4 |
 | FR-28 | Social feed with group sessions and earned achievements | Must | P4 |
 | FR-29 | Reactions on feed items | Could | P4 |
+| FR-38 | Session history of a group | Must | P2 |
 
 ### 4.7 Table tools
 
@@ -116,6 +118,17 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-36 | Link to send feedback from the app | Could | Pilot |
 | FR-37 | Pilot: seed data prepared and a test tournament held | Must | Pilot |
 
+### 4.9 Backlog (after MVP)
+
+Not scheduled. These depend on open questions in section 9.
+
+| ID | Requirement | Priority | Phase |
+|---|---|---|---|
+| FR-39 | Teams inside a group. The group owner creates teams and manages roles such as team leader | Could | Backlog |
+| FR-40 | Default confirmation mode: a session result counts only after the team leader confirms it. Ratings and stats use confirmed sessions only | Could | Backlog |
+| FR-41 | Optional group setting: one team leader proposes the result, and the other teams confirm it in their own UI | Could | Backlog |
+| FR-42 | Rules for unconfirmed sessions: timeout, dispute handling, and how guests are covered | Could | Backlog |
+
 ## 5. Phases
 
 | Phase | Duration | Result |
@@ -123,9 +136,9 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | Initiation | 2 weeks | Project charter approved |
 | Requirements | 2 weeks | Specification and prototype approved |
 | P1 | 2 weeks | Session creation works, catalog started |
-| P2 | 2 weeks | Rating and statistics are calculated |
+| P2 | 2 weeks | Rating and statistics are calculated, minimal groups work |
 | P3 | 2 weeks | Customization and profile are ready |
-| P4 | 2 weeks | Groups, social part, table tools |
+| P4 | 2 weeks | Group management, social feed, table tools |
 | Pilot | 2 weeks | Test tournament held |
 | Final | 1 week | Final report, improvement backlog |
 
@@ -160,7 +173,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 - At least 30 achievements
 - Rating calculation confirmed correct by tests on synthetic data
 
-## 9. Out of scope and open questions
+## 9. Decisions, out of scope and open questions
 
 Out of scope for this project:
 
@@ -169,13 +182,18 @@ Out of scope for this project:
 - Own online games with multiplayer or ranked mode (planned in stages after the MVP: no multiplayer, then simple multiplayer, then ranked). Needs confirmation of whether any stage falls inside the 5 months
 - Integrations with external catalogs such as BoardGameGeek
 
+Decisions made:
+
+- MVP is P1 and P2: accounts, catalog, sessions, history, statistics, rating, minimal groups
+- In the MVP the session creator records the result alone. Confirmation by team leaders is in the backlog (section 4.9). The session `status` field is kept in the data model for it
+- The catalog is managed by the maintainer directly in the database. Custom games are visible to their author and the author's groups
+- Profiles are visible to group members only
+- Rating is Elo-style, details in docs/rating.md
+
 Open questions:
 
-1. Rating algorithm and how it handles guests, teams and games with 3 or more players
-2. Must session results be confirmed by other participants, or can the creator record them alone?
-3. Who can add games to the shared catalog, and are custom games visible to everyone or only to the author's groups?
-4. Are profiles public, or visible only to group members?
-5. Is a platform admin role needed before the pilot, or is direct database access enough?
-6. Scope of character customization: what items exist and how many?
-7. Is email verification required during the pilot?
-8. Data protection: are users in the EU, and is a privacy policy needed before public launch?
+1. Rating parameters and how an overall leaderboard is defined (see docs/rating.md)
+2. Confirmation rules for the backlog: timeout for non-responding confirmers, dispute handling, how guests are covered
+3. Scope of character customization: what items exist and how many?
+4. Is email verification required during the pilot?
+5. Data protection: are users in the EU, and is a privacy policy needed before public launch?
