@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Character from "@/components/Character/Character";
 import { signOut } from "@/lib/auth/actions";
+import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./page.module.css";
 
@@ -18,14 +18,8 @@ export default function Home() {
 
 // Reads the session, so it streams in behind the Suspense boundary.
 async function Greeting() {
+  const user = await requireUser();
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
 
   // First real database read: the signed-in user's own profile.
   const { data: profile, error } = await supabase

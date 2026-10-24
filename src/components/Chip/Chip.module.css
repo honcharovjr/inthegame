@@ -1,0 +1,55 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-chip);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--color-chip);
+  color: var(--color-ink);
+}
+
+.small {
+  height: 24px;
+  padding: 0 9px;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.primary {
+  background: var(--color-primary-tint);
+  color: var(--color-primary-deep);
+}
+
+.coral {
+  background: var(--color-coral-tint);
+  color: var(--color-coral-ink);
+}
+
+.lemon {
+  background: var(--color-lemon);
+  color: var(--color-lemon-ink);
+}
+
+.sky {
+  background: var(--color-sky-tint);
+  color: var(--color-sky-ink);
+}
+
+.violet {
+  background: var(--color-violet-tint);
+  color: var(--color-violet-ink);
+}
+
+.dark {
+  background: var(--color-primary-deep);
+  color: #ffffff;
+}
+
+a.chip:focus-visible {
+  outline: 2px solid var(--color-primary-deep);
+  outline-offset: 2px;
+}

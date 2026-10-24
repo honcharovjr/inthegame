@@ -1,0 +1,83 @@
+.page {
+  padding: var(--space-5) var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.title {
+  padding-top: var(--space-2);
+  font-size: 32px;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 52px;
+  padding: 0 18px;
+  border-radius: 26px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-muted);
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  color: var(--color-ink);
+}
+
+.searchInput::placeholder {
+  color: var(--color-muted);
+}
+
+.searchInput:focus-visible {
+  outline: none;
+}
+
+.search:focus-within {
+  outline: 2px solid var(--color-primary-deep);
+  outline-offset: 2px;
+}
+
+.filters {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.empty {
+  padding: 24px 4px;
+  color: var(--color-muted);
+}
+
+.problem {
+  padding: 10px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--color-coral-tint);
+  color: var(--color-coral-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
