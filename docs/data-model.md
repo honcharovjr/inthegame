@@ -193,6 +193,7 @@ Helper functions are `security definer` with a fixed `search_path`, so policies 
 Notes:
 
 - "Server-side only" means no client policy for that command. The service role key bypasses RLS and is never exposed to the browser
+- Teams go through server functions: `create_team`, `join_team`, `leave_team`, and `team_by_invite` for the preview before joining. A session saved to a team may include teammates as registered participants, checked inside `create_session`
 - Avatar files in Storage need their own bucket policies: anyone logged in can read, only the owner can write their own file
 - After a session is edited or deleted, ratings of that game are rebuilt (docs/rating.md section 5)
 

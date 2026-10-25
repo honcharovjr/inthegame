@@ -80,7 +80,7 @@ async function HistoryList({ searchParams }) {
   let query = supabase
     .from("sessions")
     .select(
-      `id, played_at, created_by, games(name, type), session_participants(place, profile_id, guests(name))${
+      `id, played_at, created_by, games(name, type), session_participants(place, profile_id, profiles(nickname), guests(name))${
         byResult ? ", mine:session_participants!inner(place)" : ""
       }`,
       { count: "exact" },
@@ -112,7 +112,9 @@ async function HistoryList({ searchParams }) {
       mine: session.created_by === profile?.id,
       game: session.games?.name ?? "Game",
       tone: findGameType(session.games?.type).tone,
-      others: people.filter((p) => !p.profile_id).map((p) => p.guests?.name),
+      others: people
+        .filter((p) => p.profile_id !== profile?.id)
+        .map((p) => p.profiles?.nickname ?? p.guests?.name),
       result: resultLabel(mine?.place ?? 0, people.length),
       won: mine?.place === 1 && people.length >= 2,
     };

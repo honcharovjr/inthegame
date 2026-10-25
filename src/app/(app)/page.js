@@ -75,7 +75,7 @@ async function HomeContent({ searchParams }) {
         supabase
           .from("sessions")
           .select(
-            "id, played_at, games(name, type), session_participants(place, profile_id, guests(name))",
+            "id, played_at, games(name, type), session_participants(place, profile_id, profiles(nickname), guests(name))",
           )
           .order("played_at", { ascending: false })
           .limit(3),
@@ -107,8 +107,8 @@ async function HomeContent({ searchParams }) {
       (p) => p.profile_id === profile.id,
     );
     const others = session.session_participants
-      .filter((p) => !p.profile_id)
-      .map((p) => p.guests?.name)
+      .filter((p) => p.profile_id !== profile.id)
+      .map((p) => p.profiles?.nickname ?? p.guests?.name)
       .filter(Boolean);
     return {
       id: session.id,

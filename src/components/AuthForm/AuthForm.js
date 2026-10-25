@@ -13,6 +13,7 @@ export default function AuthForm({
   submitLabel,
   links = [],
   initialError = null,
+  hidden = {},
 }) {
   const [state, formAction, pending] = useActionState(action, {
     error: initialError,
@@ -20,6 +21,9 @@ export default function AuthForm({
 
   return (
     <form action={formAction} className={styles.form}>
+      {Object.entries(hidden).map(([name, value]) => (
+        <input key={name} type="hidden" name={name} value={value} />
+      ))}
       {fields.map((field) => (
         <div key={field.name}>
           <label className={styles.label} htmlFor={field.name}>

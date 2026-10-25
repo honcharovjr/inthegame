@@ -18,7 +18,7 @@ const TABS = [
   { id: "home", label: "Home", href: "/" },
   { id: "games", label: "Games", href: "/games" },
   { id: "log", label: "Log a session", href: "/log" },
-  { id: "teams", label: "Teams", href: null },
+  { id: "teams", label: "Teams", href: "/teams" },
   { id: "profile", label: "Profile", href: "/profile" },
 ];
 

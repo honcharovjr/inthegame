@@ -17,12 +17,17 @@ export default function LoginPage({ searchParams }) {
 
 // Reads the URL query, so it streams in behind the Suspense boundary.
 async function LoginForm({ searchParams }) {
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
+  const safeNext =
+    typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
+      ? next
+      : "";
 
   return (
     <AuthForm
       action={signIn}
       submitLabel="Log in"
+      hidden={safeNext ? { next: safeNext } : {}}
       initialError={error === "link" ? "That link is not valid anymore." : null}
       fields={[
         {
@@ -41,7 +46,12 @@ async function LoginForm({ searchParams }) {
         },
       ]}
       links={[
-        { href: "/signup", label: "Create an account" },
+        {
+          href: safeNext
+            ? `/signup?next=${encodeURIComponent(safeNext)}`
+            : "/signup",
+          label: "Create an account",
+        },
         { href: "/forgot-password", label: "Forgot password", muted: true },
       ]}
     />

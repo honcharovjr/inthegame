@@ -6,13 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 // getClaims checks the signed login token on the server without a network
 // call to Supabase Auth, so it is much faster than getUser. The proxy has
 // already refreshed an expired token. Cached per request.
-export const requireUser = cache(async () => {
+// Give a path to come back to after logging in, for example an invite link.
+export const requireUser = cache(async (next) => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   const claims = data?.claims;
 
   if (error || !claims?.sub) {
-    redirect("/login");
+    redirect(next ? `/login?next=${encodeURIComponent(next)}` : "/login");
   }
   return { id: claims.sub };
 });

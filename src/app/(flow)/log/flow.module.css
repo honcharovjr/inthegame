@@ -637,3 +637,8 @@
   outline: 3px solid var(--color-ink);
   outline-offset: 2px;
 }
+
+/* The chosen team */
+.chipOn {
+  background: var(--color-pink);
+}
