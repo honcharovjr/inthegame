@@ -14,6 +14,7 @@ import {
 
 const ME = "me";
 const UUID = /^[0-9a-f-]{36}$/i;
+const PROFILE_KEY = /^p:[0-9a-f-]{36}$/i;
 
 // Creates a guest with a name only and returns it, so the log flow can add it
 // to the list without reloading the page.
@@ -50,7 +51,11 @@ export async function saveSession(input) {
     input ?? {};
   const keys = Array.isArray(input?.keys) ? input.keys.map(String) : [];
 
-  const keysValid = keys.every((key) => key === ME || UUID.test(key));
+  // A key is "me", a guest id, or p: and a teammate's profile id.
+  const keysValid = keys.every(
+    (key) => key === ME || UUID.test(key) || PROFILE_KEY.test(key),
+  );
+  const teamId = UUID.test(String(input?.teamId ?? "")) ? input.teamId : null;
   if (
     !UUID.test(String(gameId)) ||
     !RESULT_TYPES.includes(resultType) ||
@@ -96,8 +101,9 @@ export async function saveSession(input) {
   }
 
   const participants = keys.map((key) => ({
-    profile_id: key === ME ? profile.id : null,
-    guest_id: key === ME ? null : key,
+    profile_id:
+      key === ME ? profile.id : key.startsWith("p:") ? key.slice(2) : null,
+    guest_id: key === ME || key.startsWith("p:") ? null : key,
     place: places[key],
     score: resultType === "points" ? scores[key] : null,
   }));
@@ -107,6 +113,7 @@ export async function saveSession(input) {
     p_game_id: gameId,
     p_result_type: resultType,
     p_participants: participants,
+    p_team_id: teamId,
   });
   if (error) {
     console.error("saveSession failed", error);

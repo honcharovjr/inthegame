@@ -1,0 +1,359 @@
+.page {
+  padding: var(--space-6) var(--space-4) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.title {
+  padding: 0 4px;
+  font-size: clamp(36px, 11vw, 44px);
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  overflow-wrap: anywhere;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.body > * {
+  min-width: 0;
+}
+
+.card {
+  padding: 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cardTitle,
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.teamRow:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-float);
+}
+
+.teamRow:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.tile {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-turquoise-soft);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.teamText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.teamName {
+  overflow-wrap: anywhere;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.arrow {
+  font-size: 26px;
+  color: var(--color-muted);
+}
+
+.empty {
+  padding: 8px 4px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.error {
+  padding: 10px 14px;
+  border-radius: var(--radius-chip);
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Create a team */
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.createRow {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.input:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.primary {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: var(--radius-pill);
+  background: var(--color-pink);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.2s ease;
+}
+
+.primary:active {
+  transform: scale(0.95);
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.primary:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* A team page */
+.members {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.member {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px 0 6px;
+  border-radius: 22px;
+  background: var(--color-chip);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.inviteLink {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  background: var(--color-chip);
+  font-size: 14px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.softButton {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 22px;
+  background: var(--color-pink);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.softButton:active {
+  transform: scale(0.95);
+}
+
+.softButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.quiet {
+  background: var(--color-chip);
+}
+
+.board {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.boardRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.boardRow + .boardRow {
+  box-shadow: inset 0 1px 0 var(--color-chip);
+}
+
+.rank {
+  width: 28px;
+  flex: none;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.boardName {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.boardChips {
+  flex: none;
+  display: flex;
+  gap: 5px;
+}
+
+.sessions {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sessionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.sessionText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sessionName {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.leave {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.backLink {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.06);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.backLink:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+@media (min-width: 900px) {
+  .page {
+    padding: 56px 56px 48px;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: clamp(48px, 6vw, 76px);
+  }
+
+  .body {
+    max-width: 720px;
+  }
+}

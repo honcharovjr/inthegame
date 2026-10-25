@@ -21,7 +21,7 @@ async function LogData() {
   const { profile } = await getProfile();
   const supabase = await createClient();
 
-  const [gamesResult, guestsResult, recentResult] = await Promise.all([
+  const [gamesResult, guestsResult, recentResult, teamsResult] = await Promise.all([
     supabase
       .from("games")
       .select(
@@ -35,10 +35,26 @@ async function LogData() {
       .order("created_at"),
     supabase
       .from("sessions")
-      .select("game_id, session_participants(guest_id)")
+      .select("game_id, team_id, session_participants(guest_id, profile_id)")
       .order("played_at", { ascending: false })
       .limit(30),
+    supabase
+      .from("team_members")
+      .select("teams(id, name, team_members(profile_id, profiles(nickname)))")
+      .eq("profile_id", profile?.id),
   ]);
+
+  // The teams of the player, each with its members.
+  const teams = (teamsResult.data ?? [])
+    .filter((row) => row.teams)
+    .map((row) => ({
+      id: row.teams.id,
+      name: row.teams.name,
+      members: row.teams.team_members.map((member) => ({
+        id: member.profile_id,
+        nickname: member.profiles?.nickname ?? "Player",
+      })),
+    }));
 
   if (!profile || gamesResult.error) {
     return (
@@ -60,6 +76,10 @@ async function LogData() {
   const lastSession = latest
     ? {
         gameId: latest.game_id,
+        teamId: latest.team_id,
+        memberIds: latest.session_participants
+          .map((p) => p.profile_id)
+          .filter((id) => id && id !== profile.id),
         guestIds: latest.session_participants
           .map((p) => p.guest_id)
           .filter(Boolean),
@@ -71,6 +91,7 @@ async function LogData() {
       profile={{ id: profile.id, nickname: profile.nickname }}
       games={gamesResult.data}
       initialGuests={guestsResult.data ?? []}
+      teams={teams}
       recentGameIds={recentGameIds}
       lastSession={lastSession}
     />

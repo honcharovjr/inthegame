@@ -47,6 +47,7 @@ export default function LogFlow({
   profile,
   games: initialGames,
   initialGuests,
+  teams = [],
   recentGameIds,
   lastSession,
 }) {
@@ -66,6 +67,8 @@ export default function LogFlow({
   const [query, setQuery] = useState("");
   const [guests, setGuests] = useState(initialGuests);
   const [selected, setSelected] = useState([]);
+  const [teamId, setTeamId] = useState(null);
+  const [selectedMembers, setSelectedMembers] = useState([]);
   const [guestName, setGuestName] = useState("");
   const [guestError, setGuestError] = useState(null);
 
@@ -84,6 +87,8 @@ export default function LogFlow({
     setGameId(null);
     setQuery("");
     setSelected([]);
+    setTeamId(null);
+    setSelectedMembers([]);
     setGuestName("");
     setGuestError(null);
     setResultType("ranking");
@@ -103,23 +108,46 @@ export default function LogFlow({
 
   const game = games.find((item) => item.id === gameId) ?? null;
 
+  const team = teams.find((item) => item.id === teamId) ?? null;
+  const teammates = team
+    ? team.members.filter((member) => member.id !== profile.id)
+    : [];
+  const chosenMembers = teammates.filter((member) =>
+    selectedMembers.includes(member.id),
+  );
   const chosenGuests = guests.filter((guest) => selected.includes(guest.id));
+  // Order: you, then teammates, then guests. A teammate's key starts with p:.
   const participants = [
     { key: "me", name: profile.nickname, color: playerColor(0) },
+    ...chosenMembers.map((member, index) => ({
+      key: `p:${member.id}`,
+      name: member.nickname,
+      color: playerColor(index + 1),
+    })),
     ...chosenGuests.map((guest, index) => ({
       key: guest.id,
       name: guest.name,
-      color: playerColor(index + 1),
+      color: playerColor(chosenMembers.length + index + 1),
     })),
   ];
 
   const previousGame = previous
     ? games.find((item) => item.id === previous.gameId)
     : null;
+  const previousTeam = previous?.teamId
+    ? teams.find((item) => item.id === previous.teamId)
+    : null;
   const previousNames = previous
-    ? previous.guestIds
-        .map((id) => guests.find((guest) => guest.id === id)?.name)
-        .filter(Boolean)
+    ? [
+        ...(previousTeam
+          ? previous.memberIds.map(
+              (id) => previousTeam.members.find((m) => m.id === id)?.nickname,
+            )
+          : []),
+        ...previous.guestIds.map(
+          (id) => guests.find((guest) => guest.id === id)?.name,
+        ),
+      ].filter(Boolean)
     : [];
 
   const recentGames = recentGameIds
@@ -166,6 +194,19 @@ export default function LogFlow({
         ? current.filter((item) => item !== id)
         : [...current, id],
     );
+  }
+
+  function toggleMember(id) {
+    setSelectedMembers((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id],
+    );
+  }
+
+  function chooseTeam(id) {
+    setTeamId(id);
+    setSelectedMembers([]);
   }
 
   function submitGuest(event) {
@@ -225,13 +266,19 @@ export default function LogFlow({
           participants.map((p) => [p.key, String(pointOf(p.key))]),
         ),
         tiebreak: activeTiebreak,
+        teamId,
       });
       if (result.error) {
         setSaveError(result.error);
         setPhase("idle");
         return;
       }
-      setPrevious({ gameId, guestIds: chosenGuests.map((g) => g.id) });
+      setPrevious({
+        gameId,
+        teamId,
+        memberIds: chosenMembers.map((m) => m.id),
+        guestIds: chosenGuests.map((g) => g.id),
+      });
       setPhase("done");
       router.push("/?saved=1");
       // Fallback if the page stays alive: start over once Home has opened.
@@ -242,12 +289,22 @@ export default function LogFlow({
   // Jump to the result of the same game with the same players.
   function sameAgain() {
     if (!previous || !games.some((item) => item.id === previous.gameId)) return;
-    const ids = previous.guestIds.filter((id) =>
+    const guestIds = previous.guestIds.filter((id) =>
       guests.some((guest) => guest.id === id),
     );
+    const sameTeam = previous.teamId
+      ? teams.find((item) => item.id === previous.teamId)
+      : null;
+    const memberIds = sameTeam
+      ? previous.memberIds.filter((id) =>
+          sameTeam.members.some((member) => member.id === id),
+        )
+      : [];
     setGameId(previous.gameId);
-    setSelected(ids);
-    setOrder(["me", ...ids]);
+    setTeamId(sameTeam ? sameTeam.id : null);
+    setSelectedMembers(memberIds);
+    setSelected(guestIds);
+    setOrder(["me", ...memberIds.map((id) => `p:${id}`), ...guestIds]);
     setTied({});
     setScores({});
     setTiebreak(null);
@@ -403,6 +460,30 @@ export default function LogFlow({
             </Chip>
           </div>
 
+          {teams.length > 0 && (
+            <div className={styles.chips} role="group" aria-label="Team">
+              <button
+                type="button"
+                className={`${styles.chipButton} ${!teamId ? styles.chipOn : ""}`}
+                aria-pressed={!teamId}
+                onClick={() => chooseTeam(null)}
+              >
+                No team
+              </button>
+              {teams.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`${styles.chipButton} ${teamId === item.id ? styles.chipOn : ""}`}
+                  aria-pressed={teamId === item.id}
+                  onClick={() => chooseTeam(item.id)}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className={styles.strip}>
             {participants.map((p) => (
               <div key={p.key} className={styles.stripItem}>
@@ -423,6 +504,36 @@ export default function LogFlow({
                 &#10003;
               </span>
             </li>
+            {teammates.map((member) => {
+              const on = selectedMembers.includes(member.id);
+              const color = on
+                ? participants.find((p) => p.key === `p:${member.id}`)?.color
+                : "#c9bcc8";
+              return (
+                <li key={member.id}>
+                  <button
+                    type="button"
+                    className={`${styles.row} ${styles.rowButton}`}
+                    aria-pressed={on}
+                    onClick={() => toggleMember(member.id)}
+                  >
+                    <Avatar name={member.nickname} size={40} color={color} />
+                    <span className={styles.rowText}>
+                      <span className={styles.rowName}>{member.nickname}</span>
+                    </span>
+                    <Chip size="s" tone="turquoise">
+                      Teammate
+                    </Chip>
+                    <span
+                      className={`${styles.check} ${on ? styles.checkOn : ""}`}
+                      aria-hidden="true"
+                    >
+                      {on ? "\u2713" : ""}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
             {guests.map((guest) => {
               const on = selected.includes(guest.id);
               const color = on

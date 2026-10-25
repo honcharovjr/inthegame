@@ -11,6 +11,7 @@ export default function ConfirmButton({
   message,
   confirmLabel = "Delete",
   ariaLabel = "Delete",
+  triggerLabel,
   action,
 }) {
   const dialogRef = useRef(null);
@@ -40,14 +41,20 @@ export default function ConfirmButton({
 
   return (
     <>
-      <button
-        type="button"
-        className={styles.trash}
-        aria-label={ariaLabel}
-        onClick={open}
-      >
-        <TrashIcon size={18} />
-      </button>
+      {triggerLabel ? (
+        <button type="button" className={styles.textTrigger} onClick={open}>
+          {triggerLabel}
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={styles.trash}
+          aria-label={ariaLabel}
+          onClick={open}
+        >
+          <TrashIcon size={18} />
+        </button>
+      )}
 
       <dialog
         ref={dialogRef}
@@ -84,7 +91,7 @@ export default function ConfirmButton({
               onClick={run}
               disabled={pending}
             >
-              {pending ? "Deleting" : confirmLabel}
+              {pending ? "One moment" : confirmLabel}
             </button>
           </div>
         </div>

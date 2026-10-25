@@ -158,3 +158,30 @@
     opacity: 1;
   }
 }
+
+/* A red text button instead of the trash icon */
+.textTrigger {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 22px;
+  background: var(--color-danger-tint);
+  color: var(--color-danger-ink);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.2s ease;
+}
+
+.textTrigger:hover {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+
+.textTrigger:active {
+  transform: scale(0.96);
+}
+
+.textTrigger:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}

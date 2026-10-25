@@ -14,6 +14,12 @@ function readPassword(formData) {
   return String(formData.get("password") ?? "");
 }
 
+// Where to go after logging in. Only paths inside the app are allowed.
+function readNext(formData) {
+  const next = String(formData.get("next") ?? "");
+  return next.startsWith("/") && !next.startsWith("//") ? next : "/";
+}
+
 async function readOrigin() {
   return (await headers()).get("origin");
 }
@@ -36,7 +42,9 @@ export async function signUp(previousState, formData) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${await readOrigin()}/auth/callback` },
+    options: {
+      emailRedirectTo: `${await readOrigin()}/auth/callback?next=${encodeURIComponent(readNext(formData))}`,
+    },
   });
 
   if (error) {
@@ -48,7 +56,7 @@ export async function signUp(previousState, formData) {
       values: { email },
     };
   }
-  redirect("/");
+  redirect(readNext(formData));
 }
 
 export async function signIn(previousState, formData) {
@@ -65,7 +73,7 @@ export async function signIn(previousState, formData) {
   if (error) {
     return { error: "Wrong email or password.", values: { email } };
   }
-  redirect("/");
+  redirect(readNext(formData));
 }
 
 export async function requestPasswordReset(previousState, formData) {
