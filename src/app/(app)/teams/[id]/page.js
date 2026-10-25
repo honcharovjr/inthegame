@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
@@ -5,7 +6,6 @@ import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
-import { LinkIcon, LinkOffIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -24,6 +24,7 @@ const UUID = /^[0-9a-f-]{36}$/i;
 export default function TeamPage({ params }) {
   return (
     <main className={styles.page}>
+      <BackButton fallback="/teams" />
       <Link href="/teams" className={styles.backLink}>
         All teams
       </Link>
@@ -131,20 +132,7 @@ async function TeamContent({ params }) {
       <section className={styles.card} aria-label="Invite">
         <div className={styles.cardHead}>
           <span className={styles.cardTitle}>Invite friends</span>
-          <span
-            className={`${styles.linkState} ${team.invite_enabled ? styles.linkOn : ""}`}
-            data-tip={
-              team.invite_enabled
-                ? "Invite link is on: anyone with it can join"
-                : "Invite link is off: nobody can join with it"
-            }
-            data-tip-align="end"
-            tabIndex={0}
-            role="img"
-            aria-label={team.invite_enabled ? "Invite link is on" : "Invite link is off"}
-          >
-            {team.invite_enabled ? <LinkIcon size={18} /> : <LinkOffIcon size={18} />}
-          </span>
+          <InviteToggle teamId={team.id} enabled={team.invite_enabled} canEdit={isOwner} />
         </div>
         <div className={styles.invite} style={{ marginTop: 10 }}>
           {team.invite_enabled && (
@@ -154,9 +142,6 @@ async function TeamContent({ params }) {
               </span>
               <CopyLink link={link} />
             </>
-          )}
-          {isOwner && (
-            <InviteToggle teamId={team.id} enabled={team.invite_enabled} />
           )}
         </div>
       </section>

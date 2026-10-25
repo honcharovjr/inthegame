@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import styles from "./TabBar.module.css";
 
 const ICONS = {
@@ -23,20 +24,26 @@ const TABS = [
 ];
 
 // Floating capsule menu with icon tabs. The active tab is a pink circle.
+// A tab lights up the moment it is pressed, not when the next page arrives.
 export default function TabBar() {
   const pathname = usePathname();
+  const [pressed, setPressed] = useState({ href: null, from: null });
+  const shown = pressed.from === pathname && pressed.href ? pressed.href : pathname;
 
   return (
     <nav className={styles.bar} aria-label="Main">
       <div className={styles.brand}>In the Game</div>
       {TABS.map((tab) => {
+        const isLog = tab.id === "log";
         const active =
-          tab.href === "/"
-            ? pathname === "/"
-            : Boolean(tab.href) && pathname.startsWith(tab.href);
+          !isLog &&
+          (tab.href === "/"
+            ? shown === "/"
+            : Boolean(tab.href) && shown.startsWith(tab.href));
         const className = [
           styles.tab,
           active && styles.active,
+          isLog && `${styles.log} btn-primary`,
           !tab.href && styles.soon,
         ]
           .filter(Boolean)
@@ -65,6 +72,7 @@ export default function TabBar() {
             className={className}
             aria-label={tab.label}
             aria-current={active ? "page" : undefined}
+            onClick={() => setPressed({ href: tab.href, from: pathname })}
           >
             {icon}
             {label}

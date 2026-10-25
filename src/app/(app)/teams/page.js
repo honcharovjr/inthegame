@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
@@ -12,6 +13,7 @@ export const metadata = { title: "Teams" };
 export default function TeamsPage() {
   return (
     <main className={styles.page}>
+      <BackButton fallback="/" />
       <h1 className={styles.title}>Teams</h1>
       <Suspense fallback={<TeamsSkeleton />}>
         <TeamList />

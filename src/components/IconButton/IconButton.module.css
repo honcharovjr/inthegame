@@ -37,7 +37,8 @@
 }
 
 .pink {
-  background: var(--color-pink);
+  background: var(--color-pink-deep);
+  color: #ffffff;
 }
 
 .white {

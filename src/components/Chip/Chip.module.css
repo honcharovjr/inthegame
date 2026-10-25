@@ -46,8 +46,8 @@
 
 /* The selected filter */
 .active {
-  background: var(--color-pink);
-  color: var(--color-ink);
+  background: var(--color-pink-deep);
+  color: #ffffff;
 }
 
 a.chip {

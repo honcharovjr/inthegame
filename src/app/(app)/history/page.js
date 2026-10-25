@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
@@ -40,6 +41,7 @@ function pageHref(filters, page) {
 export default function HistoryPage({ searchParams }) {
   return (
     <main className={styles.page}>
+      <BackButton fallback="/" />
       <h1 className={styles.title}>History</h1>
       <Suspense fallback={<HistorySkeleton />}>
         <HistoryList searchParams={searchParams} />

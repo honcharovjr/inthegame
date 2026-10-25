@@ -12,6 +12,9 @@ export default function ConfirmButton({
   confirmLabel = "Delete",
   ariaLabel = "Delete",
   triggerLabel,
+  triggerClassName,
+  icon,
+  tone = "danger",
   action,
 }) {
   const dialogRef = useRef(null);
@@ -42,7 +45,11 @@ export default function ConfirmButton({
   return (
     <>
       {triggerLabel ? (
-        <button type="button" className={`${styles.textTrigger} btn-secondary`} onClick={open}>
+        <button
+          type="button"
+          className={`${triggerClassName ?? styles.textTrigger} btn-secondary`}
+          onClick={open}
+        >
           {triggerLabel}
         </button>
       ) : (
@@ -67,9 +74,9 @@ export default function ConfirmButton({
           if (event.target === event.currentTarget && !pending) close();
         }}
       >
-        <div className={styles.panel}>
+        <div className={`${styles.panel} ${tone === "pink" ? styles.pinkTone : ""}`}>
           <span className={styles.badge} aria-hidden="true">
-            <TrashIcon size={26} />
+            {icon ?? <TrashIcon size={26} />}
           </span>
           <h2 className={styles.title}>{title}</h2>
           {message && <p className={styles.message}>{message}</p>}

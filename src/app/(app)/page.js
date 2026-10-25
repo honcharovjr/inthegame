@@ -6,7 +6,6 @@ import PlayingSince from "@/components/PlayingSince/PlayingSince";
 import ResultBadge from "@/components/ResultBadge/ResultBadge";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Toast from "@/components/Toast/Toast";
-import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
@@ -241,11 +240,6 @@ async function HomeContent({ searchParams }) {
         </section>
       )}
 
-      <form action={signOut} className={styles.logout}>
-        <button type="submit" className={`${styles.signOut} btn-secondary`}>
-          Log out
-        </button>
-      </form>
       </div>
     </>
   );

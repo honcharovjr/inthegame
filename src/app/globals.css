@@ -333,3 +333,44 @@ button {
     transform: none;
   }
 }
+
+/* Adds something that is missing, such as a game: dashed and faint */
+.btn-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  background: none;
+  border: 2px dashed currentColor;
+  opacity: 0.6;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .btn-add:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.35);
+  }
+}
+
+.btn-add:active {
+  transform: scale(0.98);
+}
+
+.btn-add:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* The wrapper that lets a form float over the page below its button */
+.add-anchor {
+  position: relative;
+}

@@ -23,11 +23,23 @@
   align-items: center;
   justify-content: center;
   color: var(--color-muted);
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition: background-color 0.45s ease, color 0.45s ease,
+    box-shadow 0.45s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .tab:active {
   transform: scale(0.9);
+}
+
+.label {
+  transition: color 0.45s ease;
+}
+
+/* Logging is an action, not a place: it is always a filled button */
+.log {
+  background: var(--color-pink-deep);
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(214, 36, 122, 0.35);
 }
 
 .active {
@@ -89,8 +101,18 @@
     font-weight: 700;
   }
 
-  .tab:hover:not(.active):not(.soon) {
+  .tab:hover:not(.active):not(.soon):not(.log) {
     background: rgba(18, 10, 26, 0.06);
+  }
+
+  /* Pinned to the bottom of the menu and set apart from the places above it */
+  .log {
+    order: 99;
+    margin-top: auto;
+    height: 58px;
+    border-radius: 29px;
+    justify-content: center;
+    font-weight: 800;
   }
 
   .label {

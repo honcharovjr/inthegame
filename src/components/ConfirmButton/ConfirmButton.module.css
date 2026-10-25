@@ -153,3 +153,13 @@
   font-size: 15px;
   font-weight: 800;
 }
+
+/* A pop-up for something that is not deleting, such as logging out */
+.pinkTone .badge {
+  background: var(--color-pink-tint);
+  color: var(--color-pink-deep);
+}
+
+.pinkTone .confirm {
+  --btn-bg: var(--color-pink-deep);
+}

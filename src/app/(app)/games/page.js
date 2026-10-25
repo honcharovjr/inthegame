@@ -1,13 +1,13 @@
+import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import GameRow from "@/components/GameRow/GameRow";
-import { SearchIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
 import { GAME_TYPES } from "@/lib/games/types";
 import { createClient } from "@/lib/supabase/server";
 import AddGameButton from "./AddGameButton";
-import PlayersSlider from "./PlayersSlider";
+import GamesToolbar from "./GamesToolbar";
 import styles from "./games.module.css";
 
 export const metadata = { title: "Games" };
@@ -18,6 +18,7 @@ const PLAYER_COUNTS = [1, 2, 3, 4, 5, 6];
 export default function GamesPage({ searchParams }) {
   return (
     <main className={styles.page}>
+      <BackButton fallback="/" />
       <h1 className={styles.title}>Games</h1>
       <Suspense fallback={<CatalogSkeleton />}>
         <Catalog searchParams={searchParams} />
@@ -29,16 +30,7 @@ export default function GamesPage({ searchParams }) {
 function CatalogSkeleton() {
   return (
     <>
-      <div className={styles.toolbar}>
-        <Skeleton height={48} radius={24} />
-        <Skeleton height={78} radius={22} delay={40} />
-      </div>
-      <div className={styles.filters}>
-        <Skeleton width={56} height={32} radius={16} delay={80} />
-        <Skeleton width={72} height={32} radius={16} delay={120} />
-        <Skeleton width={64} height={32} radius={16} delay={160} />
-        <Skeleton width={64} height={32} radius={16} delay={200} />
-      </div>
+      <Skeleton height={150} radius={22} />
       <div className={styles.skeletonList}>
         <Skeleton height={64} radius={22} delay={240} />
         <Skeleton height={64} radius={22} delay={320} />
@@ -116,48 +108,30 @@ async function Catalog({ searchParams }) {
 
   return (
     <div className={`${styles.body} stagger`}>
-<div className={styles.toolbar}>
-      <form method="get" role="search" className={styles.search}>
-        <SearchIcon size={20} />
-        <input
-          className={styles.searchInput}
-          type="search"
-          name="q"
-          defaultValue={filters.q}
-          placeholder="Search games"
-          aria-label="Search games"
-        />
-        {filters.type && <input type="hidden" name="type" value={filters.type} />}
-        {filters.players && (
-          <input type="hidden" name="players" value={filters.players} />
+      <GamesToolbar
+        filters={filters}
+        playerHrefs={[0, ...PLAYER_COUNTS].map((count) =>
+          buildHref(filters, { players: count || null, page: 1 }),
         )}
-      </form>
-
-        <PlayersSlider
-          value={filters.players ?? 0}
-          hrefs={[0, ...PLAYER_COUNTS].map((count) =>
-            buildHref(filters, { players: count || null, page: 1 }),
-          )}
-        />
-      </div>
-
-      <div className={styles.filters} aria-label="Type">
-        <Chip
-          href={buildHref(filters, { type: null, page: 1 })}
-          tone={filters.type ? "white" : "active"}
-        >
-          All
-        </Chip>
-        {GAME_TYPES.map((type) => (
+      >
+        <div className={styles.types} aria-label="Type">
           <Chip
-            key={type.value}
-            href={buildHref(filters, { type: type.value, page: 1 })}
-            tone={filters.type === type.value ? "active" : "white"}
+            href={buildHref(filters, { type: null, page: 1 })}
+            tone={filters.type ? "default" : "active"}
           >
-            {type.label}
+            All
           </Chip>
-        ))}
-      </div>
+          {GAME_TYPES.map((type) => (
+            <Chip
+              key={type.value}
+              href={buildHref(filters, { type: type.value, page: 1 })}
+              tone={filters.type === type.value ? "active" : "default"}
+            >
+              {type.label}
+            </Chip>
+          ))}
+        </div>
+      </GamesToolbar>
 
       <AddGameButton existingNames={existingNames} />
 
