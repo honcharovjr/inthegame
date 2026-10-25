@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import Character from "@/components/Character/Character";
 import Chip from "@/components/Chip/Chip";
@@ -6,11 +7,11 @@ import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default function Home({ searchParams }) {
   return (
     <main className={styles.main}>
       <Suspense fallback={null}>
-        <HomeContent />
+        <HomeContent searchParams={searchParams} />
       </Suspense>
     </main>
   );
@@ -27,8 +28,9 @@ const monthFormat = new Intl.DateTimeFormat("en-GB", {
 });
 
 // Reads the session, so it streams in behind the Suspense boundary.
-async function HomeContent() {
+async function HomeContent({ searchParams }) {
   const user = await requireUser();
+  const { saved } = await searchParams;
   const supabase = await createClient();
 
   const { data: profile, error } = await supabase
@@ -65,13 +67,18 @@ async function HomeContent() {
         </div>
       </section>
 
-      {/* Becomes a link when the log flow ships. */}
-      <div className={styles.logButton} aria-disabled="true">
+      {saved && (
+        <p role="status" className={styles.saved}>
+          Session saved. Nice game.
+        </p>
+      )}
+
+      <Link href="/log" className={styles.logButton}>
         <span>Log a session</span>
         <span className={styles.logPlus} aria-hidden="true">
           +
         </span>
-      </div>
+      </Link>
 
       <form action={signOut}>
         <button type="submit" className={styles.signOut}>

@@ -17,7 +17,7 @@ const ICONS = {
 const TABS = [
   { id: "home", label: "Home", href: "/" },
   { id: "games", label: "Games", href: "/games" },
-  { id: "log", label: "Log a session", href: null },
+  { id: "log", label: "Log a session", href: "/log" },
   { id: "groups", label: "Groups", href: null },
   { id: "profile", label: "Profile", href: null },
 ];
