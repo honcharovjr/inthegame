@@ -7,7 +7,9 @@ import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import FlowShell from "@/components/FlowShell/FlowShell";
 import IconButton from "@/components/IconButton/IconButton";
-import { ClockIcon, PlusIcon, UsersIcon } from "@/components/icons";
+import GameMeta from "@/components/GameMeta/GameMeta";
+import { PlusIcon } from "@/components/icons";
+import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { playerColor } from "@/lib/sessions/colors";
 import { createGuest, saveSession } from "@/lib/sessions/actions";
@@ -20,12 +22,6 @@ const RESULT_TYPES = [
   { value: "ranking", label: "Places" },
   { value: "points", label: "Points" },
 ];
-
-function formatPlayers(game) {
-  return game.min_players === game.max_players
-    ? `${game.min_players}`
-    : `${game.min_players}-${game.max_players}`;
-}
 
 function toneClass(tone) {
   return styles[`tile${tone.charAt(0).toUpperCase()}${tone.slice(1)}`];
@@ -49,7 +45,6 @@ export default function LogFlow({
   games: initialGames,
   initialGuests,
   teams = [],
-  recentGameIds,
   lastSession,
 }) {
   const router = useRouter();
@@ -150,10 +145,6 @@ export default function LogFlow({
         ),
       ].filter(Boolean)
     : [];
-
-  const recentGames = recentGameIds
-    .map((id) => games.find((item) => item.id === id))
-    .filter(Boolean);
 
   const visibleGames = useMemo(() => {
     const text = query.trim().toLowerCase();
@@ -343,6 +334,29 @@ export default function LogFlow({
             />
           </div>
 
+          {!query && previousGame && !addingGame && (
+            <button
+              type="button"
+              className={`${styles.again} btn-primary`}
+              onClick={sameAgain}
+            >
+              <span className={styles.againIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4" />
+                </svg>
+              </span>
+              <span className={styles.againText}>
+                <span className={styles.againTitle}>
+                  Same again: {previousGame.name}
+                </span>
+                <span className={styles.againWho}>
+                  {["You", ...previousNames.slice(0, 3)].join(", ")}
+                  {previousNames.length > 3 ? `, +${previousNames.length - 3}` : ""}
+                </span>
+              </span>
+            </button>
+          )}
+
           {addingGame ? (
             <AddGameForm
               existingNames={games.map((item) => item.name.toLowerCase())}
@@ -359,51 +373,9 @@ export default function LogFlow({
               className={styles.addGame}
               onClick={() => setAddingGame(true)}
             >
-              Can&apos;t find it? Add your own game
+              <PlusIcon size={16} />
+              Add custom game
             </button>
-          )}
-
-          {!query && previousGame && (
-            <button
-              type="button"
-              className={`${styles.row} ${styles.rowButton} ${styles.again}`}
-              onClick={sameAgain}
-            >
-              <span className={styles.againIcon} aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4" />
-                </svg>
-              </span>
-              <span className={styles.rowText}>
-                <span className={styles.rowName}>Same again</span>
-                <span className={styles.chips}>
-                  <Chip size="s" tone="yellow">{previousGame.name}</Chip>
-                  <Chip size="s">You</Chip>
-                  {previousNames.slice(0, 3).map((name) => (
-                    <Chip key={name} size="s">{name}</Chip>
-                  ))}
-                  {previousNames.length > 3 && (
-                    <Chip size="s">+{previousNames.length - 3}</Chip>
-                  )}
-                </span>
-              </span>
-            </button>
-          )}
-
-          {!query && recentGames.length > 0 && (
-            <div className={styles.chips} aria-label="Recent games">
-              <Chip tone="white">Recent</Chip>
-              {recentGames.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={styles.chipButton}
-                  onClick={() => pickGame(item.id)}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
           )}
 
           {visibleGames.length === 0 && (
@@ -420,28 +392,19 @@ export default function LogFlow({
                     className={`${styles.row} ${styles.rowButton} ${gameId === item.id ? styles.rowOn : ""}`}
                     onClick={() => pickGame(item.id)}
                   >
-                    <div className={`${styles.tile} ${toneClass(type.tone)}`}>
-                      {item.name.charAt(0).toUpperCase()}
+                    <div className={`${styles.tile} ${toneClass(type.tone)}`} aria-hidden="true">
+                      {gameEmoji(item)}
                     </div>
                     <div className={styles.rowText}>
                       <div className={styles.rowName}>{item.name}</div>
-                      <div className={styles.chips}>
-                        <Chip size="s">
-                          <UsersIcon />
-                          {formatPlayers(item)}
-                        </Chip>
-                        {item.typical_duration_min && (
-                          <Chip size="s">
-                            <ClockIcon />
-                            {item.typical_duration_min} min
-                          </Chip>
-                        )}
-                        {item.is_classic && (
+                      <GameMeta game={item} />
+                      {item.is_classic && (
+                        <div className={styles.chips}>
                           <Chip size="s" tone="turquoise">
                             Classic
                           </Chip>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </button>
                 </li>

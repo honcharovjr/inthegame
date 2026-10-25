@@ -107,7 +107,8 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  font-size: 18px;
+  font-size: 22px;
+  line-height: 1;
   font-weight: 800;
   color: var(--color-ink);
 }
@@ -550,6 +551,36 @@
   padding: 22px 18px;
 }
 
+.skeletonSide,
+.skeletonMain {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Same two-column shape as the real page on desktop */
+@media (min-width: 900px) {
+  .skeletonPage {
+    align-items: flex-start;
+  }
+
+  .skeletonColumn {
+    max-width: 1160px;
+    display: grid;
+    grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr);
+    column-gap: 80px;
+    padding: 56px 56px 48px;
+  }
+
+  .skeletonSide {
+    gap: 16px;
+  }
+
+  .skeletonMain {
+    max-width: 680px;
+  }
+}
+
 .fallback {
   min-height: 100dvh;
   padding: 22px 18px;
@@ -595,44 +626,90 @@
   font-weight: 800;
 }
 
-/* Play the previous game again with the same players */
+/* Play the previous game again with the same players. One compact line. */
 .again {
-  background: var(--color-yellow);
-  box-shadow: var(--shadow-button);
+  --btn-bg: var(--color-yellow);
+  --btn-ink: var(--color-ink);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px 7px 7px;
+  border-radius: var(--radius-pill);
+  text-align: left;
 }
 
 .againIcon {
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   flex: none;
-  border-radius: 14px;
+  border-radius: 50%;
   background: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* A way to add a game that is not in the catalog */
+.againText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.againTitle,
+.againWho {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.againTitle {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.againWho {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+/* A way to add a game that is not in the catalog. Dashed and faint, because
+   it adds something that is missing. */
 .addGame {
-  align-self: flex-start;
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 19px;
-  background: var(--color-surface);
-  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.06);
-  font-size: 14px;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  background: none;
+  border: 2px dashed currentColor;
+  opacity: 0.6;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .addGame:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.35);
+  }
 }
 
 .addGame:active {
-  transform: scale(0.96);
+  transform: scale(0.98);
 }
 
 .addGame:focus-visible {
   outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 /* The chosen team */

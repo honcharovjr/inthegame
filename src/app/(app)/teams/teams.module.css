@@ -82,7 +82,8 @@
   align-items: center;
   justify-content: center;
   background: var(--color-turquoise-soft);
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1;
   font-weight: 800;
 }
 

@@ -8,6 +8,7 @@ import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import { LinkIcon, LinkOffIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
+import { gameEmoji } from "@/lib/games/emoji";
 import { playerColor } from "@/lib/sessions/colors";
 import { teamLeaderboard } from "@/lib/stats/leaderboard";
 import { leaveTeam } from "@/lib/teams/actions";
@@ -69,7 +70,7 @@ async function TeamContent({ params }) {
     supabase
       .from("sessions")
       .select(
-        "id, played_at, games(name), session_participants(place, profile_id, profiles(nickname), guests(name))",
+        "id, played_at, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
       )
       .eq("team_id", id)
       .order("played_at", { ascending: false })
@@ -200,7 +201,7 @@ async function TeamContent({ params }) {
               return (
                 <li key={session.id} className={styles.sessionRow}>
                   <span className={styles.tile} aria-hidden="true">
-                    {(session.games?.name ?? "G").charAt(0).toUpperCase()}
+                    {gameEmoji(session.games)}
                   </span>
                   <span className={styles.sessionText}>
                     <span className={styles.sessionName}>

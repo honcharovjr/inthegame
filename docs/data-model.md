@@ -70,6 +70,7 @@ The catalog (FR-06) and custom games (FR-09).
 | min_players | smallint, not null | |
 | max_players | smallint, not null | Check: not less than `min_players` |
 | typical_duration_min | smallint | Optional |
+| emoji | text | Optional. One emoji for the game tile, up to 8 characters. Null means the app uses a default for the type |
 | created_by | uuid | Null for catalog games, otherwise the author. References `profiles(id)` |
 | created_at | timestamptz, not null | Default `now()` |
 

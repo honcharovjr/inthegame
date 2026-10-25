@@ -126,3 +126,35 @@
   cursor: default;
 }
 
+
+.emojis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 6px;
+}
+
+.emoji {
+  height: 42px;
+  border-radius: 14px;
+  background: var(--color-chip);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+@media (hover: hover) {
+  .emoji:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.emojiOn {
+  background: var(--color-pink-soft);
+  box-shadow: 0 0 0 3px var(--color-pink);
+}
+
+.emoji:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}

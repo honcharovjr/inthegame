@@ -8,6 +8,7 @@ import Skeleton from "@/components/Skeleton/Skeleton";
 import Toast from "@/components/Toast/Toast";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
+import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
 import { createClient } from "@/lib/supabase/server";
@@ -72,13 +73,13 @@ async function HomeContent({ searchParams }) {
         supabase
           .from("sessions")
           .select(
-            "id, played_at, games(name, type), session_participants(place, profile_id, profiles(nickname), guests(name))",
+            "id, played_at, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
           )
           .order("played_at", { ascending: false })
           .limit(3),
         supabase
           .from("ratings")
-          .select("rating, games_count, games(name, type)")
+          .select("rating, games_count, games(name, type, emoji)")
           .eq("profile_id", profile.id)
           .order("rating", { ascending: false })
           .limit(4),
@@ -88,6 +89,7 @@ async function HomeContent({ searchParams }) {
   const ratings = (ratingResult.data ?? []).map((row, index) => ({
     id: `${row.games?.name}-${index}`,
     game: row.games?.name ?? "Game",
+    emoji: gameEmoji(row.games),
     tone: findGameType(row.games?.type).tone,
     rating: Math.round(Number(row.rating)),
     games: row.games_count,
@@ -111,6 +113,7 @@ async function HomeContent({ searchParams }) {
       id: session.id,
       playedAt: session.played_at,
       game: session.games?.name ?? "Game",
+      emoji: gameEmoji(session.games),
       tone: findGameType(session.games?.type).tone,
       others,
       result: resultLabel(mine?.place ?? 0, session.session_participants.length),
@@ -176,7 +179,7 @@ async function HomeContent({ searchParams }) {
             {ratings.map((item) => (
               <li key={item.id} className={styles.recentRow}>
                 <span className={`${styles.tile} ${styles[`tile_${item.tone}`]}`}>
-                  {item.game.charAt(0).toUpperCase()}
+                  {item.emoji}
                 </span>
                 <span className={styles.recentText}>
                   <span className={styles.recentName}>{item.game}</span>
@@ -209,7 +212,7 @@ async function HomeContent({ searchParams }) {
             {recent.map((session) => (
               <li key={session.id} className={styles.recentRow}>
                 <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
-                  {session.game.charAt(0).toUpperCase()}
+                  {session.emoji}
                 </span>
                 <span className={styles.recentText}>
                   <span className={styles.recentName}>{session.game}</span>
