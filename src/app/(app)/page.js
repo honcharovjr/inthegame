@@ -2,15 +2,15 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Character from "@/components/Character/Character";
 import Chip from "@/components/Chip/Chip";
+import Skeleton from "@/components/Skeleton/Skeleton";
 import { signOut } from "@/lib/auth/actions";
-import { requireUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile } from "@/lib/auth/session";
 import styles from "./page.module.css";
 
 export default function Home({ searchParams }) {
   return (
     <main className={styles.main}>
-      <Suspense fallback={null}>
+      <Suspense fallback={<HomeSkeleton />}>
         <HomeContent searchParams={searchParams} />
       </Suspense>
     </main>
@@ -27,20 +27,32 @@ const monthFormat = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
 });
 
-// Reads the session, so it streams in behind the Suspense boundary.
-async function HomeContent({ searchParams }) {
-  const user = await requireUser();
-  const { saved } = await searchParams;
-  const supabase = await createClient();
-
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("nickname, created_at")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
+function HomeSkeleton() {
   return (
     <>
+      <div className={styles.header}>
+        <Skeleton width={150} height={14} />
+        <Skeleton width={220} height={36} style={{ marginTop: 8 }} />
+      </div>
+      <div className={styles.card}>
+        <Skeleton width={96} height={96} radius={28} />
+        <div className={styles.identity}>
+          <Skeleton width={140} height={30} />
+          <Skeleton width={170} height={28} radius={14} />
+        </div>
+      </div>
+      <Skeleton height={58} radius={29} />
+    </>
+  );
+}
+
+// Reads the session, so it streams in behind the Suspense boundary.
+async function HomeContent({ searchParams }) {
+  const { saved } = await searchParams;
+  const { profile, error } = await getProfile();
+
+  return (
+    <div className={styles.content}>
       <header className={styles.header}>
         <div className={styles.date}>{dateFormat.format(new Date())}</div>
         <h1 className={styles.title}>Hey, {profile?.nickname ?? "player"}</h1>
@@ -85,6 +97,6 @@ async function HomeContent({ searchParams }) {
           Log out
         </button>
       </form>
-    </>
+    </div>
   );
 }

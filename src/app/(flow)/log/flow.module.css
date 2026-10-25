@@ -52,7 +52,44 @@
   list-style: none;
 }
 
-a.row:focus-visible {
+/* Rows that are buttons look like the plain rows */
+.rowButton {
+  width: 100%;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.rowButton:active {
+  transform: scale(0.98);
+}
+
+.rowButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* A chip that starts the flow for a recent game */
+.chipButton {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-chip);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.06);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.chipButton:active {
+  transform: scale(0.95);
+}
+
+.chipButton:focus-visible {
   outline: 3px solid var(--color-ink);
   outline-offset: 2px;
 }
@@ -122,6 +159,7 @@ a.row:focus-visible {
 
 .checkOn {
   background: var(--color-pink);
+  animation: pop 0.25s ease both;
 }
 
 .strip {
@@ -207,6 +245,15 @@ a.row:focus-visible {
   cursor: default;
 }
 
+.cta:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: scale(0.98);
+}
+
+.cta {
+  border: 0;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
 .cta:focus-visible {
   outline: 3px solid var(--color-ink);
   outline-offset: 3px;
@@ -272,4 +319,27 @@ a.row:focus-visible {
   width: 28px;
   height: 28px;
   accent-color: var(--color-pink-deep);
+}
+
+/* Loading and error states of the log page */
+.skeletonPage {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  background: var(--color-turquoise);
+}
+
+.skeletonColumn {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 18px;
+}
+
+.fallback {
+  min-height: 100dvh;
+  padding: 22px 18px;
+  background: var(--color-turquoise);
 }

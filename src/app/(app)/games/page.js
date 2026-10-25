@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import GameRow from "@/components/GameRow/GameRow";
 import { SearchIcon } from "@/components/icons";
+import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
 import { GAME_TYPES } from "@/lib/games/types";
 import { createClient } from "@/lib/supabase/server";
@@ -16,10 +17,30 @@ export default function GamesPage({ searchParams }) {
   return (
     <main className={styles.page}>
       <h1 className={styles.title}>Games</h1>
-      <Suspense fallback={null}>
+      <Suspense fallback={<CatalogSkeleton />}>
         <Catalog searchParams={searchParams} />
       </Suspense>
     </main>
+  );
+}
+
+function CatalogSkeleton() {
+  return (
+    <>
+      <Skeleton height={48} radius={24} />
+      <div className={styles.filters}>
+        <Skeleton width={56} height={32} radius={16} />
+        <Skeleton width={72} height={32} radius={16} />
+        <Skeleton width={64} height={32} radius={16} />
+        <Skeleton width={64} height={32} radius={16} />
+      </div>
+      <div className={styles.list}>
+        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
+        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
+        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
+        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
+      </div>
+    </>
   );
 }
 

@@ -28,8 +28,9 @@ export async function proxy(request) {
     },
   });
 
-  // Refreshes the session when it has expired.
-  await supabase.auth.getUser();
+  // Refreshes the session when it has expired. getClaims verifies the login
+  // token locally, so it avoids a round trip to Supabase on most requests.
+  await supabase.auth.getClaims();
 
   return response;
 }

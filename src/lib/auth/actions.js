@@ -23,11 +23,12 @@ export async function signUp(previousState, formData) {
   const password = readPassword(formData);
 
   if (!email) {
-    return { error: "Enter your email." };
+    return { error: "Enter your email.", values: { email } };
   }
   if (password.length < MIN_PASSWORD_LENGTH) {
     return {
       error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
+      values: { email },
     };
   }
 
@@ -39,10 +40,13 @@ export async function signUp(previousState, formData) {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: error.message, values: { email } };
   }
   if (!data.session) {
-    return { notice: "Check your email to confirm your account." };
+    return {
+      notice: "Check your email to confirm your account.",
+      values: { email },
+    };
   }
   redirect("/");
 }
@@ -52,14 +56,14 @@ export async function signIn(previousState, formData) {
   const password = readPassword(formData);
 
   if (!email || !password) {
-    return { error: "Enter your email and password." };
+    return { error: "Enter your email and password.", values: { email } };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: "Wrong email or password." };
+    return { error: "Wrong email or password.", values: { email } };
   }
   redirect("/");
 }
@@ -68,7 +72,7 @@ export async function requestPasswordReset(previousState, formData) {
   const email = readEmail(formData);
 
   if (!email) {
-    return { error: "Enter your email." };
+    return { error: "Enter your email.", values: { email } };
   }
 
   const supabase = await createClient();
@@ -77,7 +81,10 @@ export async function requestPasswordReset(previousState, formData) {
   });
 
   // Same answer whether or not the email has an account.
-  return { notice: "If that email has an account, a reset link is on its way." };
+  return {
+    notice: "If that email has an account, a reset link is on its way.",
+    values: { email },
+  };
 }
 
 export async function updatePassword(previousState, formData) {

@@ -50,6 +50,14 @@
   color: var(--color-ink);
 }
 
+a.chip {
+  transition: transform 0.15s ease;
+}
+
+a.chip:active {
+  transform: scale(0.95);
+}
+
 a.chip:focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;

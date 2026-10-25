@@ -1,15 +1,31 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 // Returns the signed-in user, or sends the visitor to the log in page.
-export async function requireUser() {
+// getClaims checks the signed login token on the server without a network
+// call to Supabase Auth, so it is much faster than getUser. The proxy has
+// already refreshed an expired token. Cached per request.
+export const requireUser = cache(async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
 
-  if (!user) {
+  if (error || !claims?.sub) {
     redirect("/login");
   }
-  return user;
-}
+  return { id: claims.sub };
+});
+
+// The signed-in player's profile. Cached per request, so several parts of
+// one page share a single database read.
+export const getProfile = cache(async () => {
+  const user = await requireUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, nickname, created_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  return { profile: data, error };
+});

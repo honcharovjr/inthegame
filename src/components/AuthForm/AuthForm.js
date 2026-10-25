@@ -32,6 +32,10 @@ export default function AuthForm({
             type={field.type}
             autoComplete={field.autoComplete}
             placeholder={field.placeholder}
+            // Keep what was typed after a failed try, except passwords.
+            defaultValue={
+              field.type === "password" ? undefined : state?.values?.[field.name]
+            }
             required
           />
         </div>
