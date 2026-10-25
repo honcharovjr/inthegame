@@ -31,8 +31,9 @@
 }
 
 .active {
-  background: var(--color-pink);
-  color: var(--color-ink);
+  background: var(--color-pink-deep);
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(214, 36, 122, 0.35);
 }
 
 .soon {
@@ -40,7 +41,7 @@
 }
 
 .tab:focus-visible {
-  outline: 2px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 

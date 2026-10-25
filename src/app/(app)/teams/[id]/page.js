@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
+import { LinkIcon, LinkOffIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { playerColor } from "@/lib/sessions/colors";
@@ -129,9 +130,20 @@ async function TeamContent({ params }) {
       <section className={styles.card} aria-label="Invite">
         <div className={styles.cardHead}>
           <span className={styles.cardTitle}>Invite friends</span>
-          <Chip size="s" tone={team.invite_enabled ? "turquoise" : "default"}>
-            {team.invite_enabled ? "Link is on" : "Link is off"}
-          </Chip>
+          <span
+            className={`${styles.linkState} ${team.invite_enabled ? styles.linkOn : ""}`}
+            data-tip={
+              team.invite_enabled
+                ? "Invite link is on: anyone with it can join"
+                : "Invite link is off: nobody can join with it"
+            }
+            data-tip-align="end"
+            tabIndex={0}
+            role="img"
+            aria-label={team.invite_enabled ? "Invite link is on" : "Invite link is off"}
+          >
+            {team.invite_enabled ? <LinkIcon size={18} /> : <LinkOffIcon size={18} />}
+          </span>
         </div>
         <div className={styles.invite} style={{ marginTop: 10 }}>
           {team.invite_enabled && (

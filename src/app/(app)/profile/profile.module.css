@@ -33,8 +33,7 @@
   box-shadow: var(--shadow-card);
 }
 
-.card:has(.cardHead),
-.card:has(.nicknameForm) {
+.card:has(.cardHead) {
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
@@ -72,21 +71,24 @@
 }
 
 /* Nickname */
-.nicknameForm {
+.nameRow {
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 
-.nicknameRow {
+.nicknameForm {
+  width: 100%;
   display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
 .input {
   flex: 1;
   min-width: 0;
-  height: 48px;
+  height: 44px;
   padding: 0 18px;
   border: 0;
   border-radius: var(--radius-pill);
@@ -95,26 +97,13 @@
   font-size: 16px;
   font-weight: 700;
   color: var(--color-ink);
+  transition: box-shadow 0.2s ease;
 }
 
 .input:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-focus);
 }
-
-.save {
-  height: 48px;
-  padding: 0 22px;
-  border-radius: var(--radius-pill);
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.save:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
 
 .message {
   padding: 8px 14px;

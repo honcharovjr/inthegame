@@ -26,6 +26,9 @@
   --color-yellow-ink: #7a6200;
   --color-violet-ink: #4a3d8f;
 
+  /* Confirming */
+  --color-success: #1fae6b;
+
   /* Warnings and deleting */
   --color-danger: #e5243b;
   --color-danger-tint: #ffe3e7;

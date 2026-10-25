@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
+import PlayingSince from "@/components/PlayingSince/PlayingSince";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
@@ -28,16 +29,10 @@ function ProfileSkeleton() {
   return (
     <div className={styles.body}>
       <Skeleton height={120} radius={22} />
-      <Skeleton height={110} radius={22} delay={80} />
-      <Skeleton height={150} radius={22} delay={160} />
+      <Skeleton height={150} radius={22} delay={80} />
     </div>
   );
 }
-
-const monthFormat = new Intl.DateTimeFormat("en-GB", {
-  month: "long",
-  year: "numeric",
-});
 
 // Reads the session and the database, so it streams in behind Suspense.
 async function ProfileContent() {
@@ -54,17 +49,9 @@ async function ProfileContent() {
       <section className={styles.card} aria-label="You">
         <Avatar name={profile?.nickname} size={72} color="#ff4fa3" />
         <div className={styles.identity}>
-          <div className={styles.name}>{profile?.nickname}</div>
-          {profile?.created_at && (
-            <Chip>
-              Playing since {monthFormat.format(new Date(profile.created_at))}
-            </Chip>
-          )}
+          <NicknameForm nickname={profile?.nickname ?? ""} />
+          {profile?.created_at && <PlayingSince date={profile.created_at} />}
         </div>
-      </section>
-
-      <section className={styles.card} aria-label="Nickname">
-        <NicknameForm nickname={profile?.nickname ?? ""} />
       </section>
 
       <section className={styles.card} aria-label="Your guests">

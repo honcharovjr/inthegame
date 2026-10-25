@@ -331,3 +331,27 @@
     max-width: 720px;
   }
 }
+
+/* The state of the invite link: an icon, with the words as a tooltip */
+.linkState {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-chip);
+  color: var(--color-muted);
+  cursor: help;
+}
+
+.linkOn {
+  background: var(--color-turquoise-tint);
+  color: var(--color-turquoise-ink);
+}
+
+.linkState:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}

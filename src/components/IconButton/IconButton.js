@@ -2,7 +2,7 @@ import styles from "./IconButton.module.css";
 
 // A round button with just an icon. The label is the tooltip on hover or focus
 // and the name that screen readers read.
-// tone: default | pink | white. tipAlign: center | end (for the right edge).
+// tone: default | pink | white | green. tipAlign: center | end (for the right edge).
 export default function IconButton({
   icon,
   label,

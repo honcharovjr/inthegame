@@ -108,12 +108,6 @@
   justify-content: space-between;
 }
 
-.numbers {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 14px 22px;
-}
 
 .number {
   font-size: clamp(28px, 8vw, 34px);
@@ -122,12 +116,6 @@
   line-height: 1;
 }
 
-.numberLabel {
-  margin-top: 4px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-muted);
-}
 
 /* A highlighter stroke behind the number */
 .mark {
@@ -144,13 +132,7 @@
   --mark: var(--color-yellow);
 }
 
-.markPink {
-  --mark: var(--color-pink-soft);
-}
 
-.markTurquoise {
-  --mark: var(--color-turquoise-soft);
-}
 
 /* Recent sessions */
 .recent {
@@ -284,16 +266,26 @@
   box-shadow: var(--shadow-card);
 }
 
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaLabel {
+  margin: 0 2px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
 .panelTop {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.divider {
-  height: 1px;
-  background: var(--color-chip);
-}
 
 .logButton {
   flex: none;
@@ -340,10 +332,5 @@
   .logPlus {
     width: 40px;
     height: 40px;
-  }
-
-  .numbers {
-    gap: 14px 56px;
-    justify-content: flex-start;
   }
 }
