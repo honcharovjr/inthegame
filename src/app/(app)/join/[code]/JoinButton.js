@@ -20,7 +20,7 @@ export default function JoinButton({ code }) {
     <>
       <button
         type="button"
-        className={styles.primary}
+        className={`${styles.primary} btn-primary`}
         onClick={join}
         disabled={pending}
       >

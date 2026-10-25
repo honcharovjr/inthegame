@@ -69,7 +69,7 @@
 }
 
 .teamRow:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -82,7 +82,8 @@
   align-items: center;
   justify-content: center;
   background: var(--color-turquoise-soft);
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1;
   font-weight: 800;
 }
 
@@ -158,7 +159,7 @@
 }
 
 .input:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -166,15 +167,8 @@
   height: 48px;
   padding: 0 22px;
   border-radius: var(--radius-pill);
-  background: var(--color-pink);
   font-size: 15px;
   font-weight: 800;
-  cursor: pointer;
-  transition: transform 0.12s ease, opacity 0.2s ease;
-}
-
-.primary:active {
-  transform: scale(0.95);
 }
 
 .primary:disabled {
@@ -182,10 +176,6 @@
   cursor: default;
 }
 
-.primary:focus-visible {
-  outline: 3px solid var(--color-ink);
-  outline-offset: 2px;
-}
 
 /* A team page */
 .members {
@@ -324,7 +314,7 @@
 }
 
 .backLink:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -341,4 +331,28 @@
   .body {
     max-width: 720px;
   }
+}
+
+/* The state of the invite link: an icon, with the words as a tooltip */
+.linkState {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-chip);
+  color: var(--color-muted);
+  cursor: help;
+}
+
+.linkOn {
+  background: var(--color-turquoise-tint);
+  color: var(--color-turquoise-ink);
+}
+
+.linkState:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }

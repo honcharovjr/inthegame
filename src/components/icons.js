@@ -105,3 +105,43 @@ export function ResetIcon(props) {
     </Icon>
   );
 }
+
+export function AlertIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7.5v5.5M12 16.4v.1" />
+    </Icon>
+  );
+}
+
+export function CalendarIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 5 5zM3.5 10h17M8 3v4M16 3v4" />
+    </Icon>
+  );
+}
+
+export function PenIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19l-4 1zM14.5 6.5l3 3" />
+    </Icon>
+  );
+}
+
+export function CloseIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </Icon>
+  );
+}
+
+export function TrophyIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4" />
+    </Icon>
+  );
+}

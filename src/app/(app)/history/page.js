@@ -3,6 +3,7 @@ import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
+import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { deleteSession } from "@/lib/sessions/actions";
 import { resultLabel } from "@/lib/stats/month";
@@ -80,7 +81,7 @@ async function HistoryList({ searchParams }) {
   let query = supabase
     .from("sessions")
     .select(
-      `id, played_at, created_by, games(name, type), session_participants(place, profile_id, profiles(nickname), guests(name))${
+      `id, played_at, created_by, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))${
         byResult ? ", mine:session_participants!inner(place)" : ""
       }`,
       { count: "exact" },
@@ -111,6 +112,7 @@ async function HistoryList({ searchParams }) {
       playedAt: session.played_at,
       mine: session.created_by === profile?.id,
       game: session.games?.name ?? "Game",
+      emoji: gameEmoji(session.games),
       tone: findGameType(session.games?.type).tone,
       others: people
         .filter((p) => p.profile_id !== profile?.id)
@@ -142,7 +144,7 @@ async function HistoryList({ searchParams }) {
         {sessions.map((session) => (
           <li key={session.id} className={styles.row}>
             <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
-              {session.game.charAt(0).toUpperCase()}
+              {session.emoji}
             </span>
             <span className={styles.text}>
               <span className={styles.name}>{session.game}</span>

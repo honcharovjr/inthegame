@@ -25,7 +25,7 @@ async function LogData() {
     supabase
       .from("games")
       .select(
-        "id, name, type, is_classic, min_players, max_players, typical_duration_min",
+        "id, name, type, emoji, is_classic, min_players, max_players, typical_duration_min",
       )
       .order("name"),
     supabase
@@ -37,7 +37,7 @@ async function LogData() {
       .from("sessions")
       .select("game_id, team_id, session_participants(guest_id, profile_id)")
       .order("played_at", { ascending: false })
-      .limit(30),
+      .limit(1),
     supabase
       .from("team_members")
       .select("teams(id, name, team_members(profile_id, profiles(nickname)))")
@@ -66,11 +66,6 @@ async function LogData() {
     );
   }
 
-  // The player's latest games, newest first, without repeats.
-  const recentGameIds = [
-    ...new Set((recentResult.data ?? []).map((row) => row.game_id)),
-  ].slice(0, 4);
-
   // The latest session, so the flow can offer to play it again.
   const latest = recentResult.data?.[0];
   const lastSession = latest
@@ -92,7 +87,6 @@ async function LogData() {
       games={gamesResult.data}
       initialGuests={guestsResult.data ?? []}
       teams={teams}
-      recentGameIds={recentGameIds}
       lastSession={lastSession}
     />
   );
@@ -102,13 +96,18 @@ function LogSkeleton() {
   return (
     <main className={styles.skeletonPage}>
       <div className={styles.skeletonColumn}>
-        <Skeleton tone="light" width={44} height={44} radius={22} />
-        <Skeleton tone="light" height={6} radius={3} delay={60} />
-        <Skeleton tone="light" width={220} height={110} radius={20} delay={120} />
-        <Skeleton tone="light" height={54} radius={27} delay={200} />
-        <Skeleton tone="light" height={78} radius={24} delay={280} />
-        <Skeleton tone="light" height={78} radius={24} delay={360} />
-        <Skeleton tone="light" height={78} radius={24} delay={440} />
+        <div className={styles.skeletonSide}>
+          <Skeleton tone="light" width={44} height={44} radius={22} />
+          <Skeleton tone="light" height={6} radius={3} delay={60} />
+          <Skeleton tone="light" width={220} height={110} radius={20} delay={120} />
+        </div>
+        <div className={styles.skeletonMain}>
+          <Skeleton tone="light" height={54} radius={27} delay={200} />
+          <Skeleton tone="light" height={50} radius={25} delay={240} />
+          <Skeleton tone="light" height={78} radius={24} delay={280} />
+          <Skeleton tone="light" height={78} radius={24} delay={360} />
+          <Skeleton tone="light" height={78} radius={24} delay={440} />
+        </div>
       </div>
     </main>
   );

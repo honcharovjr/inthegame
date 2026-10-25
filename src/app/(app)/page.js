@@ -2,10 +2,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
+import PlayingSince from "@/components/PlayingSince/PlayingSince";
+import ResultBadge from "@/components/ResultBadge/ResultBadge";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Toast from "@/components/Toast/Toast";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
+import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
 import { createClient } from "@/lib/supabase/server";
@@ -26,10 +29,6 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "long",
 });
-const monthFormat = new Intl.DateTimeFormat("en-GB", {
-  month: "long",
-  year: "numeric",
-});
 const shortDate = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -47,8 +46,7 @@ function HomeSkeleton() {
           <Skeleton width={64} height={64} radius={32} delay={160} />
           <div className={styles.identity}>
             <Skeleton width={140} height={26} delay={220} />
-            <Skeleton width={150} height={26} radius={13} delay={280} />
-          </div>
+            </div>
           <Skeleton width={96} height={48} radius={24} delay={340} />
         </div>
         <Skeleton height={64} radius={16} delay={400} />
@@ -75,13 +73,13 @@ async function HomeContent({ searchParams }) {
         supabase
           .from("sessions")
           .select(
-            "id, played_at, games(name, type), session_participants(place, profile_id, profiles(nickname), guests(name))",
+            "id, played_at, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
           )
           .order("played_at", { ascending: false })
           .limit(3),
         supabase
           .from("ratings")
-          .select("rating, games_count, games(name, type)")
+          .select("rating, games_count, games(name, type, emoji)")
           .eq("profile_id", profile.id)
           .order("rating", { ascending: false })
           .limit(4),
@@ -91,6 +89,7 @@ async function HomeContent({ searchParams }) {
   const ratings = (ratingResult.data ?? []).map((row, index) => ({
     id: `${row.games?.name}-${index}`,
     game: row.games?.name ?? "Game",
+    emoji: gameEmoji(row.games),
     tone: findGameType(row.games?.type).tone,
     rating: Math.round(Number(row.rating)),
     games: row.games_count,
@@ -114,10 +113,12 @@ async function HomeContent({ searchParams }) {
       id: session.id,
       playedAt: session.played_at,
       game: session.games?.name ?? "Game",
+      emoji: gameEmoji(session.games),
       tone: findGameType(session.games?.type).tone,
       others,
       result: resultLabel(mine?.place ?? 0, session.session_participants.length),
-      won: mine?.place === 1 && session.session_participants.length >= 2,
+      place: mine?.place ?? 0,
+      players: session.session_participants.length,
     };
   });
 
@@ -141,13 +142,8 @@ async function HomeContent({ searchParams }) {
           <Avatar name={profile?.nickname} size={64} color="#ff4fa3" />
           <div className={styles.identity}>
             <div className={styles.name}>{profile?.nickname}</div>
-            {profile?.created_at && (
-              <Chip>
-                Playing since {monthFormat.format(new Date(profile.created_at))}
-              </Chip>
-            )}
           </div>
-          <Link href="/log" className={styles.logButton} aria-label="Log a session">
+          <Link href="/log" className={`${styles.logButton} btn-primary`} aria-label="Log a session">
             <span>Log</span>
             <span className={styles.logPlus} aria-hidden="true">
               +
@@ -155,41 +151,25 @@ async function HomeContent({ searchParams }) {
           </Link>
         </div>
 
-        <div className={styles.divider} aria-hidden="true" />
-
-        <div className={styles.cardTitle}>This month</div>
-        {stats.played === 0 ? (
-          <div>
+        <div className={styles.meta}>
+          {profile?.created_at && <PlayingSince date={profile.created_at} />}
+          {stats.played === 0 ? (
             <Chip>No sessions yet this month</Chip>
-          </div>
-        ) : (
-          <div className={styles.numbers}>
-            <div>
-              <div className={styles.number}>
-                <span className={`${styles.mark} ${styles.markYellow}`}>
-                  {stats.wins}
-                </span>
-              </div>
-              <div className={styles.numberLabel}>wins</div>
-            </div>
-            <div>
-              <div className={styles.number}>
-                <span className={`${styles.mark} ${styles.markPink}`}>
-                  {stats.played}
-                </span>
-              </div>
-              <div className={styles.numberLabel}>sessions</div>
-            </div>
-            <div>
-              <div className={styles.number}>
-                <span className={`${styles.mark} ${styles.markTurquoise}`}>
-                  {stats.winRate === null ? "n/a" : `${stats.winRate}%`}
-                </span>
-              </div>
-              <div className={styles.numberLabel}>win rate</div>
-            </div>
-          </div>
-        )}
+          ) : (
+            <>
+              <span className={styles.metaLabel}>This month</span>
+              <Chip tone="yellow">
+                {stats.wins} {stats.wins === 1 ? "win" : "wins"}
+              </Chip>
+              <Chip tone="pink">
+                {stats.played} {stats.played === 1 ? "session" : "sessions"}
+              </Chip>
+              {stats.winRate !== null && (
+                <Chip tone="turquoise">{stats.winRate}% win rate</Chip>
+              )}
+            </>
+          )}
+        </div>
       </section>
 
       {ratings.length > 0 && (
@@ -199,7 +179,7 @@ async function HomeContent({ searchParams }) {
             {ratings.map((item) => (
               <li key={item.id} className={styles.recentRow}>
                 <span className={`${styles.tile} ${styles[`tile_${item.tone}`]}`}>
-                  {item.game.charAt(0).toUpperCase()}
+                  {item.emoji}
                 </span>
                 <span className={styles.recentText}>
                   <span className={styles.recentName}>{item.game}</span>
@@ -232,7 +212,7 @@ async function HomeContent({ searchParams }) {
             {recent.map((session) => (
               <li key={session.id} className={styles.recentRow}>
                 <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
-                  {session.game.charAt(0).toUpperCase()}
+                  {session.emoji}
                 </span>
                 <span className={styles.recentText}>
                   <span className={styles.recentName}>{session.game}</span>
@@ -249,7 +229,11 @@ async function HomeContent({ searchParams }) {
                   </span>
                 </span>
                 <span className={styles.resultChip}>
-                  <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
+                  <ResultBadge
+                    place={session.place}
+                    players={session.players}
+                    label={session.result}
+                  />
                 </span>
               </li>
             ))}
@@ -258,7 +242,7 @@ async function HomeContent({ searchParams }) {
       )}
 
       <form action={signOut} className={styles.logout}>
-        <button type="submit" className={styles.signOut}>
+        <button type="submit" className={`${styles.signOut} btn-secondary`}>
           Log out
         </button>
       </form>

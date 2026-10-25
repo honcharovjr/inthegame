@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth/session";
 import { GAME_TYPES } from "@/lib/games/types";
 import { createClient } from "@/lib/supabase/server";
 import AddGameButton from "./AddGameButton";
+import PlayersSlider from "./PlayersSlider";
 import styles from "./games.module.css";
 
 export const metadata = { title: "Games" };
@@ -28,7 +29,10 @@ export default function GamesPage({ searchParams }) {
 function CatalogSkeleton() {
   return (
     <>
-      <Skeleton height={48} radius={24} />
+      <div className={styles.toolbar}>
+        <Skeleton height={48} radius={24} />
+        <Skeleton height={78} radius={22} delay={40} />
+      </div>
       <div className={styles.filters}>
         <Skeleton width={56} height={32} radius={16} delay={80} />
         <Skeleton width={72} height={32} radius={16} delay={120} />
@@ -82,7 +86,7 @@ async function Catalog({ searchParams }) {
   let query = supabase
     .from("games")
     .select(
-      "id, name, type, is_classic, min_players, max_players, typical_duration_min, created_by",
+      "id, name, type, emoji, is_classic, min_players, max_players, typical_duration_min, created_by",
       { count: "exact" },
     )
     .order("name")
@@ -112,6 +116,7 @@ async function Catalog({ searchParams }) {
 
   return (
     <div className={`${styles.body} stagger`}>
+<div className={styles.toolbar}>
       <form method="get" role="search" className={styles.search}>
         <SearchIcon size={20} />
         <input
@@ -128,6 +133,14 @@ async function Catalog({ searchParams }) {
         )}
       </form>
 
+        <PlayersSlider
+          value={filters.players ?? 0}
+          hrefs={[0, ...PLAYER_COUNTS].map((count) =>
+            buildHref(filters, { players: count || null, page: 1 }),
+          )}
+        />
+      </div>
+
       <div className={styles.filters} aria-label="Type">
         <Chip
           href={buildHref(filters, { type: null, page: 1 })}
@@ -142,26 +155,6 @@ async function Catalog({ searchParams }) {
             tone={filters.type === type.value ? "active" : "white"}
           >
             {type.label}
-          </Chip>
-        ))}
-      </div>
-
-      <div className={styles.filters} aria-label="Players">
-        <Chip
-          href={buildHref(filters, { players: null, page: 1 })}
-          tone={filters.players ? "white" : "active"}
-          size="s"
-        >
-          Any players
-        </Chip>
-        {PLAYER_COUNTS.map((count) => (
-          <Chip
-            key={count}
-            href={buildHref(filters, { players: count, page: 1 })}
-            tone={filters.players === count ? "active" : "white"}
-            size="s"
-          >
-            {count}
           </Chip>
         ))}
       </div>

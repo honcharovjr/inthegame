@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { createGame } from "@/lib/games/actions";
+import { GAME_EMOJIS } from "@/lib/games/emoji";
 import { GAME_TYPES } from "@/lib/games/types";
 import styles from "./AddGameForm.module.css";
 
@@ -11,6 +12,7 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState("");
   const [type, setType] = useState("board");
+  const [emoji, setEmoji] = useState(GAME_EMOJIS[0]);
   const [min, setMin] = useState("2");
   const [max, setMax] = useState("4");
   const [duration, setDuration] = useState("");
@@ -30,6 +32,7 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
       const result = await createGame({
         name,
         type,
+        emoji,
         minPlayers: min,
         maxPlayers: max,
         duration,
@@ -61,6 +64,23 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
           autoFocus
         />
       </label>
+
+      <div className={styles.field}>
+        <span className={styles.label}>Emoji</span>
+        <div className={styles.emojis} role="group" aria-label="Game emoji">
+          {GAME_EMOJIS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={`${styles.emoji} ${emoji === item ? styles.emojiOn : ""}`}
+              aria-pressed={emoji === item}
+              onClick={() => setEmoji(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className={styles.field}>
         <span className={styles.label}>Type</span>
@@ -134,10 +154,10 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
       )}
 
       <div className={styles.actions}>
-        <button type="button" className={styles.cancel} onClick={onCancel}>
+        <button type="button" className={`${styles.cancel} btn-secondary`} onClick={onCancel}>
           Cancel
         </button>
-        <button type="submit" className={styles.add} disabled={pending}>
+        <button type="submit" className={`${styles.add} btn-primary`} disabled={pending}>
           {pending ? "Adding" : warned ? "Add anyway" : "Add game"}
         </button>
       </div>

@@ -1,35 +1,21 @@
 import Chip from "@/components/Chip/Chip";
-import { ClockIcon, UsersIcon } from "@/components/icons";
+import GameMeta from "@/components/GameMeta/GameMeta";
+import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import styles from "./GameRow.module.css";
-
-function formatPlayers(game) {
-  return game.min_players === game.max_players
-    ? `${game.min_players}`
-    : `${game.min_players}-${game.max_players}`;
-}
 
 export default function GameRow({ game }) {
   const type = findGameType(game.type);
 
   return (
     <li className={styles.row}>
-      <div className={`${styles.tile} ${styles[type.tone]}`}>
-        {game.name.charAt(0).toUpperCase()}
+      <div className={`${styles.tile} ${styles[type.tone]}`} aria-hidden="true">
+        {gameEmoji(game)}
       </div>
       <div className={styles.text}>
         <div className={styles.name}>{game.name}</div>
+        <GameMeta game={game} />
         <div className={styles.chips}>
-          <Chip size="s">
-            <UsersIcon />
-            {formatPlayers(game)}
-          </Chip>
-          {game.typical_duration_min && (
-            <Chip size="s">
-              <ClockIcon />
-              {game.typical_duration_min} min
-            </Chip>
-          )}
           {game.is_classic && (
             <Chip size="s" tone="turquoise">
               Classic

@@ -3,16 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { GAME_EMOJIS } from "./emoji";
 import { GAME_TYPES } from "./types";
 
 // Adds a custom game. It belongs to its author and shows up next to the
 // catalog games with a Custom chip. Input: { name, type, minPlayers,
-// maxPlayers, duration } where duration is optional.
+// maxPlayers, duration, emoji } where duration is optional.
 export async function createGame(input) {
   const name = String(input?.name ?? "").trim();
   const type = String(input?.type ?? "");
   const min = Number.parseInt(input?.minPlayers, 10);
   const max = Number.parseInt(input?.maxPlayers, 10);
+  const emoji = String(input?.emoji ?? "");
   const rawDuration = String(input?.duration ?? "").trim();
   const duration = rawDuration === "" ? null : Number.parseInt(rawDuration, 10);
 
@@ -21,6 +23,9 @@ export async function createGame(input) {
   }
   if (!GAME_TYPES.some((item) => item.value === type)) {
     return { error: "Pick a type for the game." };
+  }
+  if (!GAME_EMOJIS.includes(emoji)) {
+    return { error: "Pick an emoji for the game." };
   }
   if (!Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max < min || max > 50) {
     return { error: "Check the number of players." };
@@ -40,6 +45,7 @@ export async function createGame(input) {
     .insert({
       name,
       type,
+      emoji,
       min_players: min,
       max_players: max,
       typical_duration_min: duration,
@@ -47,7 +53,7 @@ export async function createGame(input) {
       created_by: profile.id,
     })
     .select(
-      "id, name, type, is_classic, min_players, max_players, typical_duration_min, created_by",
+      "id, name, type, emoji, is_classic, min_players, max_players, typical_duration_min, created_by",
     )
     .single();
   if (error) {
