@@ -2,6 +2,7 @@
   min-height: 100dvh;
   display: flex;
   justify-content: center;
+  transition: background-color 0.35s ease;
 }
 
 .turquoise {
@@ -40,9 +41,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.back:active {
+  transform: scale(0.92);
 }
 
 .back:focus-visible {
@@ -85,6 +90,11 @@
   background: var(--color-ink);
 }
 
+.segment,
+.segmentOn {
+  transition: background-color 0.3s ease;
+}
+
 .headline {
   margin-top: 8px;
   font-size: 60px;
@@ -99,4 +109,5 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  animation: slide-in 0.3s ease both;
 }

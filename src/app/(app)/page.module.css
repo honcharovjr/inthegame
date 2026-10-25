@@ -5,6 +5,13 @@
   gap: var(--space-3);
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: enter 0.35s ease both;
+}
+
 .header {
   padding: 0 4px;
 }
@@ -70,6 +77,7 @@
 }
 
 .logButton {
+  transition: transform 0.15s ease;
   height: 58px;
   border-radius: var(--radius-pill);
   background: var(--color-pink);
@@ -80,6 +88,10 @@
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.03em;
+}
+
+.logButton:active {
+  transform: scale(0.98);
 }
 
 .logButton:focus-visible {

@@ -23,6 +23,11 @@
   align-items: center;
   justify-content: center;
   color: var(--color-muted);
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.tab:active {
+  transform: scale(0.9);
 }
 
 .active {

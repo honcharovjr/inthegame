@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import {
   RESULT_TYPES,
@@ -10,69 +10,62 @@ import {
 } from "./places";
 
 const ME = "me";
+const UUID = /^[0-9a-f-]{36}$/i;
 
-async function readProfileId(supabase) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect("/login");
-  }
-  const { data } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  return data?.id ?? null;
-}
-
-// Creates a guest with a name only, then returns to the players step with
-// the new guest already selected.
-export async function addGuest(gameId, selectedIds, previousState, formData) {
-  const name = String(formData.get("name") ?? "").trim();
-  if (name.length < 1 || name.length > 30) {
+// Creates a guest with a name only and returns it, so the log flow can add it
+// to the list without reloading the page.
+export async function createGuest(name) {
+  const trimmed = String(name ?? "").trim();
+  if (trimmed.length < 1 || trimmed.length > 30) {
     return { error: "Give the guest a name of up to 30 characters." };
   }
 
-  const supabase = await createClient();
-  const profileId = await readProfileId(supabase);
-  if (!profileId) {
+  const { profile } = await getProfile();
+  if (!profile) {
     return { error: "Your profile is missing. Log out and in again." };
   }
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("guests")
-    .insert({ owner_id: profileId, name })
-    .select("id")
+    .insert({ owner_id: profile.id, name: trimmed })
+    .select("id, name")
     .single();
   if (error) {
-    console.error("addGuest failed", error);
+    console.error("createGuest failed", error);
     return { error: "Could not add the guest. Try again." };
   }
-
-  const selected = [...selectedIds, data.id].join(",");
-  redirect(`/log/players?game=${gameId}&with=${selected}`);
+  return { guest: data };
 }
 
-// Saves the session. Turns the form into places, checks them, then calls the
-// create_session database function, which saves everything in one step.
-export async function saveSession(previousState, formData) {
-  const gameId = String(formData.get("game") ?? "");
-  const resultType = String(formData.get("result_type") ?? "");
-  const keys = formData.getAll("participant").map(String);
+// Saves a session. Input from the log flow:
+//   { gameId, resultType, keys, winner, places, scores }
+// keys are "me" or guest ids. Turns the input into places, checks them, then
+// calls the create_session database function, which saves everything at once.
+export async function saveSession(input) {
+  const { gameId, resultType, winner, places: givenPlaces, scores: givenScores } =
+    input ?? {};
+  const keys = Array.isArray(input?.keys) ? input.keys.map(String) : [];
 
-  if (!gameId || !RESULT_TYPES.includes(resultType) || keys.length < 1) {
+  const keysValid = keys.every((key) => key === ME || UUID.test(key));
+  if (
+    !UUID.test(String(gameId)) ||
+    !RESULT_TYPES.includes(resultType) ||
+    keys.length < 1 ||
+    !keysValid ||
+    new Set(keys).size !== keys.length
+  ) {
     return { error: "Something is missing. Go back and try again." };
   }
 
   let places;
-  let scores = {};
+  const scores = {};
   try {
     if (resultType === "winner") {
-      places = placesFromWinner(keys, String(formData.get("winner") ?? ""));
+      places = placesFromWinner(keys, String(winner ?? ""));
     } else if (resultType === "points") {
       for (const key of keys) {
-        const raw = String(formData.get(`score_${key}`) ?? "").trim();
+        const raw = String(givenScores?.[key] ?? "").trim();
         const score = Number(raw);
         if (raw === "" || !Number.isFinite(score)) {
           throw new Error("Enter a score for every player.");
@@ -83,7 +76,7 @@ export async function saveSession(previousState, formData) {
     } else {
       places = {};
       for (const key of keys) {
-        places[key] = Number.parseInt(String(formData.get(`place_${key}`)), 10);
+        places[key] = Number.parseInt(String(givenPlaces?.[key]), 10);
       }
       validatePlaces(places);
     }
@@ -91,19 +84,19 @@ export async function saveSession(previousState, formData) {
     return { error: error.message };
   }
 
-  const supabase = await createClient();
-  const profileId = await readProfileId(supabase);
-  if (!profileId) {
+  const { profile } = await getProfile();
+  if (!profile) {
     return { error: "Your profile is missing. Log out and in again." };
   }
 
   const participants = keys.map((key) => ({
-    profile_id: key === ME ? profileId : null,
+    profile_id: key === ME ? profile.id : null,
     guest_id: key === ME ? null : key,
     place: places[key],
     score: resultType === "points" ? scores[key] : null,
   }));
 
+  const supabase = await createClient();
   const { error } = await supabase.rpc("create_session", {
     p_game_id: gameId,
     p_result_type: resultType,
@@ -114,5 +107,5 @@ export async function saveSession(previousState, formData) {
     return { error: "Could not save the session. Try again." };
   }
 
-  redirect("/?saved=1");
+  return { ok: true };
 }

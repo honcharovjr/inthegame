@@ -1,0 +1,23 @@
+.skeleton {
+  flex: none;
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.soft {
+  background-image: linear-gradient(
+    90deg,
+    #efe7ee 0%,
+    #f9f5f8 50%,
+    #efe7ee 100%
+  );
+}
+
+.light {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.35) 100%
+  );
+}

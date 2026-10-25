@@ -1,148 +1,82 @@
-import Link from "next/link";
 import { Suspense } from "react";
-import Chip from "@/components/Chip/Chip";
-import FlowShell from "@/components/FlowShell/FlowShell";
-import { ClockIcon, UsersIcon } from "@/components/icons";
-import { requireUser } from "@/lib/auth/session";
-import { findGameType } from "@/lib/games/types";
+import Skeleton from "@/components/Skeleton/Skeleton";
+import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import LogFlow from "./LogFlow";
 import styles from "./flow.module.css";
 
 export const metadata = { title: "Log a session" };
 
-const LIST_LIMIT = 30;
-
-export default function LogGamePage({ searchParams }) {
+export default function LogPage() {
   return (
-    <FlowShell step={1} tone="turquoise" backHref="/" headline={"Which\ngame?"}>
-      <Suspense fallback={null}>
-        <GameChooser searchParams={searchParams} />
-      </Suspense>
-    </FlowShell>
+    <Suspense fallback={<LogSkeleton />}>
+      <LogData />
+    </Suspense>
   );
 }
 
-function formatPlayers(game) {
-  return game.min_players === game.max_players
-    ? `${game.min_players}`
-    : `${game.min_players}-${game.max_players}`;
-}
-
-function toneClass(tone) {
-  return styles[`tile${tone.charAt(0).toUpperCase()}${tone.slice(1)}`];
-}
-
-// Reads the URL query and the database, so it streams in behind Suspense.
-async function GameChooser({ searchParams }) {
-  await requireUser();
-  const params = await searchParams;
-  const q = String(params.q ?? "").trim().slice(0, 60);
-
+// Loads everything the three steps need in one go, in parallel, so the steps
+// themselves never wait for the network.
+async function LogData() {
+  const { profile } = await getProfile();
   const supabase = await createClient();
-  let query = supabase
-    .from("games")
-    .select("id, name, type, is_classic, min_players, max_players, typical_duration_min")
-    .order("name")
-    .limit(LIST_LIMIT);
-  if (q) {
-    query = query.ilike("name", `%${q.replace(/[\\%_]/g, "\\$&")}%`);
+
+  const [gamesResult, guestsResult, recentResult] = await Promise.all([
+    supabase
+      .from("games")
+      .select(
+        "id, name, type, is_classic, min_players, max_players, typical_duration_min",
+      )
+      .order("name"),
+    supabase
+      .from("guests")
+      .select("id, name")
+      .eq("owner_id", profile?.id)
+      .order("created_at"),
+    supabase
+      .from("sessions")
+      .select("game_id")
+      .order("played_at", { ascending: false })
+      .limit(30),
+  ]);
+
+  if (!profile || gamesResult.error) {
+    return (
+      <main className={styles.fallback}>
+        <p role="alert" className={styles.message}>
+          Could not load the log flow. Reload the page.
+        </p>
+      </main>
+    );
   }
 
   // The player's latest games, newest first, without repeats.
-  const recentQuery = q
-    ? null
-    : supabase
-        .from("sessions")
-        .select("games ( id, name )")
-        .order("played_at", { ascending: false })
-        .limit(30);
-
-  const [{ data: games, error }, recent] = await Promise.all([
-    query,
-    recentQuery,
-  ]);
-
-  const seen = new Set();
-  const recentGames = (recent?.data ?? [])
-    .map((row) => row.games)
-    .filter((game) => game && !seen.has(game.id) && seen.add(game.id))
-    .slice(0, 4);
+  const recentGameIds = [
+    ...new Set((recentResult.data ?? []).map((row) => row.game_id)),
+  ].slice(0, 4);
 
   return (
-    <>
-      <form method="get" role="search" className={styles.search}>
-        <input
-          className={styles.searchInput}
-          type="search"
-          name="q"
-          defaultValue={q}
-          placeholder="Search games"
-          aria-label="Search games"
-        />
-      </form>
+    <LogFlow
+      profile={{ id: profile.id, nickname: profile.nickname }}
+      games={gamesResult.data}
+      initialGuests={guestsResult.data ?? []}
+      recentGameIds={recentGameIds}
+    />
+  );
+}
 
-      {recentGames.length > 0 && (
-        <div className={styles.chips} aria-label="Recent games">
-          <Chip tone="white">Recent</Chip>
-          {recentGames.map((game) => (
-            <Chip
-              key={game.id}
-              tone="white"
-              href={`/log/players?game=${game.id}`}
-            >
-              {game.name}
-            </Chip>
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <p role="alert" className={styles.message}>
-          Could not load games: {error.message}
-        </p>
-      )}
-
-      {games?.length === 0 && (
-        <p className={styles.message}>No games match this search.</p>
-      )}
-
-      <ul className={styles.list}>
-        {games?.map((game) => {
-          const type = findGameType(game.type);
-          return (
-            <li key={game.id}>
-              <Link
-                href={`/log/players?game=${game.id}`}
-                className={styles.row}
-              >
-                <div className={`${styles.tile} ${toneClass(type.tone)}`}>
-                  {game.name.charAt(0).toUpperCase()}
-                </div>
-                <div className={styles.rowText}>
-                  <div className={styles.rowName}>{game.name}</div>
-                  <div className={styles.chips}>
-                    <Chip size="s">
-                      <UsersIcon />
-                      {formatPlayers(game)}
-                    </Chip>
-                    {game.typical_duration_min && (
-                      <Chip size="s">
-                        <ClockIcon />
-                        {game.typical_duration_min} min
-                      </Chip>
-                    )}
-                    {game.is_classic && (
-                      <Chip size="s" tone="turquoise">
-                        Classic
-                      </Chip>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </>
+function LogSkeleton() {
+  return (
+    <main className={styles.skeletonPage}>
+      <div className={styles.skeletonColumn}>
+        <Skeleton tone="light" width={44} height={44} radius={22} />
+        <Skeleton tone="light" height={6} radius={3} />
+        <Skeleton tone="light" width={220} height={110} radius={20} />
+        <Skeleton tone="light" height={54} radius={27} />
+        <Skeleton tone="light" height={78} radius={24} />
+        <Skeleton tone="light" height={78} radius={24} />
+        <Skeleton tone="light" height={78} radius={24} />
+      </div>
+    </main>
   );
 }
