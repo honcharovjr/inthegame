@@ -46,6 +46,7 @@ export async function addGuest(gameId, selectedIds, previousState, formData) {
     .select("id")
     .single();
   if (error) {
+    console.error("addGuest failed", error);
     return { error: "Could not add the guest. Try again." };
   }
 
@@ -109,6 +110,7 @@ export async function saveSession(previousState, formData) {
     p_participants: participants,
   });
   if (error) {
+    console.error("saveSession failed", error);
     return { error: "Could not save the session. Try again." };
   }
 
