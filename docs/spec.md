@@ -20,7 +20,7 @@ Audience: friend groups, FIT students, game clubs; later a public service. Start
 | Participant | A person in a session: a registered user or a guest profile |
 | Guest profile | A participant record created by a registered user. It has a name only and no login |
 | Catalog | The list of games available when creating a session |
-| Group | A set of users who share sessions, leaderboards and a feed |
+| Team | A set of users who share sessions, leaderboards and a feed |
 | Rating | A numeric skill estimate per player per game, recalculated after each session |
 | Achievement | A badge awarded automatically when a condition on session history is met |
 
@@ -29,10 +29,10 @@ Audience: friend groups, FIT students, game clubs; later a public service. Start
 | Role | Description |
 |---|---|
 | Visitor | Not logged in. Sees the landing page and the registration form |
-| Player | Registered user. Logs sessions, sees own stats, joins groups |
-| Group owner | A player who created a group. Can invite and remove members |
+| Player | Registered user. Logs sessions, sees own stats, joins teams |
+| Team owner | A player who created a team. Can invite and remove members |
 | Maintainer | The project author. Manages the catalog and achievements directly in the database in early phases |
-| Team leader (backlog) | A role inside a team, planned after the MVP. Confirms or proposes session results |
+| Squad leader (backlog) | A role inside a squad, planned after the MVP. Confirms or proposes session results |
 
 A guest profile is a participant record, not a login role.
 
@@ -65,7 +65,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 |---|---|---|---|
 | FR-10 | Create a session: game, date, participants (users or guests), result per participant | Must | P1 |
 | FR-11 | Result types: winner only, ranking by place, points per participant | Must | P1 |
-| FR-12 | Team result type | Should | P2 |
+| FR-12 | Sides result type (team games) | Should | P2 |
 | FR-13 | Fast entry: recent games and recent participants are suggested. Target is under 1 minute from start to saved session | Must | P1 |
 | FR-14 | Session history for a player. A creator can edit and delete own sessions | Must | P1 |
 | FR-15 | Optional note on a session | Could | P2 |
@@ -76,7 +76,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 |---|---|---|---|
 | FR-16 | Personal stats: games played, wins, win rate, overall and per game | Must | P2 |
 | FR-17 | Rating per player per game, recalculated after each session. Algorithm is described in docs/rating.md (to be written) | Must | P2 |
-| FR-18 | Group leaderboard per game and overall | Must | P2 |
+| FR-18 | Team leaderboard per game and overall | Must | P2 |
 | FR-19 | Head to head stats between two players | Should | P2 |
 | FR-20 | Progress charts over time (Recharts) | Should | P2 |
 
@@ -90,15 +90,15 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-24 | Character on the profile with customizable appearance | Must | P3 |
 | FR-25 | Some customization items are unlocked by achievements (Assumption) | Should | P3 |
 
-### 4.6 Groups and social
+### 4.6 Teams and social
 
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
-| FR-26 | Create a group, invite by link, join and leave (minimal groups) | Must | P2 |
-| FR-27 | Group roles: owner and member. The owner can remove members | Must | P4 |
-| FR-28 | Social feed with group sessions and earned achievements | Must | P4 |
+| FR-26 | Create a team, invite by link, join and leave (minimal teams) | Must | P2 |
+| FR-27 | Team roles: owner and member. The owner can remove members | Must | P4 |
+| FR-28 | Social feed with team sessions and earned achievements | Must | P4 |
 | FR-29 | Reactions on feed items | Could | P4 |
-| FR-38 | Session history of a group | Must | P2 |
+| FR-38 | Session history of a team | Must | P2 |
 
 ### 4.7 Table tools
 
@@ -124,9 +124,9 @@ Not scheduled. These depend on open questions in section 9.
 
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
-| FR-39 | Teams inside a group. The group owner creates teams and manages roles such as team leader | Could | Backlog |
-| FR-40 | Default confirmation mode: a session result counts only after the team leader confirms it. Ratings and stats use confirmed sessions only | Could | Backlog |
-| FR-41 | Optional group setting: one team leader proposes the result, and the other teams confirm it in their own UI | Could | Backlog |
+| FR-39 | Squads inside a team. The team owner creates squads and manages roles such as squad leader | Could | Backlog |
+| FR-40 | Default confirmation mode: a session result counts only after the squad leader confirms it. Ratings and stats use confirmed sessions only | Could | Backlog |
+| FR-41 | Optional team setting: one squad leader proposes the result, and the other squads confirm it in their own UI | Could | Backlog |
 | FR-42 | Rules for unconfirmed sessions: timeout, dispute handling, and how guests are covered | Could | Backlog |
 
 ## 5. Phases
@@ -136,9 +136,9 @@ Not scheduled. These depend on open questions in section 9.
 | Initiation | 2 weeks | Project charter approved |
 | Requirements | 2 weeks | Specification and prototype approved |
 | P1 | 2 weeks | Session creation works, catalog started |
-| P2 | 2 weeks | Rating and statistics are calculated, minimal groups work |
+| P2 | 2 weeks | Rating and statistics are calculated, minimal teams work |
 | P3 | 2 weeks | Customization and profile are ready |
-| P4 | 2 weeks | Group management, social feed, table tools |
+| P4 | 2 weeks | Team management, social feed, table tools |
 | Pilot | 2 weeks | Test tournament held |
 | Final | 1 week | Final report, improvement backlog |
 
@@ -184,10 +184,10 @@ Out of scope for this project:
 
 Decisions made:
 
-- MVP is P1 and P2: accounts, catalog, sessions, history, statistics, rating, minimal groups
-- In the MVP the session creator records the result alone. Confirmation by team leaders is in the backlog (section 4.9). The session `status` field is kept in the data model for it
-- The catalog is managed by the maintainer directly in the database. Custom games are visible to their author and the author's groups
-- Profiles are visible to group members only
+- MVP is P1 and P2: accounts, catalog, sessions, history, statistics, rating, minimal teams
+- In the MVP the session creator records the result alone. Confirmation by squad leaders is in the backlog (section 4.9). The session `status` field is kept in the data model for it
+- The catalog is managed by the maintainer directly in the database. Custom games are visible to their author and the author's teams
+- Profiles are visible to team members only
 - Rating is Elo-style, details in docs/rating.md
 
 Open questions:

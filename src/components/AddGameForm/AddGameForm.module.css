@@ -1,0 +1,148 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  animation: enter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  padding-left: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.input:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.type {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: var(--color-chip);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.12s ease;
+}
+
+.type:active {
+  transform: scale(0.95);
+}
+
+.typeOn {
+  background: var(--color-pink);
+  font-weight: 800;
+}
+
+.type:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.message {
+  padding: 10px 14px;
+  border-radius: var(--radius-chip);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.warning {
+  background: var(--color-yellow-tint);
+  color: var(--color-yellow-ink);
+}
+
+.error {
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cancel,
+.add {
+  flex: 1;
+  height: 52px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.2s ease;
+}
+
+.cancel {
+  background: var(--color-chip);
+}
+
+.add {
+  background: var(--color-pink);
+}
+
+.cancel:active,
+.add:active {
+  transform: scale(0.97);
+}
+
+.add:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cancel:focus-visible,
+.add:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}

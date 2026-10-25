@@ -97,6 +97,32 @@
   font-weight: 700;
 }
 
+/* Add a game of your own */
+.addButton {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.addButton:active {
+  transform: scale(0.96);
+}
+
+.addButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
 /* Desktop: wider page, games as a grid of cards. */
 @media (min-width: 900px) {
   .page {

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import AddGameForm from "@/components/AddGameForm/AddGameForm";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import FlowShell from "@/components/FlowShell/FlowShell";
@@ -44,7 +45,7 @@ const HEADLINES = { 1: "Which\ngame?", 2: "Who\nplayed?", 3: "Who\nwon?" };
 // steps never reloads the page. Everything it needs is passed in once.
 export default function LogFlow({
   profile,
-  games,
+  games: initialGames,
   initialGuests,
   recentGameIds,
   lastSession,
@@ -58,6 +59,8 @@ export default function LogFlow({
   // reset, so a fresh flow can still offer it.
   const [previous, setPrevious] = useState(lastSession);
 
+  const [games, setGames] = useState(initialGames);
+  const [addingGame, setAddingGame] = useState(false);
   const [step, setStep] = useState(1);
   const [gameId, setGameId] = useState(null);
   const [query, setQuery] = useState("");
@@ -281,6 +284,26 @@ export default function LogFlow({
               aria-label="Search games"
             />
           </div>
+
+          {addingGame ? (
+            <AddGameForm
+              existingNames={games.map((item) => item.name.toLowerCase())}
+              onCancel={() => setAddingGame(false)}
+              onAdded={(game) => {
+                setGames((current) => [...current, game]);
+                setAddingGame(false);
+                pickGame(game.id);
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              className={styles.addGame}
+              onClick={() => setAddingGame(true)}
+            >
+              Can&apos;t find it? Add your own game
+            </button>
+          )}
 
           {!query && previousGame && (
             <button

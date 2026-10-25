@@ -46,7 +46,7 @@ The goal is to stay on free tiers now and move to paid tiers later without rewri
 
 ## Domain (draft, to be finalized in docs/data-model.md)
 
-Profile, guest profile, game (catalog), session (a played match), session participant, group, group member, achievement, user achievement, rating.
+Profile, guest profile, game (catalog), session (a played match), session participant, team, team member, achievement, user achievement, rating.
 
 ## Product constraints
 
@@ -59,9 +59,9 @@ Profile, guest profile, game (catalog), session (a played match), session partic
 
 1. Initiation and requirements: charter, technical specification, prototype
 2. Development phase 1: session creation, start of the catalog
-3. Development phase 2: rating, statistics and minimal groups (create, invite link, join, leave, group history)
+3. Development phase 2: rating, statistics and minimal teams (create, invite link, join, leave, team history)
 4. Development phase 3: character customization and profile
-5. Development phase 4: group management, social feed, table tools (scoreboard, timers, dice, team generator)
+5. Development phase 4: team management, social feed, table tools (scoreboard, timers, dice, team generator)
 6. Pilot release: test tournament
 7. Final: report and improvement backlog
 

@@ -614,3 +614,26 @@
   align-items: center;
   justify-content: center;
 }
+
+/* A way to add a game that is not in the catalog */
+.addGame {
+  align-self: flex-start;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 19px;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.06);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.addGame:active {
+  transform: scale(0.96);
+}
+
+.addGame:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
