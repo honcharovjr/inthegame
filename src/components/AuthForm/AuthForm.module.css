@@ -145,8 +145,8 @@
   height: 60px;
   margin-top: 6px;
   border-radius: var(--radius-pill);
-  background: var(--color-yellow);
-  color: var(--color-ink);
+  --btn-bg: var(--color-yellow);
+  --btn-ink: var(--color-ink);
   font-size: 18px;
   font-weight: 800;
 }

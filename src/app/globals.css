@@ -245,20 +245,20 @@ button {
    .btn-primary   filled block, the one main action of a screen
    .btn-secondary soft block for everything else
    .btn-text      text only, changes colour on hover
-   Colours are defaults (zero specificity) so a component can override them
-   with --btn-bg / --btn-ink / --text-hover or its own class. */
-:where(.btn-primary) {
+   A component changes the colours with --btn-bg / --btn-ink / --text-hover,
+   never with background or color of its own. */
+.btn-primary {
   background: var(--btn-bg, var(--color-pink-deep));
   color: var(--btn-ink, #fff);
   box-shadow: var(--shadow-button);
 }
 
-:where(.btn-secondary) {
+.btn-secondary {
   background: var(--btn-bg, var(--color-chip));
   color: var(--btn-ink, var(--color-ink));
 }
 
-:where(.btn-text) {
+.btn-text {
   background: none;
 }
 
@@ -349,20 +349,15 @@ button {
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 @media (hover: hover) {
   .btn-add:hover {
     opacity: 1;
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 79, 163, 0.14);
+    color: var(--color-pink-ink);
   }
-}
-
-.btn-add:active {
-  transform: scale(0.98);
 }
 
 .btn-add:focus-visible {
