@@ -92,9 +92,120 @@
 .side {
   flex: none;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 8px;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: opacity 0.2s ease;
+}
+
+.filtersBusy {
+  opacity: 0.6;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  padding-left: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.date {
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.date:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.resultRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.switch {
+  display: flex;
+  flex: 1;
+  min-width: 220px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+}
+
+.switchButton {
+  flex: 1;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 19px;
+  background: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.switchOn {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.1);
+}
+
+.switchButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 1px;
+}
+
+.clear {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 19px;
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.clear:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
 }
 
 .pager {

@@ -7,11 +7,34 @@ import { findGameType } from "@/lib/games/types";
 import { deleteSession } from "@/lib/sessions/actions";
 import { resultLabel } from "@/lib/stats/month";
 import { createClient } from "@/lib/supabase/server";
+import HistoryFilters from "./HistoryFilters";
 import styles from "./history.module.css";
 
 export const metadata = { title: "History" };
 
 const PAGE_SIZE = 20;
+const UUID = /^[0-9a-f-]{36}$/i;
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function readFilters(params) {
+  return {
+    game: UUID.test(String(params.game ?? "")) ? params.game : "",
+    from: DATE.test(String(params.from ?? "")) ? params.from : "",
+    to: DATE.test(String(params.to ?? "")) ? params.to : "",
+    result: ["won", "lost"].includes(params.result) ? params.result : "",
+  };
+}
+
+function pageHref(filters, page) {
+  const query = new URLSearchParams();
+  if (filters.game) query.set("game", filters.game);
+  if (filters.from) query.set("from", filters.from);
+  if (filters.to) query.set("to", filters.to);
+  if (filters.result) query.set("result", filters.result);
+  if (page > 1) query.set("page", String(page));
+  const text = query.toString();
+  return text ? `/history?${text}` : "/history";
+}
 
 export default function HistoryPage({ searchParams }) {
   return (
@@ -47,16 +70,37 @@ async function HistoryList({ searchParams }) {
   const page = Math.max(1, Number.parseInt(params.page, 10) || 1);
   const from = (page - 1) * PAGE_SIZE;
 
+  const filters = readFilters(params);
   const { profile } = await getProfile();
   const supabase = await createClient();
-  const { data, count, error } = await supabase
+
+  // To filter by your own result, the sessions are matched on your own row of
+  // participants, a second view of the same table next to the one shown.
+  const byResult = Boolean(filters.result);
+  let query = supabase
     .from("sessions")
     .select(
-      "id, played_at, created_by, games(name, type), session_participants(place, profile_id, guests(name))",
+      `id, played_at, created_by, games(name, type), session_participants(place, profile_id, guests(name))${
+        byResult ? ", mine:session_participants!inner(place)" : ""
+      }`,
       { count: "exact" },
     )
     .order("played_at", { ascending: false })
     .range(from, from + PAGE_SIZE - 1);
+
+  if (filters.game) query = query.eq("game_id", filters.game);
+  if (filters.from) query = query.gte("played_at", `${filters.from}T00:00:00.000Z`);
+  if (filters.to) query = query.lte("played_at", `${filters.to}T23:59:59.999Z`);
+  if (byResult && profile) {
+    query = query.eq("mine.profile_id", profile.id);
+    query = filters.result === "won" ? query.eq("mine.place", 1) : query.neq("mine.place", 1);
+  }
+
+  const [{ data, count, error }, gamesResult] = await Promise.all([
+    query,
+    supabase.from("games").select("id, name").order("name"),
+  ]);
+  const filtered = Object.values(filters).some(Boolean);
 
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
   const sessions = (data ?? []).map((session) => {
@@ -76,6 +120,8 @@ async function HistoryList({ searchParams }) {
 
   return (
     <div className={styles.body}>
+      <HistoryFilters games={gamesResult.data ?? []} filters={filters} />
+
       {error && (
         <p role="alert" className={styles.problem}>
           Could not load your history: {error.message}
@@ -84,7 +130,9 @@ async function HistoryList({ searchParams }) {
 
       {!error && sessions.length === 0 && (
         <p className={styles.empty}>
-          No sessions yet. Log your first one from Home.
+          {filtered
+            ? "No sessions match these filters."
+            : "No sessions yet. Log your first one from Home."}
         </p>
       )}
 
@@ -109,8 +157,10 @@ async function HistoryList({ searchParams }) {
               <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
               {session.mine && (
                 <ConfirmButton
-                  label="Delete"
-                  confirmLabel="Yes, delete"
+                  title="Delete this session?"
+                  message={`${session.game} on ${dateFormat.format(new Date(session.playedAt))} will be removed and your ratings will be recalculated.`}
+                  confirmLabel="Delete session"
+                  ariaLabel={`Delete the ${session.game} session`}
                   action={deleteSession.bind(null, session.id)}
                 />
               )}
@@ -122,15 +172,13 @@ async function HistoryList({ searchParams }) {
       {totalPages > 1 && (
         <nav className={styles.pager} aria-label="Pages">
           {page > 1 && (
-            <Chip href={page === 2 ? "/history" : `/history?page=${page - 1}`}>
-              Previous
-            </Chip>
+            <Chip href={pageHref(filters, page - 1)}>Previous</Chip>
           )}
           <Chip tone="pink">
             Page {page} of {totalPages}
           </Chip>
           {page < totalPages && (
-            <Chip href={`/history?page=${page + 1}`}>Next</Chip>
+            <Chip href={pageHref(filters, page + 1)}>Next</Chip>
           )}
         </nav>
       )}

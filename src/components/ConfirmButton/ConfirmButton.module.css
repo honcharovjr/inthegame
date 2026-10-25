@@ -1,61 +1,160 @@
-.wrap {
+.trash {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--color-danger-tint);
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.trash:hover {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+
+.trash:active {
+  transform: scale(0.9);
+}
+
+.trash:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* The pop-up */
+.dialog {
+  width: min(calc(100vw - 32px), 400px);
+  padding: 0;
+  border: 0;
+  border-radius: 28px;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.dialog::backdrop {
+  background: rgba(18, 10, 26, 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.dialog[open] {
+  animation: dialog-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.dialog[open]::backdrop {
+  animation: fade 0.25s ease both;
+}
+
+.panel {
+  padding: 28px 24px 22px;
+  border-radius: 28px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
 }
 
-.row {
+.badge {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-danger-tint);
+  color: var(--color-danger);
   display: flex;
-  gap: 6px;
-  animation: pop 0.2s ease both;
+  align-items: center;
+  justify-content: center;
 }
 
-.ask,
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.message {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.error {
+  padding: 8px 14px;
+  border-radius: var(--radius-chip);
+  background: var(--color-danger-tint);
+  color: var(--color-danger-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 .cancel,
 .confirm {
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 17px;
-  font-size: 13px;
+  flex: 1;
+  height: 52px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.12s ease, background-color 0.2s ease;
+  transition: transform 0.12s ease, opacity 0.2s ease;
 }
 
-.ask,
 .cancel {
   background: var(--color-chip);
-  color: var(--color-ink);
 }
 
 .confirm {
-  background: var(--color-pink);
-  color: var(--color-ink);
+  background: var(--color-danger);
+  color: #ffffff;
 }
 
-.ask:active,
 .cancel:active,
 .confirm:active {
-  transform: scale(0.94);
+  transform: scale(0.96);
 }
 
-.ask:focus-visible,
 .cancel:focus-visible,
 .confirm:focus-visible {
   outline: 3px solid var(--color-ink);
   outline-offset: 2px;
 }
 
-button:disabled {
+.cancel:disabled,
+.confirm:disabled {
   opacity: 0.6;
   cursor: default;
 }
 
-.error {
-  max-width: 220px;
-  font-size: 12px;
-  font-weight: 700;
-  text-align: right;
-  color: var(--color-pink-ink);
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
