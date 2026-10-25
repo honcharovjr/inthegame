@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   RESULT_TYPES,
   placesFromScores,
+  applyTiebreak,
   placesFromWinner,
   validatePlaces,
 } from "./places";
@@ -39,7 +40,7 @@ export async function createGuest(name) {
 }
 
 // Saves a session. Input from the log flow:
-//   { gameId, resultType, keys, winner, places, scores }
+//   { gameId, resultType, keys, winner, places, scores, tiebreak }
 // keys are "me" or guest ids. Turns the input into places, checks them, then
 // calls the create_session database function, which saves everything at once.
 export async function saveSession(input) {
@@ -73,6 +74,9 @@ export async function saveSession(input) {
         scores[key] = score;
       }
       places = placesFromScores(scores);
+      if (input?.tiebreak) {
+        places = applyTiebreak(places, String(input.tiebreak));
+      }
     } else {
       places = {};
       for (const key of keys) {

@@ -51,3 +51,17 @@ export function placesFromOrder(order, tied = {}) {
   });
   return places;
 }
+
+// Points ended level at the top and the player chose a winner anyway.
+// The chosen player takes place 1, the others who shared it drop to place 2.
+export function applyTiebreak(places, winnerKey) {
+  if (places[winnerKey] !== 1) {
+    throw new Error("The tiebreak winner must be one of the leaders");
+  }
+  return Object.fromEntries(
+    Object.entries(places).map(([key, place]) => [
+      key,
+      key !== winnerKey && place === 1 ? 2 : place,
+    ]),
+  );
+}
