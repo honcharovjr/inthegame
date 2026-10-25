@@ -79,8 +79,10 @@ async function ProfileContent() {
                 <Avatar name={guest.name} size={38} color="#c9bcc8" />
                 <span className={styles.guestName}>{guest.name}</span>
                 <ConfirmButton
-                  label="Remove"
-                  confirmLabel="Yes, remove"
+                  title="Remove this guest?"
+                  message={`${guest.name} will be removed from your guest list.`}
+                  confirmLabel="Remove guest"
+                  ariaLabel={`Remove ${guest.name}`}
                   action={deleteGuest.bind(null, guest.id)}
                 />
               </li>

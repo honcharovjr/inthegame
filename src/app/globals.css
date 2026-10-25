@@ -26,6 +26,11 @@
   --color-yellow-ink: #7a6200;
   --color-violet-ink: #4a3d8f;
 
+  /* Warnings and deleting */
+  --color-danger: #e5243b;
+  --color-danger-tint: #ffe3e7;
+  --color-danger-ink: #b3132a;
+
   /* Radii */
   --radius-chip: 14px;
   --radius-row: 22px;

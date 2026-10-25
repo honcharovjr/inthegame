@@ -1,19 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
+import { TrashIcon } from "@/components/icons";
 import styles from "./ConfirmButton.module.css";
 
-// A destructive button that asks twice. The first tap shows Cancel and a
-// confirm button, the second runs the action.
-// action: async () => ({ error? }). A returned error is shown under the button.
+// A red trash button that asks in a pop-up before it deletes.
+// action: async () => ({ error? }). A returned error stays in the pop-up.
 export default function ConfirmButton({
-  label = "Delete",
-  confirmLabel = "Yes, delete",
+  title = "Delete this?",
+  message,
+  confirmLabel = "Delete",
+  ariaLabel = "Delete",
   action,
 }) {
-  const [asking, setAsking] = useState(false);
+  const dialogRef = useRef(null);
   const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
+
+  function open() {
+    setError(null);
+    dialogRef.current?.showModal();
+  }
+
+  function close() {
+    dialogRef.current?.close();
+  }
 
   function run() {
     setError(null);
@@ -21,46 +32,63 @@ export default function ConfirmButton({
       const result = await action();
       if (result?.error) {
         setError(result.error);
+      } else {
+        close();
       }
-      setAsking(false);
     });
   }
 
   return (
-    <div className={styles.wrap}>
-      {asking ? (
-        <div className={styles.row}>
-          <button
-            type="button"
-            className={styles.cancel}
-            onClick={() => setAsking(false)}
-            disabled={pending}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className={styles.confirm}
-            onClick={run}
-            disabled={pending}
-          >
-            {pending ? "Deleting" : confirmLabel}
-          </button>
+    <>
+      <button
+        type="button"
+        className={styles.trash}
+        aria-label={ariaLabel}
+        onClick={open}
+      >
+        <TrashIcon size={18} />
+      </button>
+
+      <dialog
+        ref={dialogRef}
+        className={styles.dialog}
+        aria-label={title}
+        onClick={(event) => {
+          // A click on the dimmed background closes the pop-up.
+          if (event.target === event.currentTarget && !pending) close();
+        }}
+      >
+        <div className={styles.panel}>
+          <span className={styles.badge} aria-hidden="true">
+            <TrashIcon size={26} />
+          </span>
+          <h2 className={styles.title}>{title}</h2>
+          {message && <p className={styles.message}>{message}</p>}
+          {error && (
+            <p role="alert" className={styles.error}>
+              {error}
+            </p>
+          )}
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.cancel}
+              onClick={close}
+              disabled={pending}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={styles.confirm}
+              onClick={run}
+              disabled={pending}
+            >
+              {pending ? "Deleting" : confirmLabel}
+            </button>
+          </div>
         </div>
-      ) : (
-        <button
-          type="button"
-          className={styles.ask}
-          onClick={() => setAsking(true)}
-        >
-          {label}
-        </button>
-      )}
-      {error && (
-        <p role="alert" className={styles.error}>
-          {error}
-        </p>
-      )}
-    </div>
+      </dialog>
+    </>
   );
 }

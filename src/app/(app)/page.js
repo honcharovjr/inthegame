@@ -42,14 +42,17 @@ function HomeSkeleton() {
         <Skeleton width={150} height={14} />
         <Skeleton width={220} height={36} delay={80} style={{ marginTop: 8 }} />
       </div>
-      <div className={styles.card}>
-        <Skeleton width={96} height={96} radius={48} delay={160} />
-        <div className={styles.identity}>
-          <Skeleton width={140} height={30} delay={240} />
-          <Skeleton width={170} height={28} radius={14} delay={320} />
+      <div className={styles.panel}>
+        <div className={styles.panelTop}>
+          <Skeleton width={64} height={64} radius={32} delay={160} />
+          <div className={styles.identity}>
+            <Skeleton width={140} height={26} delay={220} />
+            <Skeleton width={150} height={26} radius={13} delay={280} />
+          </div>
+          <Skeleton width={96} height={48} radius={24} delay={340} />
         </div>
+        <Skeleton height={64} radius={16} delay={400} />
       </div>
-      <Skeleton height={58} radius={29} delay={400} />
     </>
   );
 }
@@ -133,32 +136,32 @@ async function HomeContent({ searchParams }) {
         </p>
       )}
 
-      <section className={styles.card} aria-label="Your character">
-        <div className={styles.stage}>
-          <div className={styles.stageShape} aria-hidden="true" />
-          <Avatar name={profile?.nickname} size={84} color="#ff4fa3" />
+      <section className={styles.panel} aria-label="You">
+        <div className={styles.panelTop}>
+          <Avatar name={profile?.nickname} size={64} color="#ff4fa3" />
+          <div className={styles.identity}>
+            <div className={styles.name}>{profile?.nickname}</div>
+            {profile?.created_at && (
+              <Chip>
+                Playing since {monthFormat.format(new Date(profile.created_at))}
+              </Chip>
+            )}
+          </div>
+          <Link href="/log" className={styles.logButton} aria-label="Log a session">
+            <span>Log</span>
+            <span className={styles.logPlus} aria-hidden="true">
+              +
+            </span>
+          </Link>
         </div>
-        <div className={styles.identity}>
-          <div className={styles.name}>{profile?.nickname}</div>
-          {profile?.created_at && (
-            <Chip>
-              Playing since {monthFormat.format(new Date(profile.created_at))}
-            </Chip>
-          )}
-        </div>
-      </section>
 
-      <Link href="/log" className={styles.logButton}>
-        <span>Log a session</span>
-        <span className={styles.logPlus} aria-hidden="true">
-          +
-        </span>
-      </Link>
+        <div className={styles.divider} aria-hidden="true" />
 
-      <section className={styles.card} aria-label="This month">
         <div className={styles.cardTitle}>This month</div>
         {stats.played === 0 ? (
-          <Chip>No sessions yet this month</Chip>
+          <div>
+            <Chip>No sessions yet this month</Chip>
+          </div>
         ) : (
           <div className={styles.numbers}>
             <div>
