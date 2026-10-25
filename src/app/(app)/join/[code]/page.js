@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -13,6 +14,7 @@ export const metadata = { title: "Join a team" };
 export default function JoinPage({ params }) {
   return (
     <main className={styles.page}>
+      <BackButton fallback="/teams" />
       <Suspense fallback={<Skeleton height={220} radius={22} />}>
         <Invite params={params} />
       </Suspense>

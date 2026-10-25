@@ -1,25 +1,39 @@
+/* Floats over the page below its button, so the list never moves */
 .form {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 14px;
   border-radius: var(--radius-card);
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  animation: enter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  box-shadow: 0 4px 8px rgba(18, 10, 26, 0.08),
+    0 24px 48px rgba(18, 10, 26, 0.22);
+  color: var(--color-ink);
+  animation: enter 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.03em;
+}
+
+.nameRow {
+  display: flex;
+  gap: 8px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
+  flex: 1;
 }
 
 .label {
@@ -32,13 +46,13 @@
 .input {
   width: 100%;
   min-width: 0;
-  height: 48px;
-  padding: 0 18px;
+  height: 42px;
+  padding: 0 14px;
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-chip);
   font: inherit;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--color-ink);
 }
@@ -48,26 +62,56 @@
   font-weight: 600;
 }
 
-.input:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
+.input:focus-visible,
+.emojiInput:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+.emojiField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: none;
+}
+
+.emojiInput {
+  width: 62px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-pink-tint);
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+  caret-color: var(--color-pink-deep);
+}
+
+.hint {
+  margin-top: -4px;
+  padding-left: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-muted);
 }
 
 .types {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .type {
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 18px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
   background: var(--color-chip);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.12s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 
 .type:active {
@@ -75,7 +119,8 @@
 }
 
 .typeOn {
-  background: var(--color-pink);
+  background: var(--color-pink-deep);
+  color: #ffffff;
   font-weight: 800;
 }
 
@@ -87,13 +132,13 @@
 .numbers {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .message {
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: var(--radius-chip);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -109,52 +154,19 @@
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cancel,
 .add {
   flex: 1;
-  height: 52px;
+  height: 42px;
   border-radius: var(--radius-pill);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
 }
 
 .add:disabled {
   opacity: 0.6;
   cursor: default;
-}
-
-
-.emojis {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
-  gap: 6px;
-}
-
-.emoji {
-  height: 42px;
-  border-radius: 14px;
-  background: var(--color-chip);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-}
-
-@media (hover: hover) {
-  .emoji:hover {
-    transform: translateY(-2px);
-  }
-}
-
-.emojiOn {
-  background: var(--color-pink-soft);
-  box-shadow: 0 0 0 3px var(--color-pink);
-}
-
-.emoji:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
 }

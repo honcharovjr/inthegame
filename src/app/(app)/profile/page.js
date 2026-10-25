@@ -1,9 +1,11 @@
+import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
+import { LogoutIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
@@ -17,6 +19,7 @@ export const metadata = { title: "Profile" };
 export default function ProfilePage() {
   return (
     <main className={styles.page}>
+      <BackButton fallback="/" />
       <h1 className={styles.title}>Profile</h1>
       <Suspense fallback={<ProfileSkeleton />}>
         <ProfileContent />
@@ -89,11 +92,16 @@ async function ProfileContent() {
         </Link>
       </div>
 
-      <form action={signOut}>
-        <button type="submit" className={`${styles.signOut} btn-secondary`}>
-          Log out
-        </button>
-      </form>
+      <ConfirmButton
+        title="Log out?"
+        message="You will need your email and password to come back."
+        confirmLabel="Log out"
+        icon={<LogoutIcon size={26} />}
+        tone="pink"
+        triggerLabel="Log out"
+        triggerClassName={styles.signOut}
+        action={signOut}
+      />
     </div>
   );
 }

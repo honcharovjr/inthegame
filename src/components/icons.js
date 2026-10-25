@@ -145,3 +145,19 @@ export function TrophyIcon(props) {
     </Icon>
   );
 }
+
+export function ArrowLeftIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M19 12H5M11 6l-6 6 6 6" />
+    </Icon>
+  );
+}
+
+export function LogoutIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M10 4H6a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 6 20h4M15 8l4 4-4 4M19 12H9" />
+    </Icon>
+  );
+}

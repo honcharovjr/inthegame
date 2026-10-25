@@ -334,7 +334,7 @@ export default function LogFlow({
             />
           </div>
 
-          {!query && previousGame && !addingGame && (
+          {!query && previousGame && (
             <button
               type="button"
               className={`${styles.again} btn-primary`}
@@ -357,26 +357,27 @@ export default function LogFlow({
             </button>
           )}
 
-          {addingGame ? (
-            <AddGameForm
-              existingNames={games.map((item) => item.name.toLowerCase())}
-              onCancel={() => setAddingGame(false)}
-              onAdded={(game) => {
-                setGames((current) => [...current, game]);
-                setAddingGame(false);
-                pickGame(game.id);
-              }}
-            />
-          ) : (
+          <div className="add-anchor">
             <button
               type="button"
-              className={styles.addGame}
+              className="btn-add"
               onClick={() => setAddingGame(true)}
             >
               <PlusIcon size={16} />
               Add custom game
             </button>
-          )}
+            {addingGame && (
+              <AddGameForm
+                existingNames={games.map((item) => item.name.toLowerCase())}
+                onCancel={() => setAddingGame(false)}
+                onAdded={(game) => {
+                  setGames((current) => [...current, game]);
+                  setAddingGame(false);
+                  pickGame(game.id);
+                }}
+              />
+            )}
+          </div>
 
           {visibleGames.length === 0 && (
             <p className={styles.message}>No games match this search.</p>

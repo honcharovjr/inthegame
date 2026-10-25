@@ -2,17 +2,20 @@
 
 import { useState, useTransition } from "react";
 import { createGame } from "@/lib/games/actions";
-import { GAME_EMOJIS } from "@/lib/games/emoji";
+import { gameEmoji, lastEmoji } from "@/lib/games/emoji";
 import { GAME_TYPES } from "@/lib/games/types";
 import styles from "./AddGameForm.module.css";
 
-// The form for a custom game. A name that already exists is warned about once
-// and can still be added. onAdded receives the saved game.
+// The form for a custom game. It floats over the page, so opening it never
+// pushes anything down: put it inside a relatively positioned wrapper.
+// A name that already exists is warned about once and can still be added.
+// onAdded receives the saved game.
 export default function AddGameForm({ existingNames, onAdded, onCancel }) {
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState("");
   const [type, setType] = useState("board");
-  const [emoji, setEmoji] = useState(GAME_EMOJIS[0]);
+  // "" until the player types one. Then the default of the type is shown.
+  const [emoji, setEmoji] = useState("");
   const [min, setMin] = useState("2");
   const [max, setMax] = useState("4");
   const [duration, setDuration] = useState("");
@@ -47,56 +50,56 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
 
   return (
     <form className={styles.form} onSubmit={submit}>
-      <div className={styles.title}>Add your own game</div>
+      <div className={styles.title}>Add custom game</div>
 
-      <label className={styles.field}>
-        <span className={styles.label}>Name</span>
-        <input
-          className={styles.input}
-          value={name}
-          maxLength={60}
-          onChange={(event) => {
-            setName(event.target.value);
-            setWarned(false);
-          }}
-          placeholder="For example Fox's Hunt"
-          required
-          autoFocus
-        />
-      </label>
-
-      <div className={styles.field}>
-        <span className={styles.label}>Emoji</span>
-        <div className={styles.emojis} role="group" aria-label="Game emoji">
-          {GAME_EMOJIS.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={`${styles.emoji} ${emoji === item ? styles.emojiOn : ""}`}
-              aria-pressed={emoji === item}
-              onClick={() => setEmoji(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+      <div className={styles.nameRow}>
+        <label className={styles.emojiField}>
+          <span className={styles.label}>Emoji</span>
+          <input
+            className={styles.emojiInput}
+            value={emoji || gameEmoji({ type })}
+            onChange={(event) => setEmoji(lastEmoji(event.target.value))}
+            onFocus={(event) => event.target.select()}
+            inputMode="text"
+            autoComplete="off"
+            aria-label="Emoji of the game. Open your emoji keyboard to type your own."
+            data-tip="Type any emoji"
+            data-tip-pos="below"
+          />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.label}>Name</span>
+          <input
+            className={styles.input}
+            value={name}
+            maxLength={60}
+            onChange={(event) => {
+              setName(event.target.value);
+              setWarned(false);
+            }}
+            placeholder="For example Fox's Hunt"
+            required
+            autoFocus
+          />
+        </label>
       </div>
+      <p className={styles.hint}>
+        Tap the emoji, then open your emoji keyboard. On Mac press Cmd Ctrl
+        Space, on Windows press Win and the dot.
+      </p>
 
-      <div className={styles.field}>
-        <span className={styles.label}>Type</span>
-        <div className={styles.types} role="group" aria-label="Game type">
-          {GAME_TYPES.map((item) => (
-            <button
-              key={item.value}
-              type="button"
-              className={`${styles.type} ${type === item.value ? styles.typeOn : ""}`}
-              aria-pressed={type === item.value}
-              onClick={() => setType(item.value)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+      <div className={styles.types} role="group" aria-label="Game type">
+        {GAME_TYPES.map((item) => (
+          <button
+            key={item.value}
+            type="button"
+            className={`${styles.type} ${type === item.value ? styles.typeOn : ""}`}
+            aria-pressed={type === item.value}
+            onClick={() => setType(item.value)}
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
 
       <div className={styles.numbers}>
