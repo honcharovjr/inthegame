@@ -7,7 +7,7 @@ export const metadata = { title: "Create account" };
 
 export default function SignUpPage({ searchParams }) {
   return (
-    <AuthShell headline="Every game you play, remembered.">
+    <AuthShell headline="Every game you play, remembered." backTo="/login">
       <Suspense fallback={null}>
         <SignUpForm searchParams={searchParams} />
       </Suspense>

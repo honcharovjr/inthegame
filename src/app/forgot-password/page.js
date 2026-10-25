@@ -6,7 +6,7 @@ export const metadata = { title: "Reset password" };
 
 export default function ForgotPasswordPage() {
   return (
-    <AuthShell headline="Reset your password." tone="yellow">
+    <AuthShell headline="Reset your password." tone="yellow" backTo="/login">
       <AuthForm
         action={requestPasswordReset}
         submitLabel="Send reset link"

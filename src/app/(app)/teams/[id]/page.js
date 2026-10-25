@@ -66,7 +66,7 @@ async function TeamContent({ params }) {
       .maybeSingle(),
     supabase
       .from("team_members")
-      .select("role, profile_id, profiles(nickname)")
+      .select("role, profile_id, profiles(nickname, character)")
       .eq("team_id", id),
     supabase
       .from("sessions")
@@ -85,6 +85,7 @@ async function TeamContent({ params }) {
   const members = (membersResult.data ?? []).map((row) => ({
     id: row.profile_id,
     name: row.profiles?.nickname ?? "Player",
+    character: row.profiles?.character ?? null,
     role: row.role,
   }));
 
@@ -117,7 +118,13 @@ async function TeamContent({ params }) {
         <ul className={styles.members} style={{ marginTop: 10 }}>
           {members.map((member, index) => (
             <li key={member.id} className={styles.member}>
-              <Avatar name={member.name} size={32} color={playerColor(index)} />
+              <Avatar
+                name={member.name}
+                size={32}
+                color={playerColor(index)}
+                registered
+                character={member.character}
+              />
               {member.name}
               {member.role === "owner" && (
                 <Chip size="s" tone="pink">
@@ -165,7 +172,13 @@ async function TeamContent({ params }) {
               >
                 {index + 1}
               </span>
-              <Avatar name={row.name} size={36} color={playerColor(index)} />
+              <Avatar
+                name={row.name}
+                size={36}
+                color={playerColor(index)}
+                registered
+                character={members.find((m) => m.id === row.id)?.character}
+              />
               <span className={styles.boardName}>{row.name}</span>
               <span className={styles.boardChips}>
                 <Chip size="s">

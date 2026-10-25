@@ -161,3 +161,11 @@ export function LogoutIcon(props) {
     </Icon>
   );
 }
+
+export function LockIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z" />
+    </Icon>
+  );
+}

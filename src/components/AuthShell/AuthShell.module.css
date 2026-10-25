@@ -29,6 +29,28 @@
 }
 
 /* Decorative shapes behind the type */
+.shapes {
+  display: contents;
+}
+
+/* Every shape: set by AuthShapes, fades in once set */
+.circle,
+.square,
+.block {
+  --ak: calc(var(--amp) * var(--k, 1));
+  translate: var(--x, 0px) var(--y, 0px);
+  scale: var(--flip, 1) 1;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+  transition: opacity 0.9s ease 0.15s;
+}
+
+.circle[data-ready],
+.square[data-ready],
+.block[data-ready] {
+  opacity: 1;
+}
+
 .circle {
   animation: drift-a 11s ease-in-out infinite;
   position: absolute;
@@ -73,12 +95,30 @@
 }
 
 .wordmark {
+  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 18px;
   font-weight: 800;
+}
+
+.word {
+  display: inline-block;
+  animation: rise-word 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(0.12s + var(--w, 0) * 90ms);
+}
+
+@keyframes rise-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em) rotate(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .headline {
@@ -134,6 +174,7 @@
     border-radius: 40px;
     background: var(--color-surface);
     box-shadow: var(--shadow-float);
+    animation: enter 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
     --field-bg: var(--color-chip);
     --text-hover: var(--color-pink-deep);
   }
@@ -169,11 +210,11 @@
     transform: translate(0, 0) scale(1);
   }
   33% {
-    transform: translate(calc(-26px * var(--amp)), calc(18px * var(--amp)))
+    transform: translate(calc(-26px * var(--ak)), calc(18px * var(--ak)))
       scale(1.03);
   }
   66% {
-    transform: translate(calc(14px * var(--amp)), calc(-22px * var(--amp)))
+    transform: translate(calc(14px * var(--ak)), calc(-22px * var(--ak)))
       scale(0.98);
   }
 }
@@ -184,8 +225,8 @@
     transform: rotate(20deg) translate(0, 0);
   }
   50% {
-    transform: rotate(calc(20deg + 12deg * var(--amp)))
-      translate(calc(24px * var(--amp)), calc(-20px * var(--amp)));
+    transform: rotate(calc(20deg + 12deg * var(--ak)))
+      translate(calc(24px * var(--ak)), calc(-20px * var(--ak)));
   }
 }
 
@@ -195,11 +236,11 @@
     transform: rotate(-12deg) translate(0, 0);
   }
   40% {
-    transform: rotate(calc(-12deg - 10deg * var(--amp)))
-      translate(calc(-18px * var(--amp)), calc(16px * var(--amp)));
+    transform: rotate(calc(-12deg - 10deg * var(--ak)))
+      translate(calc(-18px * var(--ak)), calc(16px * var(--ak)));
   }
   75% {
-    transform: rotate(calc(-12deg + 8deg * var(--amp)))
-      translate(calc(10px * var(--amp)), calc(-12px * var(--amp)));
+    transform: rotate(calc(-12deg + 8deg * var(--ak)))
+      translate(calc(10px * var(--ak)), calc(-12px * var(--ak)));
   }
 }

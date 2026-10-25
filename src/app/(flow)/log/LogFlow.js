@@ -114,11 +114,19 @@ export default function LogFlow({
   const chosenGuests = guests.filter((guest) => selected.includes(guest.id));
   // Order: you, then teammates, then guests. A teammate's key starts with p:.
   const participants = [
-    { key: "me", name: profile.nickname, color: playerColor(0) },
+    {
+      key: "me",
+      name: profile.nickname,
+      color: playerColor(0),
+      registered: true,
+      character: profile.character,
+    },
     ...chosenMembers.map((member, index) => ({
       key: `p:${member.id}`,
       name: member.nickname,
       color: playerColor(index + 1),
+      registered: true,
+      character: member.character,
     })),
     ...chosenGuests.map((guest, index) => ({
       key: guest.id,
@@ -452,7 +460,7 @@ export default function LogFlow({
           <div className={styles.strip}>
             {participants.map((p) => (
               <div key={p.key} className={styles.stripItem}>
-                <Avatar name={p.name} size={56} color={p.color} />
+                <Avatar name={p.name} size={56} color={p.color} registered={p.registered} character={p.character} />
                 {p.name}
               </div>
             ))}
@@ -460,7 +468,7 @@ export default function LogFlow({
 
           <ul className={`${styles.list} stagger`}>
             <li className={styles.row}>
-              <Avatar name={profile.nickname} size={40} color={playerColor(0)} />
+              <Avatar name={profile.nickname} size={40} color={playerColor(0)} registered character={profile.character} />
               <span className={styles.rowText}>
                 <span className={styles.rowName}>{profile.nickname}</span>
               </span>
@@ -482,7 +490,7 @@ export default function LogFlow({
                     aria-pressed={on}
                     onClick={() => toggleMember(member.id)}
                   >
-                    <Avatar name={member.nickname} size={40} color={color} />
+                    <Avatar name={member.nickname} size={40} color={color} registered character={member.character} />
                     <span className={styles.rowText}>
                       <span className={styles.rowName}>{member.nickname}</span>
                     </span>
@@ -608,7 +616,7 @@ export default function LogFlow({
                       aria-pressed={won}
                       onClick={() => setWinner(p.key)}
                     >
-                      <Avatar name={p.name} size={44} color={p.color} />
+                      <Avatar name={p.name} size={44} color={p.color} registered={p.registered} character={p.character} />
                       <span className={styles.rowText}>
                         <span className={styles.rowName}>{p.name}</span>
                       </span>
@@ -646,7 +654,7 @@ export default function LogFlow({
                     key={p.key}
                     className={`${styles.row} ${leads ? styles.rowWin : ""}`}
                   >
-                    <Avatar name={p.name} size={44} color={p.color} />
+                    <Avatar name={p.name} size={44} color={p.color} registered={p.registered} character={p.character} />
                     <label className={styles.rowText} htmlFor={`score_${p.key}`}>
                       <span className={styles.rowName}>{p.name}</span>
                     </label>
@@ -714,7 +722,7 @@ export default function LogFlow({
                             setChoosing(false);
                           }}
                         >
-                          <Avatar name={person.name} size={28} color={person.color} />
+                          <Avatar name={person.name} size={28} color={person.color} registered={person.registered} character={person.character} />
                           {person.name}
                         </button>
                       );

@@ -369,3 +369,19 @@ button {
 .add-anchor {
   position: relative;
 }
+
+/* Names of players who wear an accessory with a name perk */
+.name-gradient {
+  background: linear-gradient(90deg, #ff4fa3, #8f7bff, #2fd6d6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.name-gold {
+  display: inline-block;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #ffe48a, #ffc928);
+  color: #5a4300;
+}

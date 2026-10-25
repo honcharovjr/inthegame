@@ -7,6 +7,7 @@ import ResultBadge from "@/components/ResultBadge/ResultBadge";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Toast from "@/components/Toast/Toast";
 import { getProfile } from "@/lib/auth/session";
+import { nameStyle } from "@/lib/character/items";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
@@ -123,7 +124,7 @@ async function HomeContent({ searchParams }) {
 
   return (
     <>
-      {saved && <Toast message="Session saved. Nice game." />}
+      {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
       <div className={`${styles.content} stagger`}>
       <header className={styles.header}>
         <div className={styles.date}>{dateFormat.format(new Date())}</div>
@@ -138,9 +139,18 @@ async function HomeContent({ searchParams }) {
 
       <section className={styles.panel} aria-label="You">
         <div className={styles.panelTop}>
-          <Avatar name={profile?.nickname} size={64} color="#ff4fa3" />
+          <Avatar
+            name={profile?.nickname}
+            size={64}
+            color="#ff4fa3"
+            registered
+            character={profile?.character}
+            perks
+          />
           <div className={styles.identity}>
-            <div className={styles.name}>{profile?.nickname}</div>
+            <div className={`${styles.name} ${nameStyle(profile?.character)}`}>
+              {profile?.nickname}
+            </div>
           </div>
           <Link href="/log" className={`${styles.logButton} btn-primary`} aria-label="Log a session">
             <span>Log</span>
