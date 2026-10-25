@@ -40,11 +40,19 @@ export default function FlowShell({
               className={styles.back}
               onClick={onBack}
               aria-label="Back"
+              data-tip="Back"
+              data-tip-pos="below"
             >
               {chevron}
             </button>
           ) : (
-            <Link href={backHref} className={styles.back} aria-label="Back">
+            <Link
+              href={backHref}
+              className={styles.back}
+              aria-label="Back"
+              data-tip="Back"
+              data-tip-pos="below"
+            >
               {chevron}
             </Link>
           )}

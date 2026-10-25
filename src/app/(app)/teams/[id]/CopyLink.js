@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import styles from "../teams.module.css";
+import IconButton from "@/components/IconButton/IconButton";
+import { CheckIcon, CopyIcon } from "@/components/icons";
 
-// Copies the invite link and says so for a moment.
+// Copies the invite link. The icon turns into a check for a moment.
 export default function CopyLink({ link }) {
   const [copied, setCopied] = useState(false);
 
@@ -18,8 +19,11 @@ export default function CopyLink({ link }) {
   }
 
   return (
-    <button type="button" className={styles.softButton} onClick={copy}>
-      {copied ? "Copied" : "Copy link"}
-    </button>
+    <IconButton
+      tone="pink"
+      label={copied ? "Copied" : "Copy invite link"}
+      icon={copied ? <CheckIcon size={20} /> : <CopyIcon size={20} />}
+      onClick={copy}
+    />
   );
 }

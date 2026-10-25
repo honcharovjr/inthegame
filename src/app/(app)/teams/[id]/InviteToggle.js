@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import IconButton from "@/components/IconButton/IconButton";
+import { LinkIcon, LinkOffIcon } from "@/components/icons";
 import { setInviteEnabled } from "@/lib/teams/actions";
 import styles from "../teams.module.css";
 
@@ -19,14 +21,13 @@ export default function InviteToggle({ teamId, enabled }) {
 
   return (
     <>
-      <button
-        type="button"
-        className={`${styles.softButton} ${styles.quiet}`}
+      <IconButton
+        tipAlign="end"
+        label={enabled ? "Turn the invite link off" : "Turn the invite link on"}
+        icon={enabled ? <LinkOffIcon size={20} /> : <LinkIcon size={20} />}
         onClick={toggle}
         disabled={pending}
-      >
-        {enabled ? "Turn link off" : "Turn link on"}
-      </button>
+      />
       {error && (
         <p role="alert" className={styles.error}>
           {error}

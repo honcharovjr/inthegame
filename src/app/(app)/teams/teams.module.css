@@ -209,7 +209,6 @@
 
 .invite {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -225,34 +224,20 @@
   background: var(--color-chip);
   font-size: 14px;
   font-weight: 700;
+}
+
+/* The ellipsis only works on a plain block, not on the flex row around it */
+.inviteText {
+  display: block;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.softButton {
-  height: 44px;
-  padding: 0 18px;
-  border-radius: 22px;
-  background: var(--color-pink);
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform 0.12s ease;
-}
 
-.softButton:active {
-  transform: scale(0.95);
-}
 
-.softButton:focus-visible {
-  outline: 3px solid var(--color-ink);
-  outline-offset: 2px;
-}
 
-.quiet {
-  background: var(--color-chip);
-}
 
 .board {
   list-style: none;

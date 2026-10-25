@@ -65,3 +65,43 @@ export function ChevronDownIcon(props) {
     </Icon>
   );
 }
+
+export function CopyIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M9 9h10v10H9zM5 15V5h10" />
+    </Icon>
+  );
+}
+
+export function CheckIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </Icon>
+  );
+}
+
+export function LinkIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+    </Icon>
+  );
+}
+
+export function LinkOffIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1M4 4l16 16" />
+    </Icon>
+  );
+}
+
+export function ResetIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v5h5" />
+    </Icon>
+  );
+}
