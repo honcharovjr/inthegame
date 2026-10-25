@@ -74,6 +74,9 @@
 
 .wordmark {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 18px;
   font-weight: 800;
 }
