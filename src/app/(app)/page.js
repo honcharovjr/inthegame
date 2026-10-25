@@ -219,7 +219,12 @@ async function HomeContent({ searchParams }) {
 
       {recent.length > 0 && (
         <section className={styles.card} aria-label="Recent sessions">
-          <div className={styles.cardTitle}>Recent</div>
+          <div className={styles.cardHead}>
+            <span className={styles.cardTitle}>Recent</span>
+            <Chip size="s" href="/history">
+              All sessions
+            </Chip>
+          </div>
           <ul className={styles.recent}>
             {recent.map((session) => (
               <li key={session.id} className={styles.recentRow}>

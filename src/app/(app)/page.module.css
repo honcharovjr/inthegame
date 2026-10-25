@@ -152,6 +152,12 @@
   gap: 10px;
 }
 
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .numbers {
   display: flex;
   flex-wrap: wrap;

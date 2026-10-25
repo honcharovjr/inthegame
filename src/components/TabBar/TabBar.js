@@ -19,7 +19,7 @@ const TABS = [
   { id: "games", label: "Games", href: "/games" },
   { id: "log", label: "Log a session", href: "/log" },
   { id: "groups", label: "Groups", href: null },
-  { id: "profile", label: "Profile", href: null },
+  { id: "profile", label: "Profile", href: "/profile" },
 ];
 
 // Floating capsule menu with icon tabs. The active tab is a pink circle.
