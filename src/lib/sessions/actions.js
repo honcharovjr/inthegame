@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth/session";
 import { rebuildGameRatings } from "@/lib/rating/rebuild";
 import { createClient } from "@/lib/supabase/server";
@@ -120,5 +121,43 @@ export async function saveSession(input) {
     console.error("rebuildGameRatings failed", ratingError);
   }
 
+  return { ok: true };
+}
+
+// Deletes a session of the player and rebuilds the ratings of its game, so the
+// result is the same as if the session had never been logged.
+export async function deleteSession(sessionId) {
+  if (!UUID.test(String(sessionId))) {
+    return { error: "Unknown session." };
+  }
+
+  const supabase = await createClient();
+  const { data: session } = await supabase
+    .from("sessions")
+    .select("id, game_id")
+    .eq("id", sessionId)
+    .maybeSingle();
+  if (!session) {
+    return { error: "Unknown session." };
+  }
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .delete()
+    .eq("id", sessionId)
+    .select("id");
+  if (error || !data?.length) {
+    if (error) console.error("deleteSession failed", error);
+    return { error: "Only the player who logged a session can delete it." };
+  }
+
+  try {
+    await rebuildGameRatings(session.game_id);
+  } catch (ratingError) {
+    console.error("rebuildGameRatings failed", ratingError);
+  }
+
+  revalidatePath("/history");
+  revalidatePath("/");
   return { ok: true };
 }

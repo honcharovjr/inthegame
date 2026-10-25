@@ -1,0 +1,61 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  gap: 6px;
+  animation: pop 0.2s ease both;
+}
+
+.ask,
+.cancel,
+.confirm {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 17px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.2s ease;
+}
+
+.ask,
+.cancel {
+  background: var(--color-chip);
+  color: var(--color-ink);
+}
+
+.confirm {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+
+.ask:active,
+.cancel:active,
+.confirm:active {
+  transform: scale(0.94);
+}
+
+.ask:focus-visible,
+.cancel:focus-visible,
+.confirm:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error {
+  max-width: 220px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--color-pink-ink);
+}
