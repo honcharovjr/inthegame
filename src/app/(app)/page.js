@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import Skeleton from "@/components/Skeleton/Skeleton";
+import Toast from "@/components/Toast/Toast";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
 import { findGameType } from "@/lib/games/types";
@@ -118,17 +119,13 @@ async function HomeContent({ searchParams }) {
   });
 
   return (
-    <div className={`${styles.content} stagger`}>
+    <>
+      {saved && <Toast message="Session saved. Nice game." />}
+      <div className={`${styles.content} stagger`}>
       <header className={styles.header}>
         <div className={styles.date}>{dateFormat.format(new Date())}</div>
         <h1 className={styles.title}>Hey, {profile?.nickname ?? "player"}</h1>
       </header>
-
-      {saved && (
-        <p role="status" className={styles.saved}>
-          Session saved. Nice game.
-        </p>
-      )}
 
       {error && (
         <p role="alert" className={styles.problem}>
@@ -243,7 +240,9 @@ async function HomeContent({ searchParams }) {
                     )}
                   </span>
                 </span>
-                <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
+                <span className={styles.resultChip}>
+                  <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
+                </span>
               </li>
             ))}
           </ul>
@@ -255,6 +254,7 @@ async function HomeContent({ searchParams }) {
           Log out
         </button>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

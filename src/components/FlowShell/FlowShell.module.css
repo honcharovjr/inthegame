@@ -97,7 +97,7 @@
 
 .headline {
   margin-top: 8px;
-  font-size: 60px;
+  font-size: clamp(40px, 15vw, 60px);
   line-height: 0.92;
   font-weight: 800;
   letter-spacing: -0.05em;
@@ -144,7 +144,7 @@
   .headline {
     grid-area: headline;
     margin-top: 24px;
-    font-size: 120px;
+    font-size: clamp(56px, 7vw, 112px);
   }
 
   .content {
