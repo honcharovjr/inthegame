@@ -29,16 +29,17 @@ function CatalogSkeleton() {
     <>
       <Skeleton height={48} radius={24} />
       <div className={styles.filters}>
-        <Skeleton width={56} height={32} radius={16} />
-        <Skeleton width={72} height={32} radius={16} />
-        <Skeleton width={64} height={32} radius={16} />
-        <Skeleton width={64} height={32} radius={16} />
+        <Skeleton width={56} height={32} radius={16} delay={80} />
+        <Skeleton width={72} height={32} radius={16} delay={120} />
+        <Skeleton width={64} height={32} radius={16} delay={160} />
+        <Skeleton width={64} height={32} radius={16} delay={200} />
       </div>
-      <div className={styles.list}>
-        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
-        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
-        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
-        <Skeleton height={64} radius={22} style={{ margin: "8px 14px", width: "auto" }} />
+      <div className={styles.skeletonList}>
+        <Skeleton height={64} radius={22} delay={240} />
+        <Skeleton height={64} radius={22} delay={320} />
+        <Skeleton height={64} radius={22} delay={400} />
+        <Skeleton height={64} radius={22} delay={480} />
+        <Skeleton height={64} radius={22} delay={560} />
       </div>
     </>
   );
@@ -103,7 +104,7 @@ async function Catalog({ searchParams }) {
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
-    <>
+    <div className={`${styles.body} stagger`}>
       <form method="get" role="search" className={styles.search}>
         <SearchIcon size={20} />
         <input
@@ -168,7 +169,7 @@ async function Catalog({ searchParams }) {
         <p className={styles.empty}>No games match these filters.</p>
       )}
 
-      <ul className={styles.list}>
+      <ul className={`${styles.list} stagger`}>
         {games?.map((game) => (
           <GameRow key={game.id} game={game} />
         ))}
@@ -191,6 +192,6 @@ async function Catalog({ searchParams }) {
           )}
         </nav>
       )}
-    </>
+    </div>
   );
 }

@@ -39,3 +39,15 @@ export function validatePlaces(places) {
   }
   return places;
 }
+
+// Drag and drop ranking: the list order gives the places. A player marked as
+// tied shares the place of the player above. Competition ranking:
+// order a, b, c, d with c tied to b gives places 1, 2, 2, 4.
+export function placesFromOrder(order, tied = {}) {
+  const places = {};
+  order.forEach((key, index) => {
+    places[key] =
+      index > 0 && tied[key] ? places[order[index - 1]] : index + 1;
+  });
+  return places;
+}

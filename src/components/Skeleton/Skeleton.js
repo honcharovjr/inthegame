@@ -7,12 +7,19 @@ export default function Skeleton({
   height = 16,
   radius = 12,
   tone = "soft",
+  delay = 0,
   style,
 }) {
   return (
     <div
       className={`${styles.skeleton} ${styles[tone]}`}
-      style={{ width, height, borderRadius: radius, ...style }}
+      style={{
+        width,
+        height,
+        borderRadius: radius,
+        animationDelay: `0s, ${delay}ms`,
+        ...style,
+      }}
       aria-hidden="true"
     />
   );

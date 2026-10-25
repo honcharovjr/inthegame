@@ -70,12 +70,12 @@ function LogSkeleton() {
     <main className={styles.skeletonPage}>
       <div className={styles.skeletonColumn}>
         <Skeleton tone="light" width={44} height={44} radius={22} />
-        <Skeleton tone="light" height={6} radius={3} />
-        <Skeleton tone="light" width={220} height={110} radius={20} />
-        <Skeleton tone="light" height={54} radius={27} />
-        <Skeleton tone="light" height={78} radius={24} />
-        <Skeleton tone="light" height={78} radius={24} />
-        <Skeleton tone="light" height={78} radius={24} />
+        <Skeleton tone="light" height={6} radius={3} delay={60} />
+        <Skeleton tone="light" width={220} height={110} radius={20} delay={120} />
+        <Skeleton tone="light" height={54} radius={27} delay={200} />
+        <Skeleton tone="light" height={78} radius={24} delay={280} />
+        <Skeleton tone="light" height={78} radius={24} delay={360} />
+        <Skeleton tone="light" height={78} radius={24} delay={440} />
       </div>
     </main>
   );
