@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { AlertIcon } from "@/components/icons";
 import styles from "./AuthForm.module.css";
 
 // A form that runs a server action and shows its error or notice.
@@ -24,34 +25,67 @@ export default function AuthForm({
       {Object.entries(hidden).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
-      {fields.map((field) => (
-        <div key={field.name}>
-          <label className={styles.label} htmlFor={field.name}>
-            {field.label}
-          </label>
-          <input
-            className={styles.input}
-            id={field.name}
-            name={field.name}
-            type={field.type}
-            autoComplete={field.autoComplete}
-            placeholder={field.placeholder}
-            // Keep what was typed after a failed try, except passwords.
-            defaultValue={
-              field.type === "password" ? undefined : state?.values?.[field.name]
-            }
-            required
-          />
-        </div>
-      ))}
+      {fields.map((field) => {
+        const invalid = state?.error && state?.fields?.includes(field.name);
+        return (
+          <div key={field.name}>
+            <label className={styles.label} htmlFor={field.name}>
+              {field.label}
+            </label>
+            <div className={styles.field}>
+              <input
+                key={state?.at}
+                className={`${styles.input} ${invalid ? styles.invalid : ""}`}
+                id={field.name}
+                name={field.name}
+                type={field.type}
+                autoComplete={field.autoComplete}
+                placeholder={field.placeholder}
+                aria-invalid={invalid ? "true" : undefined}
+                // Keep what was typed after a failed try, except passwords.
+                defaultValue={
+                  field.type === "password"
+                    ? undefined
+                    : state?.values?.[field.name]
+                }
+                required
+              />
+              {invalid && (
+                <span
+                  className={styles.errorIcon}
+                  data-tip={state.error}
+                  data-tip-align="end"
+                  tabIndex={0}
+                  role="img"
+                  aria-label={state.error}
+                >
+                  <AlertIcon size={20} />
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
 
+      {/* Messages float above the page, so the card never changes size */}
       {state?.error && (
-        <p role="alert" className={`${styles.message} ${styles.error}`}>
+        <p
+          key={state.at ?? "initial"}
+          role="alert"
+          className={`${styles.popup} ${styles.popupError}`}
+        >
+          <span className={styles.popupIcon} aria-hidden="true">
+            <AlertIcon size={18} />
+          </span>
           {state.error}
         </p>
       )}
       {state?.notice && (
-        <p role="status" className={`${styles.message} ${styles.notice}`}>
+        <p
+          key={state.at}
+          role="status"
+          className={`${styles.popup} ${styles.popupNotice}`}
+        >
           {state.notice}
         </p>
       )}

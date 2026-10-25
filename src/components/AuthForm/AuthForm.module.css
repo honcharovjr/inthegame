@@ -38,20 +38,107 @@
   box-shadow: 0 0 0 4px var(--color-focus), 0 6px 18px rgba(214, 36, 122, 0.12);
 }
 
-.message {
-  padding: 10px 16px;
-  border-radius: var(--radius-chip);
-  background: var(--message-bg, var(--color-surface));
-  font-size: 14px;
-  font-weight: 700;
+.field {
+  position: relative;
 }
 
-.error {
-  color: var(--color-pink-ink);
+.invalid {
+  padding-right: 54px;
+  background: var(--color-danger-tint);
+  box-shadow: 0 0 0 2px var(--color-danger);
 }
 
-.notice {
+.invalid:focus-visible {
+  box-shadow: 0 0 0 4px rgba(229, 36, 59, 0.3);
+}
+
+.errorIcon {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-danger);
+  cursor: help;
+}
+
+.errorIcon:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* The tooltip may wrap, unlike the one-word tooltips elsewhere */
+.errorIcon[data-tip]::after {
+  width: 200px;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+/* A notice that floats at the top and fades away by itself */
+.popup {
+  position: fixed;
+  z-index: 50;
+  top: 16px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(calc(100vw - 32px), 420px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px 14px 14px;
+  border-radius: 22px;
+  box-shadow: var(--shadow-float);
+  font-size: 15px;
+  font-weight: 800;
+  animation: popup-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    popup-out 0.3s ease 6s forwards;
+}
+
+.popupError {
+  background: var(--color-danger-tint);
+  color: var(--color-danger-ink);
+}
+
+.popupNotice {
+  background: var(--color-turquoise-tint);
   color: var(--color-turquoise-ink);
+}
+
+.popupIcon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(-28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes popup-out {
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96);
+    visibility: hidden;
+  }
 }
 
 .button {

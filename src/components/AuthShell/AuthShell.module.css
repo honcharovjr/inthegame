@@ -132,7 +132,6 @@
     background: var(--color-surface);
     box-shadow: var(--shadow-float);
     --field-bg: var(--color-chip);
-    --message-bg: var(--color-chip);
     --text-hover: var(--color-pink-deep);
   }
 

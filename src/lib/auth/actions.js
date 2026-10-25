@@ -24,18 +24,25 @@ async function readOrigin() {
   return (await headers()).get("origin");
 }
 
+// A failed or finished form. fields names the inputs to mark; at lets the
+// page show the same message again after a second try.
+function result(message, values, fields = []) {
+  return { ...message, values, fields, at: Date.now() };
+}
+
 export async function signUp(previousState, formData) {
   const email = readEmail(formData);
   const password = readPassword(formData);
 
   if (!email) {
-    return { error: "Enter your email.", values: { email } };
+    return result({ error: "Enter your email." }, { email }, ["email"]);
   }
   if (password.length < MIN_PASSWORD_LENGTH) {
-    return {
-      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
-      values: { email },
-    };
+    return result(
+      { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` },
+      { email },
+      ["password"],
+    );
   }
 
   const supabase = await createClient();
@@ -48,13 +55,10 @@ export async function signUp(previousState, formData) {
   });
 
   if (error) {
-    return { error: error.message, values: { email } };
+    return result({ error: error.message }, { email }, ["email"]);
   }
   if (!data.session) {
-    return {
-      notice: "Check your email to confirm your account.",
-      values: { email },
-    };
+    return result({ notice: "Check your email to confirm your account." }, { email });
   }
   redirect(readNext(formData));
 }
@@ -64,14 +68,20 @@ export async function signIn(previousState, formData) {
   const password = readPassword(formData);
 
   if (!email || !password) {
-    return { error: "Enter your email and password.", values: { email } };
+    return result({ error: "Enter your email and password." }, { email }, [
+      !email && "email",
+      !password && "password",
+    ].filter(Boolean));
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: "Wrong email or password.", values: { email } };
+    return result({ error: "Wrong email or password." }, { email }, [
+      "email",
+      "password",
+    ]);
   }
   redirect(readNext(formData));
 }
@@ -80,7 +90,7 @@ export async function requestPasswordReset(previousState, formData) {
   const email = readEmail(formData);
 
   if (!email) {
-    return { error: "Enter your email.", values: { email } };
+    return result({ error: "Enter your email." }, { email }, ["email"]);
   }
 
   const supabase = await createClient();
@@ -89,26 +99,28 @@ export async function requestPasswordReset(previousState, formData) {
   });
 
   // Same answer whether or not the email has an account.
-  return {
-    notice: "If that email has an account, a reset link is on its way.",
-    values: { email },
-  };
+  return result(
+    { notice: "If that email has an account, a reset link is on its way." },
+    { email },
+  );
 }
 
 export async function updatePassword(previousState, formData) {
   const password = readPassword(formData);
 
   if (password.length < MIN_PASSWORD_LENGTH) {
-    return {
-      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
-    };
+    return result(
+      { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` },
+      {},
+      ["password"],
+    );
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
-    return { error: error.message };
+    return result({ error: error.message }, {}, ["password"]);
   }
   redirect("/");
 }
