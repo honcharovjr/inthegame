@@ -52,7 +52,7 @@ async function StatsContent({ params, searchParams }) {
     supabase.from("teams").select("id, name").eq("id", id).maybeSingle(),
     supabase
       .from("team_members")
-      .select("profile_id, profiles(nickname)")
+      .select("profile_id, profiles(nickname, character)")
       .eq("team_id", id),
     supabase
       .from("sessions")
@@ -70,6 +70,7 @@ async function StatsContent({ params, searchParams }) {
   const members = (membersResult.data ?? []).map((row) => ({
     id: row.profile_id,
     name: row.profiles?.nickname ?? "Player",
+    character: row.profiles?.character ?? null,
   }));
   const sessions = sessionsResult.data ?? [];
   const games = teamGames(
@@ -161,7 +162,13 @@ async function StatsContent({ params, searchParams }) {
                 >
                   {index + 1}
                 </span>
-                <Avatar name={row.name} size={36} color={playerColor(index)} />
+                <Avatar
+                  name={row.name}
+                  size={36}
+                  color={playerColor(index)}
+                  registered
+                  character={members.find((m) => m.id === row.id)?.character}
+                />
                 <span className={styles.boardName}>{row.name}</span>
                 <span className={styles.boardChips}>
                   <Chip size="s">

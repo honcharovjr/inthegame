@@ -7,6 +7,7 @@ import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
 import { LogoutIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
+import { nameStyle } from "@/lib/character/items";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
 import { deleteGuest } from "@/lib/profile/actions";
@@ -50,9 +51,19 @@ async function ProfileContent() {
   return (
     <div className={`${styles.body} stagger`}>
       <section className={styles.card} aria-label="You">
-        <Avatar name={profile?.nickname} size={72} color="#ff4fa3" />
+        <Avatar
+          name={profile?.nickname}
+          size={104}
+          color="#ff4fa3"
+          registered
+          character={profile?.character}
+          perks
+        />
         <div className={styles.identity}>
-          <NicknameForm nickname={profile?.nickname ?? ""} />
+          <NicknameForm
+            nickname={profile?.nickname ?? ""}
+            nameClass={nameStyle(profile?.character)}
+          />
           {profile?.created_at && <PlayingSince date={profile.created_at} />}
         </div>
       </section>
@@ -86,6 +97,14 @@ async function ProfileContent() {
       </section>
 
       <div className={styles.links}>
+        <Link href="/profile/customize" className={styles.linkRow}>
+          <span>Customize character</span>
+          <span aria-hidden="true">&#8250;</span>
+        </Link>
+        <Link href="/profile/achievements" className={styles.linkRow}>
+          <span>Achievements</span>
+          <span aria-hidden="true">&#8250;</span>
+        </Link>
         <Link href="/history" className={styles.linkRow}>
           <span>Session history</span>
           <span aria-hidden="true">&#8250;</span>

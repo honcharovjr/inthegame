@@ -40,7 +40,7 @@ async function LogData() {
       .limit(1),
     supabase
       .from("team_members")
-      .select("teams(id, name, team_members(profile_id, profiles(nickname)))")
+      .select("teams(id, name, team_members(profile_id, profiles(nickname, character)))")
       .eq("profile_id", profile?.id),
   ]);
 
@@ -53,6 +53,7 @@ async function LogData() {
       members: row.teams.team_members.map((member) => ({
         id: member.profile_id,
         nickname: member.profiles?.nickname ?? "Player",
+        character: member.profiles?.character ?? null,
       })),
     }));
 
@@ -83,7 +84,7 @@ async function LogData() {
 
   return (
     <LogFlow
-      profile={{ id: profile.id, nickname: profile.nickname }}
+      profile={{ id: profile.id, nickname: profile.nickname, character: profile.character ?? null }}
       games={gamesResult.data}
       initialGuests={guestsResult.data ?? []}
       teams={teams}

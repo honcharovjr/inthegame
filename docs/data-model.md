@@ -39,6 +39,7 @@ One row per registered user. Created by a trigger on sign-up (Assumption: trigge
 | user_id | uuid, unique | References `auth.users(id)` on delete set null. Null after the account is deleted |
 | nickname | text, not null | 2 to 30 characters |
 | avatar_url | text | Optional, points to Storage |
+| character | jsonb | Optional. The chosen item codes of the character, see docs/character.md. Null means the default blob. Must be a JSON object |
 | created_at | timestamptz, not null | Default `now()` |
 
 Account deletion (FR-05, Pilot): the auth user is deleted, `user_id` becomes null, and the row is anonymized (placeholder nickname, no avatar) instead of removed, so sessions of other players stay consistent.
@@ -171,6 +172,31 @@ One row per rated participant per session. Feeds the progress chart (FR-20) and 
 
 Rebuilding a game deletes its `rating_history` rows and `ratings`, then replays its sessions.
 
+### 3.10 achievements
+
+The catalog of achievements (FR-21), filled by a migration. The rules live in code (docs/achievements.md).
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid, PK | |
+| code | text, not null, unique | Stable kebab-case code, for example `first-win` |
+| name | text, not null | |
+| description | text, not null | One sentence, the rule in words |
+| tier | smallint, not null | 1 to 3 |
+| sort_order | smallint, not null | |
+
+### 3.11 user_achievements
+
+Who earned what. Written server-side only. Never deleted when a session is deleted.
+
+| Column | Type | Notes |
+|---|---|---|
+| profile_id | uuid, not null | References `profiles(id)` on delete cascade |
+| achievement_id | uuid, not null | References `achievements(id)` on delete cascade |
+| earned_at | timestamptz, not null | Default `now()` |
+
+Primary key (`profile_id`, `achievement_id`).
+
 ## 4. Statistics
 
 No stored statistics tables in the MVP. Games played, wins and win rate (docs/rating.md section 6) are computed by queries or SQL views over `session_participants`. The overall team leaderboard is ranked by wins and games played (docs/rating.md section 9, proposal). Revisit if queries become slow.
@@ -190,6 +216,8 @@ Helper functions are `security definer` with a fixed `search_path`, so policies 
 | session_participants | Same as the parent session | Creator of the parent session | Creator of the parent session | Creator of the parent session |
 | ratings | Same visibility as the player's profile or guest | Server-side only | Server-side only | Server-side only |
 | rating_history | Same as `ratings` | Server-side only | Server-side only | Server-side only |
+| achievements | Any logged-in user | Migration only | Migration only | Migration only |
+| user_achievements | Same visibility as the player's profile | Server-side only | Server-side only | Server-side only |
 
 Notes:
 

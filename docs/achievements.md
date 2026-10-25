@@ -93,8 +93,8 @@ Tier shows how hard it is: 1 easy, 2 medium, 3 hard.
 
 All rules are computed from `sessions`, `session_participants`, `games`, `teams`, `team_members`, `ratings` and `rating_history`. No new data is collected. The checks are pure functions in `src/lib/achievements/` with tests, in the same style as `src/lib/rating/` and `src/lib/stats/`.
 
-## 5. Open points
+## 5. Decisions
 
-1. Are the thresholds right for groups of 20 to 50 users? (Assumption: yes for a pilot)
-2. Should deleting a session ever take an achievement back? (Assumption: no)
-3. Do guests who later link to an account inherit achievements? (Out of scope until guest linking exists, P4)
+1. Thresholds are accepted as listed, to be tuned on pilot data
+2. Deleting a session never takes an achievement back
+3. A team admin will later be able to link a guest to a registered player. Linking is out of scope for now, and achievements are not stored for guests or moved by linking. This is noted only for context

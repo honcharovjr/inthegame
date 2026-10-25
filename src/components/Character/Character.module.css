@@ -1,0 +1,138 @@
+.wrap {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+  line-height: 0;
+}
+
+.svg {
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* Laurel wreath: a gold ring even on small avatars */
+.ring {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ffc928;
+}
+
+/* The perks. They only run where the character is large. */
+.perk_bounce:hover .svg {
+  animation: bounce 0.6s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.perk_glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+.perk_sway .figure {
+  transform-origin: 50% 90%;
+  animation: sway 3.6s ease-in-out infinite;
+}
+
+.shineBar {
+  animation: shine 4.5s ease-in-out infinite;
+}
+
+.wrap:not(.perk_shine) .shineBar {
+  animation: none;
+  opacity: 0;
+}
+
+.confetti,
+.sparkles,
+.swoosh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 7%;
+  height: 7%;
+  border-radius: 2px;
+  background: var(--c);
+  opacity: 0;
+  animation: burst 1.4s cubic-bezier(0.2, 0.8, 0.3, 1) 0.2s both;
+  transform: rotate(var(--a)) translateY(0);
+}
+
+.sparkles i {
+  position: absolute;
+  width: 14%;
+  height: 14%;
+  background: #ffc928;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: twinkle 2.2s ease-in-out infinite;
+}
+
+.swoosh::before {
+  content: "";
+  position: absolute;
+  left: -30%;
+  top: 55%;
+  width: 90%;
+  height: 8%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, transparent, #8f7bff);
+  transform: rotate(-18deg) translateX(-40%);
+  opacity: 0;
+  animation: swoosh 1.1s ease-out 0.3s both;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-8%); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 162, 58, 0); filter: drop-shadow(0 0 4px rgba(255, 162, 58, 0.45)); }
+  50% { filter: drop-shadow(0 0 14px rgba(255, 162, 58, 0.9)); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes shine {
+  0%, 55% { transform: translateX(0); opacity: 0; }
+  60% { opacity: 0.9; }
+  85% { transform: translateX(90px); opacity: 0.9; }
+  100% { transform: translateX(90px); opacity: 0; }
+}
+
+@keyframes burst {
+  0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(0.6); }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(-190%) scale(1); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+
+@keyframes swoosh {
+  0% { opacity: 0; transform: rotate(-18deg) translateX(-40%); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(-18deg) translateX(90%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .perk_glow,
+  .perk_sway .figure,
+  .shineBar,
+  .sparkles i {
+    animation: none;
+  }
+
+  .confetti,
+  .swoosh {
+    display: none;
+  }
+}

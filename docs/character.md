@@ -19,7 +19,7 @@ A character is a choice of one item in each group. Free items are open from the 
 | Body colour | 10 colours from the project palette | none |
 | Eyes | Dots, Wide, Sleepy, Happy, Wink | none |
 | Mouth | Smile, Grin, Flat, Open, Tongue | none |
-| Background | 8 solid colours and patterns: dots, stripes, rings, plain | 4 patterns unlocked by achievements |
+| Background | 8 free: 5 plain colours, Dots, Stripes, Rings | 4 patterns: Confetti (Winner's Circle), Zigzag (Globetrotter), Stars (Centurion), Checker (Weekly Habit) |
 | Badge | none | Any earned achievement can be worn as a small badge on the character |
 | Accessory | none | 10 accessories, see section 3 |
 
@@ -60,8 +60,8 @@ On the profile, a "Customize" screen with a large live preview and one row of op
 - Item codes are defined in code (`src/lib/character/items.js`) together with the achievement that unlocks each accessory, so adding an item needs no migration
 - Row Level Security: achievements readable by every logged-in user. `user_achievements` readable like a profile, written by the server only. `profiles.character` is written by its owner through the existing profile update rules
 
-## 7. Open points
+## 7. Decisions
 
-1. Are 10 accessories and 5 free options per group enough for the pilot? (Assumption: yes)
-2. Should other players see locked accessories on someone's profile? (Assumption: no, only worn items are shown)
-3. Later phases can add items that cost nothing in the database: new codes in `items.js`
+1. 10 accessories and 5 free options per group are enough for the pilot. Mass content creation comes after the MVP
+2. Other players see only the items a player wears, never the locked ones
+3. New items later are new codes in `items.js`, with no migration

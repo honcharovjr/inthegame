@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { awardAchievements } from "@/lib/achievements/award";
 import { getProfile } from "@/lib/auth/session";
 import { rebuildGameRatings } from "@/lib/rating/rebuild";
 import { createClient } from "@/lib/supabase/server";
@@ -126,6 +127,16 @@ export async function saveSession(input) {
     await rebuildGameRatings(gameId);
   } catch (ratingError) {
     console.error("rebuildGameRatings failed", ratingError);
+  }
+
+  // Achievements come after ratings, because some depend on them. The same
+  // rule applies: a failure here never undoes the saved session.
+  try {
+    await awardAchievements(
+      participants.map((p) => p.profile_id).filter(Boolean),
+    );
+  } catch (achievementError) {
+    console.error("awardAchievements failed", achievementError);
   }
 
   return { ok: true };

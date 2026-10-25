@@ -97,7 +97,7 @@ export default function RankingList({
             <span className={styles.rank} aria-hidden="true">
               {place}
             </span>
-            <Avatar name={p.name} size={40} color={p.color} />
+            <Avatar name={p.name} size={40} color={p.color} registered={p.registered} character={p.character} />
             <span className={styles.rowText}>
               <span className={styles.rowName}>{p.name}</span>
             </span>

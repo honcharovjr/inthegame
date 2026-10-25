@@ -8,7 +8,7 @@ import styles from "./profile.module.css";
 
 // The player's name with a pen next to it. The pen turns the name into an
 // input, and the green tick saves it.
-export default function NicknameForm({ nickname }) {
+export default function NicknameForm({ nickname, nameClass = "" }) {
   const [editing, setEditing] = useState(false);
   const [state, formAction, pending] = useActionState(
     async (previous, formData) => {
@@ -22,7 +22,7 @@ export default function NicknameForm({ nickname }) {
   if (!editing) {
     return (
       <div className={styles.nameRow}>
-        <span className={styles.name}>{nickname}</span>
+        <span className={`${styles.name} ${nameClass}`}>{nickname}</span>
         <IconButton
           icon={<PenIcon size={18} />}
           label="Change nickname"

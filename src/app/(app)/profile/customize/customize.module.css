@@ -1,0 +1,235 @@
+.page {
+  padding: var(--space-6) var(--space-4) 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.title {
+  padding: 0 4px;
+  font-size: clamp(36px, 11vw, 44px);
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
+}
+
+.stageText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.stageName {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.card {
+  padding: 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tile {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-chip);
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .tile:hover:not(.tileLocked) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(18, 10, 26, 0.14);
+  }
+}
+
+.tileOn {
+  background: var(--color-pink-tint);
+  box-shadow: 0 0 0 3px var(--color-pink-deep);
+}
+
+.tileLocked {
+  cursor: help;
+}
+
+.tileLocked > :first-child {
+  opacity: 0.35;
+  filter: grayscale(0.7);
+}
+
+.lock {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  box-shadow: 0 2px 6px rgba(18, 10, 26, 0.2);
+  color: var(--color-muted);
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Tooltips of locked tiles are longer than one word */
+.tile[data-tip]::after {
+  white-space: normal;
+  width: 190px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(18, 10, 26, 0.12);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.badgeChip {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: var(--color-chip);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.badgeOn {
+  background: var(--color-pink-deep);
+  color: #ffffff;
+}
+
+.badgeChip:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.empty {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.error {
+  padding: 10px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--color-danger-tint);
+  color: var(--color-danger-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.reset,
+.save {
+  height: 52px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.reset {
+  flex: 1;
+}
+
+.save {
+  flex: 2;
+}
+
+.save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (min-width: 900px) {
+  .page {
+    padding: 56px 56px 48px;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: clamp(48px, 6vw, 76px);
+  }
+
+  .body {
+    max-width: 860px;
+  }
+
+  .stage {
+    flex-direction: row;
+    gap: 28px;
+    padding: 28px 32px;
+  }
+
+  .stageText {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .stageName {
+    font-size: 36px;
+  }
+}
