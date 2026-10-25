@@ -80,13 +80,13 @@
 }
 
 .signOut {
-  align-self: flex-start;
-  padding: 6px 4px;
-  background: none;
-  font-size: 15px;
+  width: 100%;
+  height: 52px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
   font-weight: 800;
-  color: var(--color-pink-deep);
-  cursor: pointer;
+  color: var(--color-pink-ink);
+  --btn-bg: var(--color-pink-tint);
 }
 
 /* This month */
@@ -303,25 +303,9 @@
   height: 48px;
   padding: 0 6px 0 18px;
   border-radius: var(--radius-pill);
-  background: var(--color-pink);
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-.logButton:hover {
-  box-shadow: var(--shadow-card);
-  transform: translateY(-1px);
-}
-
-.logButton:active {
-  transform: scale(0.96);
-}
-
-.logButton:focus-visible {
-  outline: 3px solid var(--color-ink);
-  outline-offset: 3px;
 }
 
 .logPlus {
@@ -329,6 +313,7 @@
   height: 36px;
   border-radius: 50%;
   background: var(--color-surface);
+  color: var(--color-pink-deep);
   display: flex;
   align-items: center;
   justify-content: center;

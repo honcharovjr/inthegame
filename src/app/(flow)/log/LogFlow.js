@@ -598,7 +598,7 @@ export default function LogFlow({
 
           <button
             type="button"
-            className={styles.cta}
+            className={`${styles.cta} btn-secondary`}
             disabled={participants.length < 2}
             onClick={enterResult}
           >
@@ -758,7 +758,7 @@ export default function LogFlow({
                   </div>
                   <button
                     type="button"
-                    className={styles.cancel}
+                    className={`${styles.cancel} btn-secondary`}
                     onClick={() => {
                       setChoosing(false);
                       setTiebreak(null);
@@ -776,7 +776,7 @@ export default function LogFlow({
                   </p>
                   <button
                     type="button"
-                    className={styles.small}
+                    className={`${styles.small} btn-secondary`}
                     onClick={() => setChoosing(true)}
                   >
                     {activeTiebreak
@@ -796,7 +796,7 @@ export default function LogFlow({
 
           <button
             type="button"
-            className={styles.cta}
+            className={`${styles.cta} btn-secondary`}
             disabled={phase !== "idle"}
             onClick={save}
           >

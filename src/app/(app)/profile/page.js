@@ -103,7 +103,7 @@ async function ProfileContent() {
       </div>
 
       <form action={signOut}>
-        <button type="submit" className={styles.signOut}>
+        <button type="submit" className={`${styles.signOut} btn-secondary`}>
           Log out
         </button>
       </form>

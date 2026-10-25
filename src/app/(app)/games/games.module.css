@@ -119,7 +119,7 @@
 }
 
 .addButton:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 

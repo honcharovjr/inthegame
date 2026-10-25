@@ -7,6 +7,7 @@
 
 .pink {
   background: var(--color-pink);
+  --text-hover: var(--color-surface);
 }
 
 .turquoise {
@@ -132,6 +133,7 @@
     box-shadow: var(--shadow-float);
     --field-bg: var(--color-chip);
     --message-bg: var(--color-chip);
+    --text-hover: var(--color-pink-deep);
   }
 
   .circle {

@@ -147,7 +147,7 @@ async function HomeContent({ searchParams }) {
               </Chip>
             )}
           </div>
-          <Link href="/log" className={styles.logButton} aria-label="Log a session">
+          <Link href="/log" className={`${styles.logButton} btn-primary`} aria-label="Log a session">
             <span>Log</span>
             <span className={styles.logPlus} aria-hidden="true">
               +
@@ -258,7 +258,7 @@ async function HomeContent({ searchParams }) {
       )}
 
       <form action={signOut} className={styles.logout}>
-        <button type="submit" className={styles.signOut}>
+        <button type="submit" className={`${styles.signOut} btn-secondary`}>
           Log out
         </button>
       </form>

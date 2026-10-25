@@ -32,7 +32,7 @@
 }
 
 .searchInput:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .rowButton:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .chipButton:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -200,7 +200,7 @@
 }
 
 .guestInput:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -208,11 +208,10 @@
   height: 48px;
   padding: 0 20px;
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  --btn-bg: var(--color-surface);
   box-shadow: var(--shadow-button);
   font-size: 15px;
   font-weight: 800;
-  cursor: pointer;
 }
 
 .message {
@@ -228,14 +227,13 @@
   margin-top: auto;
   height: 60px;
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  --btn-bg: var(--color-surface);
   box-shadow: var(--shadow-button);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   font-weight: 800;
-  cursor: pointer;
 }
 
 .cta[aria-disabled="true"],
@@ -255,7 +253,7 @@
 }
 
 .cta:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 3px;
 }
 
@@ -283,7 +281,7 @@
 }
 
 .switchButton:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 1px;
 }
 
@@ -355,7 +353,7 @@
 }
 
 .handle:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -380,7 +378,7 @@
 }
 
 .tieButton:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -413,7 +411,7 @@
 }
 
 .stepButton:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -440,7 +438,7 @@
 }
 
 .score:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 1px;
 }
 
@@ -522,7 +520,7 @@
 
 .leaderChoice:focus-visible,
 .cancel:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -530,10 +528,9 @@
   height: 40px;
   padding: 0 18px;
   border-radius: 20px;
-  background: rgba(18, 10, 26, 0.08);
+  --btn-bg: rgba(18, 10, 26, 0.08);
   font-size: 14px;
   font-weight: 800;
-  cursor: pointer;
 }
 
 /* Loading and error states of the log page */
@@ -634,7 +631,7 @@
 }
 
 .addGame:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 

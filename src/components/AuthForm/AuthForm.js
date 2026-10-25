@@ -56,7 +56,7 @@ export default function AuthForm({
         </p>
       )}
 
-      <button className={styles.button} type="submit" disabled={pending}>
+      <button className={`${styles.button} btn-primary`} type="submit" disabled={pending}>
         {pending ? "Please wait" : submitLabel}
       </button>
 
@@ -66,7 +66,7 @@ export default function AuthForm({
             <Link
               key={link.href}
               href={link.href}
-              className={link.muted ? styles.muted : styles.strong}
+              className={`${link.muted ? styles.muted : styles.strong} btn-text`}
             >
               {link.label}
             </Link>

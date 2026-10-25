@@ -30,7 +30,7 @@
 }
 
 .trigger:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .search:focus-within {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: 1px;
 }
 
@@ -120,7 +120,7 @@
 }
 
 .option:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--color-focus);
   outline-offset: -3px;
 }
 

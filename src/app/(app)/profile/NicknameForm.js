@@ -25,7 +25,7 @@ export default function NicknameForm({ nickname }) {
           defaultValue={state?.values?.nickname ?? nickname}
           required
         />
-        <button type="submit" className={styles.save} disabled={pending}>
+        <button type="submit" className={`${styles.save} btn-primary`} disabled={pending}>
           {pending ? "Saving" : "Save"}
         </button>
       </div>

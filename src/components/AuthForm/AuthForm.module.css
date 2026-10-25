@@ -28,9 +28,14 @@
   color: var(--color-muted);
 }
 
+.input {
+  transition: box-shadow 0.2s ease;
+}
+
+/* A soft glow, not an outline */
 .input:focus-visible {
-  outline: 3px solid var(--color-ink);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-focus), 0 6px 18px rgba(214, 36, 122, 0.12);
 }
 
 .message {
@@ -57,8 +62,6 @@
   color: var(--color-ink);
   font-size: 18px;
   font-weight: 800;
-  box-shadow: var(--shadow-button);
-  cursor: pointer;
 }
 
 .button:disabled {
@@ -66,10 +69,6 @@
   cursor: default;
 }
 
-.button:focus-visible {
-  outline: 3px solid var(--color-ink);
-  outline-offset: 3px;
-}
 
 .links {
   display: flex;
@@ -88,3 +87,4 @@
   color: var(--color-ink);
   opacity: 0.7;
 }
+

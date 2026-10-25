@@ -42,7 +42,7 @@ export default function ConfirmButton({
   return (
     <>
       {triggerLabel ? (
-        <button type="button" className={styles.textTrigger} onClick={open}>
+        <button type="button" className={`${styles.textTrigger} btn-secondary`} onClick={open}>
           {triggerLabel}
         </button>
       ) : (
@@ -81,7 +81,7 @@ export default function ConfirmButton({
           <div className={styles.actions}>
             <button
               type="button"
-              className={styles.cancel}
+              className={`${styles.cancel} btn-secondary`}
               onClick={close}
               disabled={pending}
             >
@@ -89,7 +89,7 @@ export default function ConfirmButton({
             </button>
             <button
               type="button"
-              className={styles.confirm}
+              className={`${styles.confirm} btn-primary`}
               onClick={run}
               disabled={pending}
             >

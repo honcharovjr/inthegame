@@ -31,6 +31,9 @@
   --color-danger-tint: #ffe3e7;
   --color-danger-ink: #b3132a;
 
+  /* Keyboard focus: a soft raspberry ring instead of a heavy black one */
+  --color-focus: rgba(214, 36, 122, 0.45);
+
   /* Radii */
   --radius-chip: 14px;
   --radius-row: 22px;
@@ -42,6 +45,7 @@
     0 8px 22px rgba(18, 10, 26, 0.06);
   --shadow-float: 0 12px 30px rgba(18, 10, 26, 0.12);
   --shadow-button: 0 10px 24px rgba(18, 10, 26, 0.14);
+  --shadow-lift: 0 16px 32px rgba(18, 10, 26, 0.18);
 
   /* Spacing scale */
   --space-1: 4px;
@@ -232,4 +236,97 @@ button {
 [data-tip][data-tip-align="end"]:hover::after,
 [data-tip][data-tip-align="end"]:focus-visible::after {
   transform: translate(0, 0);
+}
+
+/* Buttons. Three kinds share one structure:
+   .btn-primary   filled block, the one main action of a screen
+   .btn-secondary soft block for everything else
+   .btn-text      text only, changes colour on hover
+   Colours are defaults (zero specificity) so a component can override them
+   with --btn-bg / --btn-ink / --text-hover or its own class. */
+:where(.btn-primary) {
+  background: var(--btn-bg, var(--color-pink-deep));
+  color: var(--btn-ink, #fff);
+  box-shadow: var(--shadow-button);
+}
+
+:where(.btn-secondary) {
+  background: var(--btn-bg, var(--color-chip));
+  color: var(--btn-ink, var(--color-ink));
+}
+
+:where(.btn-text) {
+  background: none;
+}
+
+.btn-primary,
+.btn-secondary {
+  position: relative;
+  isolation: isolate;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.2s ease;
+}
+
+/* The glow lives inside the block, above its fill and below its content */
+.btn-primary::before,
+.btn-secondary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    120% 150% at 50% 0%,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled),
+  .btn-secondary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .btn-primary:hover:not(:disabled)::before,
+  .btn-secondary:hover:not(:disabled)::before {
+    opacity: 1;
+  }
+}
+
+.btn-primary:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-card);
+}
+
+.btn-text {
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .btn-text:hover {
+    color: var(--text-hover, var(--color-pink-deep));
+    opacity: 1;
+  }
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-text:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary:hover:not(:disabled),
+  .btn-secondary:hover:not(:disabled) {
+    transform: none;
+  }
 }
