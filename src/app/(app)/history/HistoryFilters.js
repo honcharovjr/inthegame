@@ -39,38 +39,36 @@ export default function HistoryFilters({ games, filters }) {
       className={`${styles.filters} ${pending ? styles.filtersBusy : ""}`}
       aria-label="Filters"
     >
-      <div className={styles.fields}>
-        <div className={styles.field}>
-          <span className={styles.fieldLabel}>Game</span>
-          <GameSelect
-            games={games}
-            value={filters.game}
-            onChange={(game) => update({ game })}
-          />
-        </div>
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>From</span>
-          <input
-            className={styles.date}
-            type="date"
-            value={filters.from}
-            max={filters.to || undefined}
-            onChange={(event) => update({ from: event.target.value })}
-          />
-        </label>
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>To</span>
-          <input
-            className={styles.date}
-            type="date"
-            value={filters.to}
-            min={filters.from || undefined}
-            onChange={(event) => update({ to: event.target.value })}
-          />
-        </label>
+      <div className={`${styles.field} ${styles.fieldGame}`}>
+        <span className={styles.fieldLabel}>Game</span>
+        <GameSelect
+          games={games}
+          value={filters.game}
+          onChange={(game) => update({ game })}
+        />
       </div>
-
-      <div className={styles.resultRow}>
+      <label className={`${styles.field} ${styles.fieldDate}`}>
+        <span className={styles.fieldLabel}>From</span>
+        <input
+          className={styles.date}
+          type="date"
+          value={filters.from}
+          max={filters.to || undefined}
+          onChange={(event) => update({ from: event.target.value })}
+        />
+      </label>
+      <label className={`${styles.field} ${styles.fieldDate}`}>
+        <span className={styles.fieldLabel}>To</span>
+        <input
+          className={styles.date}
+          type="date"
+          value={filters.to}
+          min={filters.from || undefined}
+          onChange={(event) => update({ to: event.target.value })}
+        />
+      </label>
+      <div className={`${styles.field} ${styles.fieldResult}`}>
+        <span className={styles.fieldLabel}>Result</span>
         <div className={styles.switch} role="group" aria-label="Result">
           {RESULTS.map((option) => (
             <button
@@ -84,17 +82,19 @@ export default function HistoryFilters({ games, filters }) {
             </button>
           ))}
         </div>
-        {active && (
-          <button
-            type="button"
-            className={styles.clear}
-            onClick={() =>
-              update({ game: "", from: "", to: "", result: "" })
-            }
-          >
-            Clear filters
-          </button>
-        )}
+      </div>
+      <div className={styles.field}>
+        <span className={styles.fieldLabel} aria-hidden="true">
+          &nbsp;
+        </span>
+        <button
+          type="button"
+          className={styles.clear}
+          disabled={!active}
+          onClick={() => update({ game: "", from: "", to: "", result: "" })}
+        >
+          Reset filters
+        </button>
       </div>
     </section>
   );

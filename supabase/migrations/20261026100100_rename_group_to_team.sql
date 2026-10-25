@@ -29,7 +29,10 @@ alter function public.create_group(text) rename to create_team;
 alter function public.join_group(text) rename to join_team;
 alter function public.leave_group(uuid) rename to leave_team;
 
-create or replace function public.is_team_member(p_team_id uuid)
+-- The parameter keeps its old name p_group_id. Postgres cannot rename the
+-- parameter of a function that policies depend on, and nothing calls this
+-- function by name, so only the body changes.
+create or replace function public.is_team_member(p_group_id uuid)
 returns boolean
 language sql
 stable
@@ -38,7 +41,7 @@ set search_path = ''
 as $$
   select exists (
     select 1 from public.team_members
-    where team_id = p_team_id
+    where team_id = p_group_id
       and profile_id = public.current_profile_id()
   )
 $$;
@@ -155,7 +158,11 @@ $$;
 
 -- Leave a team. The owner cannot leave while other members remain.
 -- An owner who is alone deletes the team by leaving (Assumption).
-create or replace function public.leave_team(p_team_id uuid)
+-- Dropped and created again, because the parameter name changes and nothing
+-- depends on this function.
+drop function public.leave_team(uuid);
+
+create function public.leave_team(p_team_id uuid)
 returns void
 language plpgsql
 security definer
@@ -185,3 +192,6 @@ begin
   end if;
 end;
 $$;
+
+revoke execute on function public.leave_team(uuid) from public, anon;
+grant execute on function public.leave_team(uuid) to authenticated;
