@@ -89,3 +89,55 @@
   margin-top: auto;
   padding-top: var(--space-6);
 }
+
+/* Desktop: the poster on the left, the form on a white card on the right. */
+@media (min-width: 900px) {
+  .column {
+    max-width: 1160px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(380px, 0.9fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "wordmark form"
+      "headline form";
+    column-gap: 80px;
+    align-items: center;
+    padding: 48px 56px;
+  }
+
+  .wordmark {
+    grid-area: wordmark;
+    align-self: start;
+    font-size: 22px;
+  }
+
+  .headline {
+    grid-area: headline;
+    width: auto;
+    margin-top: 0;
+    font-size: 108px;
+  }
+
+  .body {
+    grid-area: form;
+    margin-top: 0;
+    padding: 40px;
+    border-radius: 40px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-float);
+    --field-bg: var(--color-chip);
+    --message-bg: var(--color-chip);
+  }
+
+  .circle {
+    right: auto;
+    left: 38%;
+    top: 12%;
+  }
+
+  .block {
+    right: auto;
+    left: 8%;
+    top: 62%;
+  }
+}

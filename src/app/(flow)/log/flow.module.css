@@ -472,6 +472,7 @@
 /* A level score: explain it and offer to settle it */
 .tieBox {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -494,20 +495,45 @@
   white-space: nowrap;
 }
 
-.takeButton {
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 17px;
+.leaderChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.leaderChoice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px 0 8px;
+  border-radius: 22px;
   background: var(--color-yellow);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
   animation: pop 0.25s ease both;
+  transition: transform 0.12s ease;
 }
 
-.takeButton:focus-visible {
+.leaderChoice:active {
+  transform: scale(0.95);
+}
+
+.leaderChoice:focus-visible,
+.cancel:focus-visible {
   outline: 3px solid var(--color-ink);
   outline-offset: 2px;
+}
+
+.cancel {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 20px;
+  background: rgba(18, 10, 26, 0.08);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 /* Loading and error states of the log page */

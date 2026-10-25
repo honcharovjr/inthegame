@@ -61,7 +61,7 @@ async function HomeContent({ searchParams }) {
   // This month's sessions of the player, and the three latest sessions.
   const supabase = await createClient();
   const now = new Date();
-  const [monthResult, recentResult] = profile
+  const [monthResult, recentResult, ratingResult] = profile
     ? await Promise.all([
         supabase
           .from("session_participants")
@@ -75,8 +75,22 @@ async function HomeContent({ searchParams }) {
           )
           .order("played_at", { ascending: false })
           .limit(3),
+        supabase
+          .from("ratings")
+          .select("rating, games_count, games(name, type)")
+          .eq("profile_id", profile.id)
+          .order("rating", { ascending: false })
+          .limit(4),
       ])
-    : [{ data: [] }, { data: [] }];
+    : [{ data: [] }, { data: [] }, { data: [] }];
+
+  const ratings = (ratingResult.data ?? []).map((row, index) => ({
+    id: `${row.games?.name}-${index}`,
+    game: row.games?.name ?? "Game",
+    tone: findGameType(row.games?.type).tone,
+    rating: Math.round(Number(row.rating)),
+    games: row.games_count,
+  }));
 
   const stats = monthStats(
     (monthResult.data ?? []).map((row) => ({
@@ -110,6 +124,12 @@ async function HomeContent({ searchParams }) {
         <h1 className={styles.title}>Hey, {profile?.nickname ?? "player"}</h1>
       </header>
 
+      {saved && (
+        <p role="status" className={styles.saved}>
+          Session saved. Nice game.
+        </p>
+      )}
+
       {error && (
         <p role="alert" className={styles.problem}>
           Could not load your profile: {error.message}
@@ -130,12 +150,6 @@ async function HomeContent({ searchParams }) {
           )}
         </div>
       </section>
-
-      {saved && (
-        <p role="status" className={styles.saved}>
-          Session saved. Nice game.
-        </p>
-      )}
 
       <Link href="/log" className={styles.logButton}>
         <span>Log a session</span>
@@ -178,6 +192,34 @@ async function HomeContent({ searchParams }) {
         )}
       </section>
 
+      {ratings.length > 0 && (
+        <section className={styles.card} aria-label="Your ratings">
+          <div className={styles.cardTitle}>Your ratings</div>
+          <ul className={styles.recent}>
+            {ratings.map((item) => (
+              <li key={item.id} className={styles.recentRow}>
+                <span className={`${styles.tile} ${styles[`tile_${item.tone}`]}`}>
+                  {item.game.charAt(0).toUpperCase()}
+                </span>
+                <span className={styles.recentText}>
+                  <span className={styles.recentName}>{item.game}</span>
+                  <span className={styles.recentChips}>
+                    <Chip size="s">
+                      {item.games} {item.games === 1 ? "game" : "games"}
+                    </Chip>
+                  </span>
+                </span>
+                <span className={styles.number}>
+                  <span className={`${styles.mark} ${styles.markYellow}`}>
+                    {item.rating}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {recent.length > 0 && (
         <section className={styles.card} aria-label="Recent sessions">
           <div className={styles.cardTitle}>Recent</div>
@@ -208,7 +250,7 @@ async function HomeContent({ searchParams }) {
         </section>
       )}
 
-      <form action={signOut}>
+      <form action={signOut} className={styles.logout}>
         <button type="submit" className={styles.signOut}>
           Log out
         </button>

@@ -62,3 +62,23 @@
   flex-wrap: wrap;
   gap: 5px;
 }
+
+/* Desktop: every game is its own card in the grid. */
+@media (min-width: 900px) {
+  .row {
+    padding: 16px 18px;
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+
+  .row + .row {
+    box-shadow: var(--shadow-card);
+  }
+
+  .row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-float);
+  }
+}

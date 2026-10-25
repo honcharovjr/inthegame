@@ -446,7 +446,6 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
               {participants.map((p) => {
                 const value = scores[p.key] ?? "";
                 const leads = leaderKey === p.key;
-                const canPick = picking && leaders.includes(p.key);
                 return (
                   <li
                     key={p.key}
@@ -457,18 +456,6 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
                       <span className={styles.rowName}>{p.name}</span>
                     </label>
                     {leads && <Trophy />}
-                    {canPick && (
-                      <button
-                        type="button"
-                        className={styles.takeButton}
-                        onClick={() => {
-                          setTiebreak(p.key);
-                          setChoosing(false);
-                        }}
-                      >
-                        Winner
-                      </button>
-                    )}
                     <div className={styles.stepper}>
                       <button
                         type="button"
@@ -514,21 +501,56 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
 
           {resultType === "points" && isTie && touched && (
             <div className={styles.tieBox}>
-              <p className={styles.tieText}>
-                {activeTiebreak
-                  ? "A tie, settled by your choice."
-                  : picking
-                    ? "Tap Winner on the player who takes it."
-                    : "The top score is shared."}
-              </p>
-              {!picking && (
-                <button
-                  type="button"
-                  className={styles.small}
-                  onClick={() => setChoosing(true)}
-                >
-                  {activeTiebreak ? "Choose another winner" : "Assign the winner anyway"}
-                </button>
+              {picking ? (
+                <>
+                  <p className={styles.tieText}>Who takes the win?</p>
+                  <div className={styles.leaderChoices}>
+                    {leaders.map((key) => {
+                      const person = participants.find((p) => p.key === key);
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          className={styles.leaderChoice}
+                          onClick={() => {
+                            setTiebreak(key);
+                            setChoosing(false);
+                          }}
+                        >
+                          <Avatar name={person.name} size={28} color={person.color} />
+                          {person.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.cancel}
+                    onClick={() => {
+                      setChoosing(false);
+                      setTiebreak(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className={styles.tieText}>
+                    {activeTiebreak
+                      ? "A tie, settled by your choice."
+                      : "The top score is shared."}
+                  </p>
+                  <button
+                    type="button"
+                    className={styles.small}
+                    onClick={() => setChoosing(true)}
+                  >
+                    {activeTiebreak
+                      ? "Choose another winner"
+                      : "Assign the winner anyway"}
+                  </button>
+                </>
               )}
             </div>
           )}

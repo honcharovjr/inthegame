@@ -1,6 +1,7 @@
 "use server";
 
 import { getProfile } from "@/lib/auth/session";
+import { rebuildGameRatings } from "@/lib/rating/rebuild";
 import { createClient } from "@/lib/supabase/server";
 import {
   RESULT_TYPES,
@@ -109,6 +110,14 @@ export async function saveSession(input) {
   if (error) {
     console.error("saveSession failed", error);
     return { error: "Could not save the session. Try again." };
+  }
+
+  // The session is saved. A failed rating update must not undo it: ratings
+  // are derived data and can always be rebuilt from the sessions.
+  try {
+    await rebuildGameRatings(gameId);
+  } catch (ratingError) {
+    console.error("rebuildGameRatings failed", ratingError);
   }
 
   return { ok: true };

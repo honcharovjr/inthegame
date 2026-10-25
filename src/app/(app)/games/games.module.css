@@ -96,3 +96,34 @@
   font-size: 14px;
   font-weight: 700;
 }
+
+/* Desktop: wider page, games as a grid of cards. */
+@media (min-width: 900px) {
+  .page {
+    padding: 56px 56px 48px;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 76px;
+  }
+
+  .search {
+    max-width: 560px;
+    height: 56px;
+  }
+
+  .filters {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 14px;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
