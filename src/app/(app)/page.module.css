@@ -82,8 +82,18 @@
   letter-spacing: -0.03em;
 }
 
-.logButton[aria-disabled="true"] {
-  opacity: 0.55;
+.logButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.saved {
+  padding: 10px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--color-turquoise-tint);
+  color: var(--color-turquoise-ink);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .logPlus {

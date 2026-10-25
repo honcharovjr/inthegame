@@ -1,0 +1,275 @@
+/* Shared pieces of the three log steps */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.searchInput::placeholder {
+  color: var(--color-muted);
+}
+
+.searchInput:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 24px;
+  background: var(--color-surface);
+  list-style: none;
+}
+
+a.row:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.rowOn {
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-button);
+}
+
+.tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.tilePink {
+  background: var(--color-pink);
+}
+
+.tileTurquoise {
+  background: var(--color-turquoise);
+}
+
+.tileYellow {
+  background: var(--color-yellow);
+}
+
+.tileViolet {
+  background: var(--color-violet-tint);
+}
+
+.tileDefault {
+  background: var(--color-chip);
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowName {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.check {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 10, 26, 0.1);
+  font-weight: 800;
+}
+
+.checkOn {
+  background: var(--color-pink);
+}
+
+.strip {
+  display: flex;
+  gap: 18px;
+  padding: 4px 0;
+}
+
+.stripItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.guestForm {
+  display: flex;
+  gap: 8px;
+}
+
+.guestInput {
+  flex: 1;
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.guestInput::placeholder {
+  color: var(--color-muted);
+}
+
+.guestInput:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.small {
+  height: 48px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-button);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.message {
+  padding: 10px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--color-surface);
+  color: var(--color-pink-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cta {
+  margin-top: auto;
+  height: 60px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cta[aria-disabled="true"],
+.cta:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+  cursor: default;
+}
+
+.cta:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* Step 3 */
+
+.switch {
+  display: flex;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(18, 10, 26, 0.12);
+}
+
+.switchButton {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  background: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.switchButtonOn {
+  background: var(--color-surface);
+  font-weight: 800;
+}
+
+.switchButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 1px;
+}
+
+.rank {
+  width: 36px;
+  flex: none;
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.control {
+  width: 76px;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--color-chip);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.control:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.radio {
+  width: 28px;
+  height: 28px;
+  accent-color: var(--color-pink-deep);
+}

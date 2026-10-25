@@ -81,7 +81,7 @@ scripts/          helper scripts (Python or Node)
 - `npm run dev`: dev server
 - `npm run build`: production build
 - `npm run lint`: lint
-- Test command: to be added with the test runner
+- `npm test`: unit tests (Vitest)
 
 ## Working rules for Claude
 
