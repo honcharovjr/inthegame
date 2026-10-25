@@ -111,3 +111,45 @@
   gap: 14px;
   animation: slide-in 0.3s ease both;
 }
+
+/* Desktop: the headline on the left, the working area on the right. */
+@media (min-width: 900px) {
+  .page {
+    align-items: flex-start;
+  }
+
+  .column {
+    max-width: 1160px;
+    display: grid;
+    grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      "top content"
+      "segments content"
+      "headline content"
+      "filler content";
+    column-gap: 80px;
+    row-gap: 16px;
+    padding: 56px 56px 48px;
+  }
+
+  .top {
+    grid-area: top;
+  }
+
+  .segments {
+    grid-area: segments;
+  }
+
+  .headline {
+    grid-area: headline;
+    margin-top: 24px;
+    font-size: 120px;
+  }
+
+  .content {
+    grid-area: content;
+    width: 100%;
+    max-width: 680px;
+  }
+}

@@ -17,7 +17,7 @@
   padding: 0 22px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  background: var(--field-bg, var(--color-surface));
   font: inherit;
   font-size: 16px;
   font-weight: 600;
@@ -36,7 +36,7 @@
 .message {
   padding: 10px 16px;
   border-radius: var(--radius-chip);
-  background: var(--color-surface);
+  background: var(--message-bg, var(--color-surface));
   font-size: 14px;
   font-weight: 700;
 }

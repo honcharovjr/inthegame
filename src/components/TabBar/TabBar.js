@@ -28,6 +28,7 @@ export default function TabBar() {
 
   return (
     <nav className={styles.bar} aria-label="Main">
+      <div className={styles.brand}>In the Game</div>
       {TABS.map((tab) => {
         const active =
           tab.href === "/"
@@ -55,6 +56,7 @@ export default function TabBar() {
             <path d={ICONS[tab.id]} />
           </svg>
         );
+        const label = <span className={styles.label}>{tab.label}</span>;
 
         return tab.href ? (
           <Link
@@ -65,6 +67,7 @@ export default function TabBar() {
             aria-current={active ? "page" : undefined}
           >
             {icon}
+            {label}
           </Link>
         ) : (
           <span
@@ -75,6 +78,7 @@ export default function TabBar() {
             role="link"
           >
             {icon}
+            {label}
           </span>
         );
       })}

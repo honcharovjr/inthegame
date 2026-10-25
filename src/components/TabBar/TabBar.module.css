@@ -43,3 +43,57 @@
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
+
+/* The name and the labels only show on wide screens */
+.brand,
+.label {
+  display: none;
+}
+
+/* Desktop: the capsule becomes a side menu with labels. */
+@media (min-width: 900px) {
+  .bar {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 248px;
+    max-width: none;
+    height: auto;
+    transform: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 6px;
+    padding: 36px 20px;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .brand {
+    display: block;
+    padding: 0 16px 28px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+  }
+
+  .tab {
+    width: auto;
+    height: 50px;
+    border-radius: 25px;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 0 18px;
+    font-weight: 700;
+  }
+
+  .tab:hover:not(.active):not(.soon) {
+    background: rgba(18, 10, 26, 0.06);
+  }
+
+  .label {
+    display: inline;
+    font-size: 16px;
+  }
+}

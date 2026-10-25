@@ -13,3 +13,15 @@
   margin: 0 auto;
   padding-bottom: 104px;
 }
+
+/* Desktop: room for the side menu, and a wider page. */
+@media (min-width: 900px) {
+  .app {
+    padding-left: 248px;
+  }
+
+  .content {
+    max-width: 1120px;
+    padding-bottom: 56px;
+  }
+}
