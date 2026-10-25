@@ -1,0 +1,37 @@
+.button {
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.default {
+  background: var(--color-chip);
+}
+
+.pink {
+  background: var(--color-pink);
+}
+
+.white {
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.08);
+}

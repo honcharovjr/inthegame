@@ -191,36 +191,6 @@
   outline-offset: 1px;
 }
 
-/* Always there. Soft and grey until a filter is set. */
-.clear {
-  height: 46px;
-  padding: 0 18px;
-  border-radius: var(--radius-pill);
-  background: var(--color-pink-tint);
-  color: var(--color-pink-ink);
-  font-size: 14px;
-  font-weight: 800;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.12s ease;
-}
-
-.clear:not(:disabled):active {
-  transform: scale(0.96);
-}
-
-.clear:disabled {
-  background: var(--color-chip);
-  color: var(--color-muted);
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.clear:focus-visible {
-  outline: 3px solid var(--color-ink);
-  outline-offset: 2px;
-}
-
 .pager {
   display: flex;
   justify-content: center;

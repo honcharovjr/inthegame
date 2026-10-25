@@ -50,6 +50,8 @@ export default function ConfirmButton({
           type="button"
           className={styles.trash}
           aria-label={ariaLabel}
+          data-tip={ariaLabel}
+          data-tip-align="end"
           onClick={open}
         >
           <TrashIcon size={18} />

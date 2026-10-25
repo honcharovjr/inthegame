@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import GameSelect from "@/components/GameSelect/GameSelect";
+import IconButton from "@/components/IconButton/IconButton";
+import { ResetIcon } from "@/components/icons";
 import styles from "./history.module.css";
 
 const RESULTS = [
@@ -87,14 +89,14 @@ export default function HistoryFilters({ games, filters }) {
         <span className={styles.fieldLabel} aria-hidden="true">
           &nbsp;
         </span>
-        <button
-          type="button"
-          className={styles.clear}
+        <IconButton
+          size={46}
+          tipAlign="end"
+          label="Reset filters"
+          icon={<ResetIcon size={20} />}
           disabled={!active}
           onClick={() => update({ game: "", from: "", to: "", result: "" })}
-        >
-          Reset filters
-        </button>
+        />
       </div>
     </section>
   );

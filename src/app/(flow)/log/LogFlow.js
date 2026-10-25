@@ -6,7 +6,8 @@ import AddGameForm from "@/components/AddGameForm/AddGameForm";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import FlowShell from "@/components/FlowShell/FlowShell";
-import { ClockIcon, UsersIcon } from "@/components/icons";
+import IconButton from "@/components/IconButton/IconButton";
+import { ClockIcon, PlusIcon, UsersIcon } from "@/components/icons";
 import { findGameType } from "@/lib/games/types";
 import { playerColor } from "@/lib/sessions/colors";
 import { createGuest, saveSession } from "@/lib/sessions/actions";
@@ -578,13 +579,15 @@ export default function LogFlow({
                 aria-label="Guest name"
                 required
               />
-              <button
+              <IconButton
                 type="submit"
-                className={styles.small}
+                tone="white"
+                size={48}
+                tipAlign="end"
+                label="Add guest"
+                icon={<PlusIcon size={22} />}
                 disabled={addingGuest}
-              >
-                {addingGuest ? "Adding" : "Add"}
-              </button>
+              />
             </div>
             {guestError && (
               <p role="alert" className={styles.message} style={{ marginTop: 8 }}>
@@ -689,6 +692,7 @@ export default function LogFlow({
                         type="button"
                         className={styles.stepButton}
                         aria-label={`One point less for ${p.name}`}
+                        data-tip="One point less"
                         onClick={() => bump(p.key, -1)}
                       >
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
@@ -714,6 +718,7 @@ export default function LogFlow({
                         type="button"
                         className={`${styles.stepButton} ${styles.stepPlus}`}
                         aria-label={`One point more for ${p.name}`}
+                        data-tip="One point more"
                         onClick={() => bump(p.key, 1)}
                       >
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">

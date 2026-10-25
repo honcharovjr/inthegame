@@ -120,6 +120,8 @@ export default function RankingList({
               type="button"
               className={styles.handle}
               aria-label={`Move ${p.name}, now place ${place}. Use the arrow keys.`}
+              data-tip="Drag to reorder"
+              data-tip-align="end"
               onPointerDown={(event) => startDrag(event, p.key)}
               onPointerMove={moveDrag}
               onPointerUp={endDrag}

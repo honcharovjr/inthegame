@@ -136,7 +136,9 @@ async function TeamContent({ params }) {
         <div className={styles.invite} style={{ marginTop: 10 }}>
           {team.invite_enabled && (
             <>
-              <span className={styles.inviteLink}>{link}</span>
+              <span className={styles.inviteLink}>
+                <span className={styles.inviteText}>{link}</span>
+              </span>
               <CopyLink link={link} />
             </>
           )}
