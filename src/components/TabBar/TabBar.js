@@ -8,7 +8,7 @@ const ICONS = {
   home: "M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1z",
   games: "M5 5h6v6H5zM13 5h6v6h-6zM5 13h6v6H5zM13 13h6v6h-6z",
   log: "M12 5v14M5 12h14",
-  groups:
+  teams:
     "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3.5 19a5.5 5.5 0 0 1 11 0M16 5.2a3 3 0 0 1 0 5.6M17 14a5.5 5.5 0 0 1 3.5 5",
   profile: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0",
 };
@@ -18,7 +18,7 @@ const TABS = [
   { id: "home", label: "Home", href: "/" },
   { id: "games", label: "Games", href: "/games" },
   { id: "log", label: "Log a session", href: "/log" },
-  { id: "groups", label: "Groups", href: null },
+  { id: "teams", label: "Teams", href: null },
   { id: "profile", label: "Profile", href: "/profile" },
 ];
 

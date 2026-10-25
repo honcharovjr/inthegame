@@ -8,7 +8,7 @@ Version 0.1, draft. The algorithm is a proposal. Parameters are starting values 
 - Simple and explainable to players
 - Deterministic: the same sessions always give the same ratings
 - Works for 2 or more players, ties, and guests
-- Reasonable behavior with few games (20 to 50 users, small groups)
+- Reasonable behavior with few games (20 to 50 users, small teams)
 
 ## 2. Overview
 
@@ -54,7 +54,7 @@ Ratings are stored as numbers and shown rounded to integers.
 | Points result type | Places are derived from scores, equal scores give a tie |
 | One participant | Session is stored, no rating change |
 | Guests | Rated like any player (Assumption). If a guest is later merged into an account, ratings of affected games are rebuilt |
-| Team results | Not in the MVP |
+| Side (team game) results | Not in the MVP |
 | Unconfirmed sessions | Only sessions with status confirmed count. In the MVP all sessions are confirmed |
 | Session order | Sessions are replayed by `played_at`, then by `created_at` as a tie-breaker |
 | Edit or delete of a session | Rebuild the rating of that game from scratch by replaying its sessions |
@@ -96,7 +96,7 @@ Property checks:
 
 ## 9. Open questions
 
-1. **Overall leaderboard:** ratings of different games are not comparable. Proposal for the MVP: the overall leaderboard of a group is ranked by wins and games played, and only per-game leaderboards use rating. Needs your decision
+1. **Overall leaderboard:** ratings of different games are not comparable. Proposal for the MVP: the overall leaderboard of a team is ranked by wins and games played, and only per-game leaderboards use rating. Needs your decision
 2. Is 1000 and K = 32 acceptable, or should new players have a higher K for their first games?
 3. Should guest ratings be hidden from leaderboards?
 4. Luck-heavy games (dice, simple card games) will produce noisy ratings. Show a "casual" label for such games, or accept the noise?

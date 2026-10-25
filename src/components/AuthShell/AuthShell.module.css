@@ -29,6 +29,7 @@
 
 /* Decorative shapes behind the type */
 .circle {
+  animation: drift-a 11s ease-in-out infinite;
   position: absolute;
   width: 300px;
   height: 300px;
@@ -39,6 +40,7 @@
 }
 
 .square {
+  animation: drift-b 13s ease-in-out infinite;
   position: absolute;
   width: 150px;
   height: 150px;
@@ -58,6 +60,7 @@
 }
 
 .block {
+  animation: drift-c 9s ease-in-out infinite;
   position: absolute;
   width: 130px;
   height: 130px;
@@ -141,5 +144,58 @@
     right: auto;
     left: 8%;
     top: 62%;
+  }
+}
+
+/* The shapes float slowly around their places. People who asked for less
+   motion get a much smaller drift. */
+.page {
+  --amp: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    --amp: 0.3;
+  }
+}
+
+@keyframes drift-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(calc(-26px * var(--amp)), calc(18px * var(--amp)))
+      scale(1.03);
+  }
+  66% {
+    transform: translate(calc(14px * var(--amp)), calc(-22px * var(--amp)))
+      scale(0.98);
+  }
+}
+
+@keyframes drift-b {
+  0%,
+  100% {
+    transform: rotate(20deg) translate(0, 0);
+  }
+  50% {
+    transform: rotate(calc(20deg + 12deg * var(--amp)))
+      translate(calc(24px * var(--amp)), calc(-20px * var(--amp)));
+  }
+}
+
+@keyframes drift-c {
+  0%,
+  100% {
+    transform: rotate(-12deg) translate(0, 0);
+  }
+  40% {
+    transform: rotate(calc(-12deg - 10deg * var(--amp)))
+      translate(calc(-18px * var(--amp)), calc(16px * var(--amp)));
+  }
+  75% {
+    transform: rotate(calc(-12deg + 8deg * var(--amp)))
+      translate(calc(10px * var(--amp)), calc(-12px * var(--amp)));
   }
 }

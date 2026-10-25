@@ -6,6 +6,7 @@ import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
 import { GAME_TYPES } from "@/lib/games/types";
 import { createClient } from "@/lib/supabase/server";
+import AddGameButton from "./AddGameButton";
 import styles from "./games.module.css";
 
 export const metadata = { title: "Games" };
@@ -100,7 +101,13 @@ async function Catalog({ searchParams }) {
       .gte("max_players", filters.players);
   }
 
-  const { data: games, count, error } = await query;
+  const [{ data: games, count, error }, namesResult] = await Promise.all([
+    query,
+    supabase.from("games").select("name"),
+  ]);
+  const existingNames = (namesResult.data ?? []).map((row) =>
+    row.name.toLowerCase(),
+  );
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
@@ -158,6 +165,8 @@ async function Catalog({ searchParams }) {
           </Chip>
         ))}
       </div>
+
+      <AddGameButton existingNames={existingNames} />
 
       {error && (
         <p role="alert" className={styles.problem}>

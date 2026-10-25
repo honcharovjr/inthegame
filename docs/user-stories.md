@@ -53,8 +53,8 @@ As a player, I want to choose how the result is recorded (winner only, places, o
 Acceptance: three result types are available; the form adapts to the chosen type; stats work for all three.
 
 **US-C3** (FR-12, P2, Should)
-As a player, I want to record team results, so that team games are counted correctly.
-Acceptance: participants can be grouped into teams; the winning team is recorded; each member gets the result.
+As a player, I want to record results by side, so that team games are counted correctly.
+Acceptance: participants can be split into sides; the winning side is recorded; each member gets the result.
 
 **US-C4** (FR-14, P1, Must)
 As a player, I want to see my session history, so that I can look back at what I played and with whom.
@@ -79,7 +79,7 @@ As a player, I want a rating per game, so that my skill is reflected over time.
 Acceptance: the rating updates after each session; results are reproducible from stored sessions; tests on synthetic data pass.
 
 **US-D3** (FR-18, P2, Must)
-As a group member, I want a leaderboard, so that I can see who leads in our group.
+As a team member, I want a leaderboard, so that I can see who leads in our team.
 Acceptance: per game and overall; shows rating and games played; updates after each session.
 
 **US-D4** (FR-19, P2, Should)
@@ -114,34 +114,34 @@ Acceptance: several appearance options; choices are saved and visible on the pro
 As a player, I want to unlock new items by earning achievements, so that progress gives visible rewards.
 Acceptance: locked items show how to unlock them; earning an achievement unlocks linked items.
 
-## Epic G: Groups and social
+## Epic G: Teams and social
 
 **US-G1** (FR-26, P2, Must)
-As a player, I want to create a group, so that my friends and I share sessions and leaderboards.
-Acceptance: group has a name; the creator becomes the owner.
+As a player, I want to create a team, so that my friends and I share sessions and leaderboards.
+Acceptance: team has a name; the creator becomes the owner.
 
 **US-G2** (FR-26, P2, Must)
-As a group owner, I want to invite people by link, so that joining is easy.
-Acceptance: link joins the group after login; the owner can disable the link.
+As a team owner, I want to invite people by link, so that joining is easy.
+Acceptance: link joins the team after login; the owner can disable the link.
 
 **US-G3** (FR-26, P2, Must)
-As a player, I want to leave a group, so that I control which groups I belong to.
+As a player, I want to leave a team, so that I control which teams I belong to.
 Acceptance: leaving keeps my past sessions; an owner cannot leave while other members remain (Assumption).
 
 **US-G4** (FR-28, P4, Must)
-As a group member, I want a feed of group activity, so that I see what my friends played and earned.
-Acceptance: shows new sessions and achievements, newest first; only group members see it.
+As a team member, I want a feed of team activity, so that I see what my friends played and earned.
+Acceptance: shows new sessions and achievements, newest first; only team members see it.
 
 **US-G5** (FR-29, P4, Could)
-As a group member, I want to react to feed items, so that I can cheer on friends.
+As a team member, I want to react to feed items, so that I can cheer on friends.
 Acceptance: one reaction per user per item; can be removed.
 
 **US-G6** (FR-38, P2, Must)
-As a group member, I want to see the session history of my group, so that I can follow what we played together.
-Acceptance: list sorted by date; shows game, participants and result; visible only to group members.
+As a team member, I want to see the session history of my team, so that I can follow what we played together.
+Acceptance: list sorted by date; shows game, participants and result; visible only to team members.
 
 **US-G7** (FR-27, P4, Must)
-As a group owner, I want to remove a member, so that I keep the group under control.
+As a team owner, I want to remove a member, so that I keep the team under control.
 Acceptance: only the owner can remove; the removed member's past sessions stay in the history.
 
 ## Epic H: Table tools
@@ -185,16 +185,16 @@ Acceptance: the tournament takes place; sessions are logged through the app; fee
 Not scheduled. These stories depend on open questions about timeouts, disputes and guests.
 
 **US-J1** (FR-39, Backlog, Could)
-As a group owner, I want to create teams in my group and assign roles such as team leader, so that responsibility for results is clear.
-Acceptance: the owner creates teams and assigns or changes roles; every team has at least one leader.
+As a team owner, I want to create squads in my team and assign roles such as squad leader, so that responsibility for results is clear.
+Acceptance: the owner creates squads and assigns or changes roles; every squad has at least one leader.
 
 **US-J2** (FR-40, Backlog, Could)
-As a team leader, I want to confirm a session result, so that only verified results affect ratings and stats.
+As a squad leader, I want to confirm a session result, so that only verified results affect ratings and stats.
 Acceptance: a new session is pending until the leader confirms; ratings and stats update only for confirmed sessions; only a leader can confirm.
 
 **US-J3** (FR-41, Backlog, Could)
-As a group owner, I want a setting where one team leader proposes the result and the other teams confirm it, so that all sides agree.
-Acceptance: the setting is per group; the proposal appears in the other leaders' UI; the session is confirmed when all other sides confirm; a rejection marks it disputed.
+As a team owner, I want a setting where one squad leader proposes the result and the other squads confirm it, so that all sides agree.
+Acceptance: the setting is per team; the proposal appears in the other leaders' UI; the session is confirmed when all other sides confirm; a rejection marks it disputed.
 
 **US-J4** (FR-42, Backlog, Could)
 As a player, I want clear rules for sessions that nobody confirms, so that results do not hang forever.
