@@ -136,3 +136,124 @@
   color: var(--color-pink-deep);
   cursor: pointer;
 }
+
+/* This month */
+.cardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.card:has(.cardTitle) {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.numbers {
+  display: flex;
+  justify-content: space-between;
+}
+
+.number {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.numberLabel {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+/* A highlighter stroke behind the number */
+.mark {
+  padding: 0 4px;
+  background: linear-gradient(
+    transparent 58%,
+    var(--mark) 58%,
+    var(--mark) 92%,
+    transparent 92%
+  );
+}
+
+.markYellow {
+  --mark: var(--color-yellow);
+}
+
+.markPink {
+  --mark: var(--color-pink-soft);
+}
+
+.markTurquoise {
+  --mark: var(--color-turquoise-soft);
+}
+
+/* Recent sessions */
+.recent {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recentRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.tile {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.tile_yellow {
+  background: var(--color-yellow);
+}
+
+.tile_pink {
+  background: var(--color-pink-soft);
+}
+
+.tile_turquoise {
+  background: var(--color-turquoise-soft);
+}
+
+.tile_violet {
+  background: var(--color-violet-tint);
+}
+
+.tile_default {
+  background: var(--color-chip);
+}
+
+.recentText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.recentName {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.recentChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}

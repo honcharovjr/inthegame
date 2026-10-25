@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyTiebreak,
   placesFromOrder,
   placesFromScores,
   placesFromWinner,
@@ -98,5 +99,27 @@ describe("placesFromOrder", () => {
 
   it("ignores a tie flag on the first player", () => {
     expect(placesFromOrder(["a", "b"], { a: true })).toEqual({ a: 1, b: 2 });
+  });
+});
+
+describe("applyTiebreak", () => {
+  it("lets the chosen leader take place 1 and moves the other leaders to 2", () => {
+    expect(applyTiebreak({ a: 1, b: 1, c: 3 }, "b")).toEqual({
+      a: 2,
+      b: 1,
+      c: 3,
+    });
+  });
+
+  it("works with three leaders", () => {
+    expect(applyTiebreak({ a: 1, b: 1, c: 1 }, "c")).toEqual({
+      a: 2,
+      b: 2,
+      c: 1,
+    });
+  });
+
+  it("rejects a player who is not a leader", () => {
+    expect(() => applyTiebreak({ a: 1, b: 1, c: 3 }, "c")).toThrow();
   });
 });

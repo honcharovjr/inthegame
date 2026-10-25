@@ -60,6 +60,8 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
   const [order, setOrder] = useState([]);
   const [tied, setTied] = useState({});
   const [scores, setScores] = useState({});
+  const [tiebreak, setTiebreak] = useState(null);
+  const [choosing, setChoosing] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
   const game = games.find((item) => item.id === gameId) ?? null;
@@ -87,12 +89,25 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
 
   const rankingPlaces = placesFromOrder(order, tied);
 
-  // The highest score among the numbers entered so far.
-  const entered = participants
-    .map((p) => scores[p.key])
-    .filter((value) => value !== undefined && value !== "" && !Number.isNaN(Number(value)))
-    .map(Number);
-  const topScore = entered.length > 0 ? Math.max(...entered) : null;
+  // Points. A blank field counts as 0. Only one clear leader is highlighted.
+  // When the top score is shared, nobody is highlighted until the player
+  // assigns the winner anyway.
+  function pointOf(key) {
+    const value = scores[key];
+    return value === undefined || value === "" || Number.isNaN(Number(value))
+      ? 0
+      : Number(value);
+  }
+  const topScore = Math.max(...participants.map((p) => pointOf(p.key)));
+  const leaders = participants
+    .filter((p) => pointOf(p.key) === topScore)
+    .map((p) => p.key);
+  const isTie = leaders.length > 1;
+  const touched = Object.keys(scores).length > 0;
+  const activeTiebreak =
+    isTie && tiebreak && leaders.includes(tiebreak) ? tiebreak : null;
+  const leaderKey = isTie ? activeTiebreak : leaders[0];
+  const picking = choosing && isTie;
 
   function pickGame(id) {
     setGameId(id);
@@ -127,6 +142,8 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
     setOrder(participants.map((p) => p.key));
     setTied({});
     setScores({});
+    setTiebreak(null);
+    setChoosing(false);
     setWinner("me");
     setSaveError(null);
     setStep(3);
@@ -157,7 +174,10 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
         keys: participants.map((p) => p.key),
         winner,
         places: rankingPlaces,
-        scores,
+        scores: Object.fromEntries(
+          participants.map((p) => [p.key, String(pointOf(p.key))]),
+        ),
+        tiebreak: activeTiebreak,
       });
       if (result.error) {
         setSaveError(result.error);
@@ -397,7 +417,12 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
                       <span className={styles.rowText}>
                         <span className={styles.rowName}>{p.name}</span>
                       </span>
-                      {won ? <Trophy /> : <span className={styles.pick} aria-hidden="true" />}
+                      <span
+                        className={`${styles.pick} ${won ? styles.pickOn : ""}`}
+                        aria-hidden="true"
+                      >
+                        {won && <Trophy />}
+                      </span>
                     </button>
                   </li>
                 );
@@ -420,8 +445,8 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
             <ul className={`${styles.list} stagger`}>
               {participants.map((p) => {
                 const value = scores[p.key] ?? "";
-                const leads =
-                  topScore !== null && value !== "" && Number(value) === topScore;
+                const leads = leaderKey === p.key;
+                const canPick = picking && leaders.includes(p.key);
                 return (
                   <li
                     key={p.key}
@@ -432,6 +457,18 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
                       <span className={styles.rowName}>{p.name}</span>
                     </label>
                     {leads && <Trophy />}
+                    {canPick && (
+                      <button
+                        type="button"
+                        className={styles.takeButton}
+                        onClick={() => {
+                          setTiebreak(p.key);
+                          setChoosing(false);
+                        }}
+                      >
+                        Winner
+                      </button>
+                    )}
                     <div className={styles.stepper}>
                       <button
                         type="button"
@@ -473,6 +510,27 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
                 );
               })}
             </ul>
+          )}
+
+          {resultType === "points" && isTie && touched && (
+            <div className={styles.tieBox}>
+              <p className={styles.tieText}>
+                {activeTiebreak
+                  ? "A tie, settled by your choice."
+                  : picking
+                    ? "Tap Winner on the player who takes it."
+                    : "The top score is shared."}
+              </p>
+              {!picking && (
+                <button
+                  type="button"
+                  className={styles.small}
+                  onClick={() => setChoosing(true)}
+                >
+                  {activeTiebreak ? "Choose another winner" : "Assign the winner anyway"}
+                </button>
+              )}
+            </div>
           )}
 
           {saveError && (

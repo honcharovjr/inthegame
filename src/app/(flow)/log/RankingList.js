@@ -79,8 +79,11 @@ export default function RankingList({
       {participants.map((p) => {
         const index = order.indexOf(p.key);
         const dragging = drag?.key === p.key;
+        // The dragged row follows the finger but never leaves the list, so it
+        // cannot go above the first place or below the last.
+        const dragY = index * STEP + drag?.offset - (index - drag?.startIndex) * STEP;
         const y = dragging
-          ? index * STEP + drag.offset - (index - drag.startIndex) * STEP
+          ? Math.max(0, Math.min((count - 1) * STEP, dragY))
           : index * STEP;
         const place = places[p.key];
         const first = place === 1;

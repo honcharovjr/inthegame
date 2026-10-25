@@ -5,6 +5,9 @@ import Chip from "@/components/Chip/Chip";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
+import { findGameType } from "@/lib/games/types";
+import { monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
+import { createClient } from "@/lib/supabase/server";
 import styles from "./page.module.css";
 
 export default function Home({ searchParams }) {
@@ -25,6 +28,10 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
 const monthFormat = new Intl.DateTimeFormat("en-GB", {
   month: "long",
   year: "numeric",
+});
+const shortDate = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
 });
 
 function HomeSkeleton() {
@@ -50,6 +57,51 @@ function HomeSkeleton() {
 async function HomeContent({ searchParams }) {
   const { saved } = await searchParams;
   const { profile, error } = await getProfile();
+
+  // This month's sessions of the player, and the three latest sessions.
+  const supabase = await createClient();
+  const now = new Date();
+  const [monthResult, recentResult] = profile
+    ? await Promise.all([
+        supabase
+          .from("session_participants")
+          .select("place, sessions!inner(played_at, session_participants(count))")
+          .eq("profile_id", profile.id)
+          .gte("sessions.played_at", monthStartIso(now)),
+        supabase
+          .from("sessions")
+          .select(
+            "id, played_at, games(name, type), session_participants(place, profile_id, guests(name))",
+          )
+          .order("played_at", { ascending: false })
+          .limit(3),
+      ])
+    : [{ data: [] }, { data: [] }];
+
+  const stats = monthStats(
+    (monthResult.data ?? []).map((row) => ({
+      place: row.place,
+      participants: row.sessions.session_participants[0]?.count ?? 1,
+    })),
+  );
+  const recent = (recentResult.data ?? []).map((session) => {
+    const mine = session.session_participants.find(
+      (p) => p.profile_id === profile.id,
+    );
+    const others = session.session_participants
+      .filter((p) => !p.profile_id)
+      .map((p) => p.guests?.name)
+      .filter(Boolean);
+    return {
+      id: session.id,
+      playedAt: session.played_at,
+      game: session.games?.name ?? "Game",
+      tone: findGameType(session.games?.type).tone,
+      others,
+      result: resultLabel(mine?.place ?? 0, session.session_participants.length),
+      won: mine?.place === 1 && session.session_participants.length >= 2,
+    };
+  });
 
   return (
     <div className={`${styles.content} stagger`}>
@@ -91,6 +143,70 @@ async function HomeContent({ searchParams }) {
           +
         </span>
       </Link>
+
+      <section className={styles.card} aria-label="This month">
+        <div className={styles.cardTitle}>This month</div>
+        {stats.played === 0 ? (
+          <Chip>No sessions yet this month</Chip>
+        ) : (
+          <div className={styles.numbers}>
+            <div>
+              <div className={styles.number}>
+                <span className={`${styles.mark} ${styles.markYellow}`}>
+                  {stats.wins}
+                </span>
+              </div>
+              <div className={styles.numberLabel}>wins</div>
+            </div>
+            <div>
+              <div className={styles.number}>
+                <span className={`${styles.mark} ${styles.markPink}`}>
+                  {stats.played}
+                </span>
+              </div>
+              <div className={styles.numberLabel}>sessions</div>
+            </div>
+            <div>
+              <div className={styles.number}>
+                <span className={`${styles.mark} ${styles.markTurquoise}`}>
+                  {stats.winRate === null ? "n/a" : `${stats.winRate}%`}
+                </span>
+              </div>
+              <div className={styles.numberLabel}>win rate</div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {recent.length > 0 && (
+        <section className={styles.card} aria-label="Recent sessions">
+          <div className={styles.cardTitle}>Recent</div>
+          <ul className={styles.recent}>
+            {recent.map((session) => (
+              <li key={session.id} className={styles.recentRow}>
+                <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
+                  {session.game.charAt(0).toUpperCase()}
+                </span>
+                <span className={styles.recentText}>
+                  <span className={styles.recentName}>{session.game}</span>
+                  <span className={styles.recentChips}>
+                    <Chip size="s">{shortDate.format(new Date(session.playedAt))}</Chip>
+                    {session.others.slice(0, 2).map((name) => (
+                      <Chip key={name} size="s">
+                        {name}
+                      </Chip>
+                    ))}
+                    {session.others.length > 2 && (
+                      <Chip size="s">+{session.others.length - 2}</Chip>
+                    )}
+                  </span>
+                </span>
+                <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <form action={signOut}>
         <button type="submit" className={styles.signOut}>
