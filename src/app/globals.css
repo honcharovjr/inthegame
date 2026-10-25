@@ -85,11 +85,11 @@ button {
   border: 0;
 }
 
-/* Motion. Reduced for people who ask for less of it. */
+/* Motion. Blocks rise in one after another once their content is ready. */
 @keyframes enter {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(16px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -100,7 +100,7 @@ button {
 @keyframes slide-in {
   from {
     opacity: 0;
-    transform: translateX(28px);
+    transform: translateX(32px);
   }
   to {
     opacity: 1;
@@ -116,22 +116,59 @@ button {
 
 @keyframes pop {
   0% {
-    transform: scale(0.6);
+    transform: scale(0.5);
   }
   70% {
-    transform: scale(1.12);
+    transform: scale(1.18);
   }
   100% {
     transform: scale(1);
   }
 }
 
+/* Put on a container: each direct child rises in, 70ms after the one before. */
+.stagger > * {
+  animation: enter 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 70ms; }
+.stagger > *:nth-child(3) { animation-delay: 140ms; }
+.stagger > *:nth-child(4) { animation-delay: 210ms; }
+.stagger > *:nth-child(5) { animation-delay: 280ms; }
+.stagger > *:nth-child(6) { animation-delay: 350ms; }
+.stagger > *:nth-child(7) { animation-delay: 420ms; }
+.stagger > *:nth-child(8) { animation-delay: 490ms; }
+.stagger > *:nth-child(9) { animation-delay: 560ms; }
+.stagger > *:nth-child(n + 10) { animation-delay: 630ms; }
+
+/* People who asked for less motion still get a soft fade, but nothing
+   slides, scales or bounces. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  @keyframes enter {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0.4;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }

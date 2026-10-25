@@ -1,7 +1,9 @@
 .skeleton {
   flex: none;
   background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  animation:
+    shimmer 1.4s linear infinite,
+    enter 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 .soft {

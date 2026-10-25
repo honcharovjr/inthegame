@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  placesFromOrder,
   placesFromScores,
   placesFromWinner,
   validatePlaces,
@@ -70,5 +71,32 @@ describe("validatePlaces", () => {
 
   it("rejects an empty ranking", () => {
     expect(() => validatePlaces({})).toThrow();
+  });
+});
+
+describe("placesFromOrder", () => {
+  it("gives places by position", () => {
+    expect(placesFromOrder(["a", "b", "c"])).toEqual({ a: 1, b: 2, c: 3 });
+  });
+
+  it("lets a tied player share the place above", () => {
+    expect(placesFromOrder(["a", "b", "c", "d"], { c: true })).toEqual({
+      a: 1,
+      b: 2,
+      c: 2,
+      d: 4,
+    });
+  });
+
+  it("chains ties", () => {
+    expect(placesFromOrder(["a", "b", "c"], { b: true, c: true })).toEqual({
+      a: 1,
+      b: 1,
+      c: 1,
+    });
+  });
+
+  it("ignores a tie flag on the first player", () => {
+    expect(placesFromOrder(["a", "b"], { a: true })).toEqual({ a: 1, b: 2 });
   });
 });

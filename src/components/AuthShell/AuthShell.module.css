@@ -57,11 +57,15 @@
   background: var(--color-pink);
 }
 
-.character {
+.block {
   position: absolute;
-  right: 16px;
-  top: 150px;
-  transform: rotate(-10deg);
+  width: 130px;
+  height: 130px;
+  border-radius: 38px;
+  right: 34px;
+  top: 190px;
+  transform: rotate(-12deg);
+  background: var(--color-surface);
 }
 
 .wordmark {

@@ -288,37 +288,170 @@
 }
 
 .rank {
-  width: 36px;
+  width: 34px;
   flex: none;
-  font-size: 40px;
+  font-size: 38px;
   line-height: 1;
   font-weight: 800;
   letter-spacing: -0.05em;
-}
-
-.control {
-  width: 76px;
-  height: 44px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 22px;
-  background: var(--color-chip);
-  font: inherit;
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--color-ink);
   text-align: center;
 }
 
-.control:focus-visible {
+/* The row of whoever is in front: yellow with a trophy */
+.rowWin {
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-button);
+}
+
+.trophy {
+  flex: none;
+  font-size: 22px;
+  line-height: 1;
+  animation: pop 0.3s ease both;
+}
+
+/* Place by drag and drop */
+.rankBox {
+  position: relative;
+  list-style: none;
+}
+
+.rankRow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 0 8px;
+  border-radius: 22px;
+  background: var(--color-surface);
+  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.rankDragging {
+  z-index: 2;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 16px 36px rgba(18, 10, 26, 0.22);
+}
+
+.handle {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 22px;
+  background: rgba(18, 10, 26, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.rankDragging .handle {
+  cursor: grabbing;
+}
+
+.handle:focus-visible {
   outline: 3px solid var(--color-ink);
   outline-offset: 2px;
 }
 
-.radio {
-  width: 28px;
+.tieButton {
   height: 28px;
-  accent-color: var(--color-pink-deep);
+  padding: 0 11px;
+  border-radius: 14px;
+  background: rgba(18, 10, 26, 0.07);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.tieButton:active {
+  transform: scale(0.94);
+}
+
+.tieOn {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+
+.tieButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* Points: minus on the left of the number, plus on the right */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.stepButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: rgba(18, 10, 26, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.12s ease;
+}
+
+.stepButton:active {
+  transform: scale(0.88);
+}
+
+.stepPlus {
+  background: var(--color-pink);
+}
+
+.stepButton:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.score {
+  width: 56px;
+  height: 44px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.score::-webkit-outer-spin-button,
+.score::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.score:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 1px;
+}
+
+/* Winner: tap the row of who won */
+.pick {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  flex: none;
+  background: rgba(18, 10, 26, 0.1);
+  transition: background-color 0.2s ease;
 }
 
 /* Loading and error states of the log page */

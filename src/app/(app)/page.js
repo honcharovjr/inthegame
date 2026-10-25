@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import Character from "@/components/Character/Character";
+import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { signOut } from "@/lib/auth/actions";
@@ -32,16 +32,16 @@ function HomeSkeleton() {
     <>
       <div className={styles.header}>
         <Skeleton width={150} height={14} />
-        <Skeleton width={220} height={36} style={{ marginTop: 8 }} />
+        <Skeleton width={220} height={36} delay={80} style={{ marginTop: 8 }} />
       </div>
       <div className={styles.card}>
-        <Skeleton width={96} height={96} radius={28} />
+        <Skeleton width={96} height={96} radius={48} delay={160} />
         <div className={styles.identity}>
-          <Skeleton width={140} height={30} />
-          <Skeleton width={170} height={28} radius={14} />
+          <Skeleton width={140} height={30} delay={240} />
+          <Skeleton width={170} height={28} radius={14} delay={320} />
         </div>
       </div>
-      <Skeleton height={58} radius={29} />
+      <Skeleton height={58} radius={29} delay={400} />
     </>
   );
 }
@@ -52,7 +52,7 @@ async function HomeContent({ searchParams }) {
   const { profile, error } = await getProfile();
 
   return (
-    <div className={styles.content}>
+    <div className={`${styles.content} stagger`}>
       <header className={styles.header}>
         <div className={styles.date}>{dateFormat.format(new Date())}</div>
         <h1 className={styles.title}>Hey, {profile?.nickname ?? "player"}</h1>
@@ -67,7 +67,7 @@ async function HomeContent({ searchParams }) {
       <section className={styles.card} aria-label="Your character">
         <div className={styles.stage}>
           <div className={styles.stageShape} aria-hidden="true" />
-          <Character size={84} color="#ff4fa3" />
+          <Avatar name={profile?.nickname} size={84} color="#ff4fa3" />
         </div>
         <div className={styles.identity}>
           <div className={styles.name}>{profile?.nickname}</div>
