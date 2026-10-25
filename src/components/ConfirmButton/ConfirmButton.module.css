@@ -30,6 +30,8 @@
 /* The pop-up */
 .dialog {
   width: min(calc(100vw - 32px), 400px);
+  /* The global reset removes the margin that centres a pop-up. */
+  margin: auto;
   padding: 0;
   border: 0;
   border-radius: 28px;
