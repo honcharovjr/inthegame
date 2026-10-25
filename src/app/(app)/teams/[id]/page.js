@@ -147,7 +147,15 @@ async function TeamContent({ params }) {
       </section>
 
       <section className={styles.card} aria-label="Leaderboard">
-        <div className={styles.cardTitle}>Leaderboard</div>
+        <div className={styles.cardHead}>
+          <span className={styles.cardTitle}>Leaderboard</span>
+          <Link
+            href={`/teams/${team.id}/stats`}
+            className={`${styles.statsLink} btn-secondary`}
+          >
+            Full stats
+          </Link>
+        </div>
         <ol className={styles.board}>
           {board.map((row, index) => (
             <li key={row.id} className={styles.boardRow}>

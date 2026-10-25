@@ -376,3 +376,31 @@
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
+
+/* The way to the full stats of a team */
+.statsLink {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 17px;
+  display: inline-flex;
+  align-items: center;
+  --btn-bg: var(--color-pink-tint);
+  --btn-ink: var(--color-pink-ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* The games to pick a leaderboard from */
+.gameChips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+}
+
+@media (min-width: 900px) {
+  .gameChips {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}

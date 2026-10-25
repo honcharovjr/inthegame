@@ -7,7 +7,7 @@ export const metadata = { title: "Log in" };
 
 export default function LoginPage({ searchParams }) {
   return (
-    <AuthShell headline="Welcome back." tone="turquoise">
+    <AuthShell headline="Welcome back." tone="turquoise" backFallback="/signup">
       <Suspense fallback={null}>
         <LoginForm searchParams={searchParams} />
       </Suspense>
