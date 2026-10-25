@@ -2,53 +2,46 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 11px 14px;
-  border-radius: var(--radius-row);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  padding: 10px 14px;
   list-style: none;
 }
 
+/* Hairline between rows inside the white list card */
+.row + .row {
+  box-shadow: inset 0 1px 0 var(--color-chip);
+}
+
 .tile {
-  width: 46px;
-  height: 46px;
-  border-radius: 23px;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: none;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
+  color: var(--color-ink);
 }
 
 .default {
   background: var(--color-chip);
-  color: var(--color-ink);
 }
 
-.primary {
-  background: var(--color-primary-tint);
-  color: var(--color-primary-deep);
+.pink {
+  background: var(--color-pink-soft);
 }
 
-.coral {
-  background: var(--color-coral-tint);
-  color: var(--color-coral-ink);
+.turquoise {
+  background: var(--color-turquoise-soft);
 }
 
-.lemon {
-  background: var(--color-lemon);
-  color: var(--color-lemon-ink);
-}
-
-.sky {
-  background: var(--color-sky-tint);
-  color: var(--color-sky-ink);
+.yellow {
+  background: var(--color-yellow);
 }
 
 .violet {
   background: var(--color-violet-tint);
-  color: var(--color-violet-ink);
 }
 
 .text {
@@ -56,16 +49,16 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .name {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 800;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }

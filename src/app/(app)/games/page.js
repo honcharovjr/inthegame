@@ -102,7 +102,7 @@ async function Catalog({ searchParams }) {
       <div className={styles.filters} aria-label="Type">
         <Chip
           href={buildHref(filters, { type: null, page: 1 })}
-          tone={filters.type ? "default" : "dark"}
+          tone={filters.type ? "white" : "active"}
         >
           All
         </Chip>
@@ -110,7 +110,7 @@ async function Catalog({ searchParams }) {
           <Chip
             key={type.value}
             href={buildHref(filters, { type: type.value, page: 1 })}
-            tone={filters.type === type.value ? "dark" : type.tone}
+            tone={filters.type === type.value ? "active" : "white"}
           >
             {type.label}
           </Chip>
@@ -120,7 +120,7 @@ async function Catalog({ searchParams }) {
       <div className={styles.filters} aria-label="Players">
         <Chip
           href={buildHref(filters, { players: null, page: 1 })}
-          tone={filters.players ? "default" : "dark"}
+          tone={filters.players ? "white" : "active"}
           size="s"
         >
           Any players
@@ -129,7 +129,7 @@ async function Catalog({ searchParams }) {
           <Chip
             key={count}
             href={buildHref(filters, { players: count, page: 1 })}
-            tone={filters.players === count ? "dark" : "default"}
+            tone={filters.players === count ? "active" : "white"}
             size="s"
           >
             {count}
@@ -160,7 +160,7 @@ async function Catalog({ searchParams }) {
               Previous
             </Chip>
           )}
-          <Chip tone="primary">
+          <Chip tone="pink">
             Page {filters.page} of {totalPages}
           </Chip>
           {filters.page < totalPages && (

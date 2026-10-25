@@ -17,11 +17,12 @@ const ICONS = {
 const TABS = [
   { id: "home", label: "Home", href: "/" },
   { id: "games", label: "Games", href: "/games" },
-  { id: "log", label: "Log", href: null },
+  { id: "log", label: "Log a session", href: null },
   { id: "groups", label: "Groups", href: null },
   { id: "profile", label: "Profile", href: null },
 ];
 
+// Floating capsule menu with icon tabs. The active tab is a pink circle.
 export default function TabBar() {
   const pathname = usePathname();
 
@@ -29,34 +30,30 @@ export default function TabBar() {
     <nav className={styles.bar} aria-label="Main">
       {TABS.map((tab) => {
         const active =
-          tab.href === "/" ? pathname === "/" : tab.href && pathname.startsWith(tab.href);
+          tab.href === "/"
+            ? pathname === "/"
+            : Boolean(tab.href) && pathname.startsWith(tab.href);
         const className = [
           styles.tab,
-          tab.id === "log" && styles.log,
           active && styles.active,
           !tab.href && styles.soon,
         ]
           .filter(Boolean)
           .join(" ");
-        const content = (
-          <>
-            <span className={styles.icon}>
-              <svg
-                viewBox="0 0 24 24"
-                width="22"
-                height="22"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d={ICONS[tab.id]} />
-              </svg>
-            </span>
-            <span className={styles.label}>{tab.label}</span>
-          </>
+        const icon = (
+          <svg
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d={ICONS[tab.id]} />
+          </svg>
         );
 
         return tab.href ? (
@@ -64,13 +61,20 @@ export default function TabBar() {
             key={tab.id}
             href={tab.href}
             className={className}
+            aria-label={tab.label}
             aria-current={active ? "page" : undefined}
           >
-            {content}
+            {icon}
           </Link>
         ) : (
-          <span key={tab.id} className={className} aria-disabled="true">
-            {content}
+          <span
+            key={tab.id}
+            className={className}
+            aria-label={tab.label}
+            aria-disabled="true"
+            role="link"
+          >
+            {icon}
           </span>
         );
       })}
