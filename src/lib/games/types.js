@@ -1,10 +1,10 @@
 // Game types as stored in the database, with their label and colour tone.
 export const GAME_TYPES = [
-  { value: "board", label: "Board", tone: "lemon" },
-  { value: "card", label: "Card", tone: "coral" },
-  { value: "dice", label: "Dice", tone: "primary" },
-  { value: "dominoes", label: "Dominoes", tone: "sky" },
-  { value: "party", label: "Party", tone: "violet" },
+  { value: "board", label: "Board", tone: "yellow" },
+  { value: "card", label: "Card", tone: "pink" },
+  { value: "dice", label: "Dice", tone: "turquoise" },
+  { value: "dominoes", label: "Dominoes", tone: "violet" },
+  { value: "party", label: "Party", tone: "pink" },
   { value: "other", label: "Other", tone: "default" },
 ];
 

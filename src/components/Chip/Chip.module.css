@@ -6,7 +6,7 @@
   padding: 0 12px;
   border-radius: var(--radius-chip);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   background: var(--color-chip);
   color: var(--color-ink);
@@ -19,24 +19,24 @@
   gap: 5px;
 }
 
-.primary {
-  background: var(--color-primary-tint);
-  color: var(--color-primary-deep);
+.white {
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(18, 10, 26, 0.06);
 }
 
-.coral {
-  background: var(--color-coral-tint);
-  color: var(--color-coral-ink);
+.pink {
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
 }
 
-.lemon {
-  background: var(--color-lemon);
-  color: var(--color-lemon-ink);
+.turquoise {
+  background: var(--color-turquoise-tint);
+  color: var(--color-turquoise-ink);
 }
 
-.sky {
-  background: var(--color-sky-tint);
-  color: var(--color-sky-ink);
+.yellow {
+  background: var(--color-yellow-tint);
+  color: var(--color-yellow-ink);
 }
 
 .violet {
@@ -44,12 +44,13 @@
   color: var(--color-violet-ink);
 }
 
-.dark {
-  background: var(--color-primary-deep);
-  color: #ffffff;
+/* The selected filter */
+.active {
+  background: var(--color-pink);
+  color: var(--color-ink);
 }
 
 a.chip:focus-visible {
-  outline: 2px solid var(--color-primary-deep);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }

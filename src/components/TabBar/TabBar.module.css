@@ -1,109 +1,40 @@
 .bar {
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
   z-index: 10;
+  width: calc(100% - 48px);
+  max-width: 360px;
+  height: 62px;
+  transform: translateX(-50%);
   display: flex;
   justify-content: space-around;
-  align-items: flex-start;
-  height: 84px;
-  padding: 8px 8px 0;
+  align-items: center;
+  border-radius: var(--radius-pill);
   background: var(--color-surface);
-  box-shadow: 0 -6px 24px rgba(14, 45, 46, 0.06);
+  box-shadow: var(--shadow-float);
 }
 
 .tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  width: 64px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-
-.icon {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-muted);
 }
 
 .active {
-  color: var(--color-primary-deep);
-}
-
-.active .icon {
-  filter: drop-shadow(0 0 5px rgba(47, 214, 214, 0.9));
-}
-
-.log {
+  background: var(--color-pink);
   color: var(--color-ink);
 }
 
-.log .icon {
-  width: 46px;
-  height: 46px;
-  margin-top: -8px;
-  border-radius: 23px;
-  background: var(--color-primary-deep);
-  color: #ffffff;
-  box-shadow: var(--shadow-button);
-}
-
 .soon {
-  opacity: 0.55;
+  opacity: 0.4;
 }
 
 .tab:focus-visible {
-  outline: 2px solid var(--color-primary-deep);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
-  border-radius: 12px;
-}
-
-/* On wide screens the bar becomes a side menu. */
-@media (min-width: 900px) {
-  .bar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 248px;
-    height: auto;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 6px;
-    padding: 32px 20px;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .tab {
-    width: auto;
-    flex-direction: row;
-    gap: 12px;
-    height: 44px;
-    padding: 0 16px;
-    border-radius: 22px;
-    font-size: 15px;
-  }
-
-  .icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .active {
-    background: var(--color-primary-tint);
-  }
-
-  .log .icon {
-    width: 22px;
-    height: 22px;
-    margin-top: 0;
-    background: none;
-    box-shadow: none;
-    color: inherit;
-  }
 }

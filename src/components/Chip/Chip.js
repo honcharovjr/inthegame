@@ -2,7 +2,7 @@ import Link from "next/link";
 import styles from "./Chip.module.css";
 
 // A highlighted chip for any value that comes from data or settings.
-// tone: default | primary | coral | lemon | sky | violet | dark
+// tone: default | white | pink | turquoise | yellow | violet | active
 // Pass href to render a link, for example a filter.
 export default function Chip({
   tone = "default",

@@ -1,40 +1,42 @@
 :root {
   /* Surfaces and text */
-  --color-bg: #eaf7f7;
-  --color-surface: #fafefe;
-  --color-ink: #0e2d2e;
-  --color-muted: #48696a;
-  --color-chip: #d9eeee;
+  --color-bg: #faf7f9;
+  --color-surface: #ffffff;
+  --color-ink: #120a1a;
+  --color-muted: #6e6170;
+  --color-chip: #f2edf1;
 
-  /* Main colour: turquoise */
-  --color-primary: #2fd6d6;
-  --color-primary-deep: #0a6466;
-  --color-primary-tint: #d3f6f6;
+  /* Wrapped palette: loud fills for flow screens and accents */
+  --color-pink: #ff4fa3;
+  --color-turquoise: #2fd6d6;
+  --color-yellow: #ffe14d;
 
-  /* Accent pair: coral and lemon (pair to be confirmed) */
-  --color-coral: #ff7f66;
-  --color-coral-tint: #ffe0d8;
-  --color-coral-ink: #a63a22;
-  --color-lemon: #f6e27a;
-  --color-lemon-ink: #5f4b00;
+  /* Soft tints for tiles, markers and chips on white */
+  --color-pink-soft: #ffc2df;
+  --color-pink-tint: #ffe0ef;
+  --color-turquoise-soft: #a9eeee;
+  --color-turquoise-tint: #dff8f8;
+  --color-yellow-tint: #fff6c2;
+  --color-violet-tint: #e6e0ff;
 
-  /* Supporting tints for game types and tags */
-  --color-sky-tint: #d3e6ff;
-  --color-sky-ink: #1f4f8f;
-  --color-violet-tint: #e2dcf7;
+  /* Text on tints. Bright fills are too faint for text on white */
+  --color-pink-ink: #b0145f;
+  --color-pink-deep: #d6247a;
+  --color-turquoise-ink: #087b7b;
+  --color-yellow-ink: #7a6200;
   --color-violet-ink: #4a3d8f;
 
   /* Radii */
   --radius-chip: 14px;
-  --radius-row: 26px;
-  --radius-card: 28px;
+  --radius-row: 22px;
+  --radius-card: 22px;
   --radius-pill: 999px;
 
-  /* Depth and glow. No borders anywhere: shape comes from fill and shadow */
-  --shadow-card: 0 1px 2px rgba(14, 45, 46, 0.05),
-    0 12px 32px rgba(14, 45, 46, 0.08);
-  --shadow-button: 0 10px 22px rgba(10, 100, 102, 0.28);
-  --glow-primary: 0 0 16px rgba(47, 214, 214, 0.8);
+  /* Depth. No borders anywhere: shape comes from fill and shadow */
+  --shadow-card: 0 1px 2px rgba(18, 10, 26, 0.04),
+    0 8px 22px rgba(18, 10, 26, 0.06);
+  --shadow-float: 0 12px 30px rgba(18, 10, 26, 0.12);
+  --shadow-button: 0 10px 24px rgba(18, 10, 26, 0.14);
 
   /* Spacing scale */
   --space-1: 4px;
@@ -61,7 +63,7 @@ body {
   flex-direction: column;
   color: var(--color-ink);
   background: var(--color-bg);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-bricolage), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

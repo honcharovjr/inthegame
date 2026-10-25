@@ -1,34 +1,117 @@
 .main {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.header {
+  padding: 0 4px;
+}
+
+.date {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.title {
+  font-size: 38px;
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.stage {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stageShape {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: var(--color-yellow);
+  transform: rotate(12deg);
+}
+
+.stage svg {
+  position: relative;
+}
+
+.identity {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-5);
+  gap: 8px;
 }
 
-.main h1 {
-  font-size: 40px;
+.name {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.logButton {
+  height: 58px;
+  border-radius: var(--radius-pill);
+  background: var(--color-pink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 22px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.03em;
+}
+
+.logButton[aria-disabled="true"] {
+  opacity: 0.55;
+}
+
+.logPlus {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
 }
 
 .problem {
   padding: 10px 16px;
   border-radius: var(--radius-chip);
-  background: var(--color-coral-tint);
-  color: var(--color-coral-ink);
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .signOut {
-  height: 44px;
-  padding: 0 20px;
-  border-radius: 22px;
-  background: var(--color-primary-tint);
-  color: var(--color-primary-deep);
-  font-weight: 700;
+  align-self: flex-start;
+  padding: 6px 4px;
+  background: none;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-pink-deep);
   cursor: pointer;
 }

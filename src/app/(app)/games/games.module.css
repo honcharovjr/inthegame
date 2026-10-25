@@ -1,25 +1,25 @@
 .page {
-  padding: var(--space-5) var(--space-5) var(--space-6);
+  padding: var(--space-6) var(--space-4) var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-3);
 }
 
 .title {
-  padding-top: var(--space-2);
-  font-size: 32px;
-  line-height: 1.08;
+  padding: 0 4px;
+  font-size: 44px;
+  line-height: 0.92;
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.05em;
 }
 
 .search {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  height: 52px;
+  height: 48px;
   padding: 0 18px;
-  border-radius: 26px;
+  border-radius: var(--radius-pill);
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
   color: var(--color-muted);
@@ -32,6 +32,7 @@
   background: none;
   font: inherit;
   font-size: 16px;
+  font-weight: 600;
   color: var(--color-ink);
 }
 
@@ -44,21 +45,22 @@
 }
 
 .search:focus-within {
-  outline: 2px solid var(--color-primary-deep);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 
 .filters {
   display: flex;
-  gap: var(--space-2);
+  gap: 6px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 2px 2px 6px;
 }
 
+/* One white card holds the whole list, rows are split by hairlines */
 .list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .pager {
@@ -71,13 +73,14 @@
 .empty {
   padding: 24px 4px;
   color: var(--color-muted);
+  font-weight: 600;
 }
 
 .problem {
   padding: 10px 16px;
   border-radius: var(--radius-chip);
-  background: var(--color-coral-tint);
-  color: var(--color-coral-ink);
+  background: var(--color-pink-tint);
+  color: var(--color-pink-ink);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }

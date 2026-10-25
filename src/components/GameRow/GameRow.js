@@ -31,7 +31,7 @@ export default function GameRow({ game }) {
             </Chip>
           )}
           {game.is_classic && (
-            <Chip size="s" tone="primary">
+            <Chip size="s" tone="turquoise">
               Classic
             </Chip>
           )}
