@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useFilterLoading } from "@/components/FilterLoading/FilterLoading";
 import GameSelect from "@/components/GameSelect/GameSelect";
 import IconButton from "@/components/IconButton/IconButton";
 import { ResetIcon } from "@/components/icons";
@@ -16,8 +15,7 @@ const RESULTS = [
 // Filters of the history. They live in the address, so a filtered view can be
 // reloaded or shared, and every change starts again from page one.
 export default function HistoryFilters({ games, filters }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { pending, go } = useFilterLoading();
 
   function update(changes) {
     const next = { ...filters, ...changes };
@@ -27,9 +25,7 @@ export default function HistoryFilters({ games, filters }) {
     if (next.to) query.set("to", next.to);
     if (next.result) query.set("result", next.result);
     const text = query.toString();
-    startTransition(() => {
-      router.push(text ? `/history?${text}` : "/history");
-    });
+    go(text ? `/history?${text}` : "/history");
   }
 
   const active = Boolean(

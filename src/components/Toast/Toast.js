@@ -8,9 +8,11 @@ const DURATION = 5000;
 
 // A notice that drops in from the top centre, drains a bar while it waits and
 // closes itself. Hovering or focusing it pauses the bar. It also has a close
-// button. When it goes, the ?saved flag leaves the address, so a reload does
-// not show it again.
-export default function Toast({ message }) {
+// button.
+// tone: success (green) | error (red).
+// dismissTo: an address to replace the current one with when the notice goes,
+// so a flag such as ?saved does not show it again after a reload.
+export default function Toast({ message, tone = "success", dismissTo }) {
   const router = useRouter();
   const [state, setState] = useState("open");
 
@@ -19,7 +21,7 @@ export default function Toast({ message }) {
     setState("leaving");
     setTimeout(() => {
       setState("gone");
-      router.replace("/", { scroll: false });
+      if (dismissTo) router.replace(dismissTo, { scroll: false });
     }, 260);
   }
 
@@ -27,9 +29,9 @@ export default function Toast({ message }) {
 
   return (
     <div
-      className={`${styles.toast} ${state === "leaving" ? styles.leaving : ""}`}
-      role="status"
-      aria-live="polite"
+      className={`${styles.toast} ${styles[tone]} ${state === "leaving" ? styles.leaving : ""}`}
+      role={tone === "error" ? "alert" : "status"}
+      aria-live={tone === "error" ? "assertive" : "polite"}
     >
       <span className={styles.icon} aria-hidden="true">
         <svg
@@ -42,7 +44,7 @@ export default function Toast({ message }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M5 12.5l4.5 4.5L19 7.5" />
+          <path d={tone === "error" ? "M12 6v8M12 18v.1" : "M5 12.5l4.5 4.5L19 7.5"} />
         </svg>
       </span>
       <span className={styles.text}>{message}</span>

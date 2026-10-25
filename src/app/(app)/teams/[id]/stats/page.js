@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import BackButton from "@/components/BackButton/BackButton";
+import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import Chip from "@/components/Chip/Chip";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
@@ -107,10 +108,29 @@ async function StatsContent({ params, searchParams }) {
     gameId ? `/teams/${id}/stats?game=${gameId}` : `/teams/${id}/stats`;
 
   return (
+    <FilterLoading>
     <div className={`${styles.body} stagger`}>
       <BackButton fallback={`/teams/${id}`} />
       <h1 className={styles.title}>{team.name} stats</h1>
 
+      {games.length > 0 && (
+        <div className={styles.gameChips} aria-label="Game">
+          <FilterChip href={href("")} tone={game ? "white" : "active"}>
+            All games
+          </FilterChip>
+          {games.map((item) => (
+            <FilterChip
+              key={item.id}
+              href={href(item.id)}
+              tone={game?.id === item.id ? "active" : "white"}
+            >
+              {gameEmoji(item)} {item.name}
+            </FilterChip>
+          ))}
+        </div>
+      )}
+
+      <FilterBody skeleton={<Skeleton height={260} radius={22} />}>
       <div className={styles.chips} aria-label="Totals">
         <Chip tone="pink">
           {shown.length} {shown.length === 1 ? "session" : "sessions"}
@@ -119,23 +139,6 @@ async function StatsContent({ params, searchParams }) {
           {games.length} {games.length === 1 ? "game" : "games"}
         </Chip>
       </div>
-
-      {games.length > 0 && (
-        <div className={styles.gameChips} aria-label="Game">
-          <Chip href={href("")} tone={game ? "white" : "active"}>
-            All games
-          </Chip>
-          {games.map((item) => (
-            <Chip
-              key={item.id}
-              href={href(item.id)}
-              tone={game?.id === item.id ? "active" : "white"}
-            >
-              {gameEmoji(item)} {item.name}
-            </Chip>
-          ))}
-        </div>
-      )}
 
       <section className={styles.card} aria-label="Leaderboard">
         <div className={styles.cardTitle}>
@@ -183,6 +186,8 @@ async function StatsContent({ params, searchParams }) {
           </ol>
         )}
       </section>
+      </FilterBody>
     </div>
+    </FilterLoading>
   );
 }

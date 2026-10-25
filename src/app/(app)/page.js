@@ -123,7 +123,7 @@ async function HomeContent({ searchParams }) {
 
   return (
     <>
-      {saved && <Toast message="Session saved. Nice game." />}
+      {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
       <div className={`${styles.content} stagger`}>
       <header className={styles.header}>
         <div className={styles.date}>{dateFormat.format(new Date())}</div>

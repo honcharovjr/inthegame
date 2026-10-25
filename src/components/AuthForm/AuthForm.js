@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { AlertIcon } from "@/components/icons";
+import Toast from "@/components/Toast/Toast";
 import styles from "./AuthForm.module.css";
 
 // A form that runs a server action and shows its error or notice.
@@ -21,7 +22,11 @@ export default function AuthForm({
   });
 
   return (
-    <form action={formAction} className={styles.form}>
+    <>
+      {/* Messages float above the page, so the card never changes size */}
+      {state?.error && <Toast key={state.at ?? "initial"} message={state.error} tone="error" />}
+      {state?.notice && <Toast key={state.at} message={state.notice} tone="success" />}
+    <form action={formAction} className={`${styles.form} ${styles.rise}`}>
       {Object.entries(hidden).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
@@ -67,29 +72,6 @@ export default function AuthForm({
         );
       })}
 
-      {/* Messages float above the page, so the card never changes size */}
-      {state?.error && (
-        <p
-          key={state.at ?? "initial"}
-          role="alert"
-          className={`${styles.popup} ${styles.popupError}`}
-        >
-          <span className={styles.popupIcon} aria-hidden="true">
-            <AlertIcon size={18} />
-          </span>
-          {state.error}
-        </p>
-      )}
-      {state?.notice && (
-        <p
-          key={state.at}
-          role="status"
-          className={`${styles.popup} ${styles.popupNotice}`}
-        >
-          {state.notice}
-        </p>
-      )}
-
       <button className={`${styles.button} btn-primary`} type="submit" disabled={pending}>
         {pending ? "Please wait" : submitLabel}
       </button>
@@ -108,5 +90,6 @@ export default function AuthForm({
         </div>
       )}
     </form>
+    </>
   );
 }

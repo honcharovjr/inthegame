@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useFilterLoading } from "@/components/FilterLoading/FilterLoading";
 import IconButton from "@/components/IconButton/IconButton";
 import { ResetIcon, SearchIcon, UsersIcon } from "@/components/icons";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import styles from "./games.module.css";
 // meaning any number. The page changes when the thumb is let go, so dragging
 // does not fire a request per step.
 export default function GamesToolbar({ filters, playerHrefs, children }) {
-  const router = useRouter();
+  const { go } = useFilterLoading();
   const value = filters.players ?? 0;
   const [draft, setDraft] = useState(value);
   const [seen, setSeen] = useState(value);
@@ -25,12 +25,26 @@ export default function GamesToolbar({ filters, playerHrefs, children }) {
   const active = Boolean(filters.q || filters.type || filters.players);
 
   function commit(next) {
-    if (next !== value) router.replace(playerHrefs[next], { scroll: false });
+    if (next !== value) go(playerHrefs[next], { replace: true });
   }
 
   return (
     <section className={styles.panel} aria-label="Filters">
-      <form method="get" role="search" className={styles.search}>
+      <form
+        method="get"
+        role="search"
+        className={styles.search}
+        onSubmit={(event) => {
+          // Search without leaving the page, so the results can show a skeleton
+          event.preventDefault();
+          const query = new URLSearchParams();
+          for (const [key, text] of new FormData(event.currentTarget)) {
+            if (String(text).trim()) query.set(key, String(text).trim());
+          }
+          const text = query.toString();
+          go(text ? `/games?${text}` : "/games");
+        }}
+      >
         <SearchIcon size={20} />
         <input
           className={styles.searchInput}
@@ -88,7 +102,7 @@ export default function GamesToolbar({ filters, playerHrefs, children }) {
         label="Reset filters"
         icon={<ResetIcon size={20} />}
         disabled={!active}
-        onClick={() => router.push("/games")}
+        onClick={() => go("/games")}
       />
 
       {children}

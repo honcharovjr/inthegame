@@ -1,6 +1,7 @@
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
@@ -125,9 +126,11 @@ async function HistoryList({ searchParams }) {
   });
 
   return (
+    <FilterLoading>
     <div className={styles.body}>
       <HistoryFilters games={gamesResult.data ?? []} filters={filters} />
 
+      <FilterBody skeleton={<HistorySkeleton />}>
       {error && (
         <p role="alert" className={styles.problem}>
           Could not load your history: {error.message}
@@ -178,16 +181,18 @@ async function HistoryList({ searchParams }) {
       {totalPages > 1 && (
         <nav className={styles.pager} aria-label="Pages">
           {page > 1 && (
-            <Chip href={pageHref(filters, page - 1)}>Previous</Chip>
+            <FilterChip href={pageHref(filters, page - 1)}>Previous</FilterChip>
           )}
           <Chip tone="pink">
             Page {page} of {totalPages}
           </Chip>
           {page < totalPages && (
-            <Chip href={pageHref(filters, page + 1)}>Next</Chip>
+            <FilterChip href={pageHref(filters, page + 1)}>Next</FilterChip>
           )}
         </nav>
       )}
+      </FilterBody>
     </div>
+    </FilterLoading>
   );
 }

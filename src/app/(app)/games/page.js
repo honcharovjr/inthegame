@@ -1,6 +1,7 @@
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import GameRow from "@/components/GameRow/GameRow";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
@@ -24,6 +25,18 @@ export default function GamesPage({ searchParams }) {
         <Catalog searchParams={searchParams} />
       </Suspense>
     </main>
+  );
+}
+
+function ListSkeleton() {
+  return (
+    <div className={styles.skeletonList}>
+      <Skeleton height={64} radius={22} />
+      <Skeleton height={64} radius={22} delay={80} />
+      <Skeleton height={64} radius={22} delay={160} />
+      <Skeleton height={64} radius={22} delay={240} />
+      <Skeleton height={64} radius={22} delay={320} />
+    </div>
   );
 }
 
@@ -107,6 +120,7 @@ async function Catalog({ searchParams }) {
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
+    <FilterLoading>
     <div className={`${styles.body} stagger`}>
       <GamesToolbar
         filters={filters}
@@ -115,26 +129,27 @@ async function Catalog({ searchParams }) {
         )}
       >
         <div className={styles.types} aria-label="Type">
-          <Chip
+          <FilterChip
             href={buildHref(filters, { type: null, page: 1 })}
             tone={filters.type ? "default" : "active"}
           >
             All
-          </Chip>
+          </FilterChip>
           {GAME_TYPES.map((type) => (
-            <Chip
+            <FilterChip
               key={type.value}
               href={buildHref(filters, { type: type.value, page: 1 })}
               tone={filters.type === type.value ? "active" : "default"}
             >
               {type.label}
-            </Chip>
+            </FilterChip>
           ))}
         </div>
       </GamesToolbar>
 
       <AddGameButton existingNames={existingNames} />
 
+      <FilterBody skeleton={<ListSkeleton />}>
       {error && (
         <p role="alert" className={styles.problem}>
           Could not load games: {error.message}
@@ -154,20 +169,22 @@ async function Catalog({ searchParams }) {
       {totalPages > 1 && (
         <nav className={styles.pager} aria-label="Pages">
           {filters.page > 1 && (
-            <Chip href={buildHref(filters, { page: filters.page - 1 })}>
+            <FilterChip href={buildHref(filters, { page: filters.page - 1 })}>
               Previous
-            </Chip>
+            </FilterChip>
           )}
           <Chip tone="pink">
             Page {filters.page} of {totalPages}
           </Chip>
           {filters.page < totalPages && (
-            <Chip href={buildHref(filters, { page: filters.page + 1 })}>
+            <FilterChip href={buildHref(filters, { page: filters.page + 1 })}>
               Next
-            </Chip>
+            </FilterChip>
           )}
         </nav>
       )}
+      </FilterBody>
     </div>
+    </FilterLoading>
   );
 }
