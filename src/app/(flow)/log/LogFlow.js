@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import FlowShell from "@/components/FlowShell/FlowShell";
@@ -42,10 +42,21 @@ const HEADLINES = { 1: "Which\ngame?", 2: "Who\nplayed?", 3: "Who\nwon?" };
 
 // The whole log flow on one page: game, players, result. Moving between the
 // steps never reloads the page. Everything it needs is passed in once.
-export default function LogFlow({ profile, games, initialGuests, recentGameIds }) {
+export default function LogFlow({
+  profile,
+  games,
+  initialGuests,
+  recentGameIds,
+  lastSession,
+}) {
   const router = useRouter();
-  const [saving, startSaving] = useTransition();
+  const [, startSaving] = useTransition();
   const [addingGuest, startAddingGuest] = useTransition();
+  // idle | saving | done. Anything but idle locks the screen under an overlay.
+  const [phase, setPhase] = useState("idle");
+  // The previous session, kept up to date after every save. Not cleared by a
+  // reset, so a fresh flow can still offer it.
+  const [previous, setPrevious] = useState(lastSession);
 
   const [step, setStep] = useState(1);
   const [gameId, setGameId] = useState(null);
@@ -64,6 +75,29 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
   const [choosing, setChoosing] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
+  // Back to a clean first step. The guest list is kept, new guests stay.
+  function resetFlow() {
+    setStep(1);
+    setGameId(null);
+    setQuery("");
+    setSelected([]);
+    setGuestName("");
+    setGuestError(null);
+    setResultType("ranking");
+    setWinner("me");
+    setOrder([]);
+    setTied({});
+    setScores({});
+    setTiebreak(null);
+    setChoosing(false);
+    setSaveError(null);
+    setPhase("idle");
+  }
+
+  // The app keeps pages it left alive in the background. When this page goes
+  // away, start over, so the next visit begins at the first step.
+  useEffect(() => () => resetFlow(), []);
+
   const game = games.find((item) => item.id === gameId) ?? null;
 
   const chosenGuests = guests.filter((guest) => selected.includes(guest.id));
@@ -75,6 +109,15 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
       color: playerColor(index + 1),
     })),
   ];
+
+  const previousGame = previous
+    ? games.find((item) => item.id === previous.gameId)
+    : null;
+  const previousNames = previous
+    ? previous.guestIds
+        .map((id) => guests.find((guest) => guest.id === id)?.name)
+        .filter(Boolean)
+    : [];
 
   const recentGames = recentGameIds
     .map((id) => games.find((item) => item.id === id))
@@ -167,6 +210,7 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
 
   function save() {
     setSaveError(null);
+    setPhase("saving");
     startSaving(async () => {
       const result = await saveSession({
         gameId,
@@ -181,10 +225,33 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
       });
       if (result.error) {
         setSaveError(result.error);
+        setPhase("idle");
         return;
       }
+      setPrevious({ gameId, guestIds: chosenGuests.map((g) => g.id) });
+      setPhase("done");
       router.push("/?saved=1");
+      // Fallback if the page stays alive: start over once Home has opened.
+      setTimeout(resetFlow, 1500);
     });
+  }
+
+  // Jump to the result of the same game with the same players.
+  function sameAgain() {
+    if (!previous || !games.some((item) => item.id === previous.gameId)) return;
+    const ids = previous.guestIds.filter((id) =>
+      guests.some((guest) => guest.id === id),
+    );
+    setGameId(previous.gameId);
+    setSelected(ids);
+    setOrder(["me", ...ids]);
+    setTied({});
+    setScores({});
+    setTiebreak(null);
+    setChoosing(false);
+    setWinner("me");
+    setSaveError(null);
+    setStep(3);
   }
 
   function goBack() {
@@ -214,6 +281,33 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
               aria-label="Search games"
             />
           </div>
+
+          {!query && previousGame && (
+            <button
+              type="button"
+              className={`${styles.row} ${styles.rowButton} ${styles.again}`}
+              onClick={sameAgain}
+            >
+              <span className={styles.againIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4" />
+                </svg>
+              </span>
+              <span className={styles.rowText}>
+                <span className={styles.rowName}>Same again</span>
+                <span className={styles.chips}>
+                  <Chip size="s" tone="yellow">{previousGame.name}</Chip>
+                  <Chip size="s">You</Chip>
+                  {previousNames.slice(0, 3).map((name) => (
+                    <Chip key={name} size="s">{name}</Chip>
+                  ))}
+                  {previousNames.length > 3 && (
+                    <Chip size="s">+{previousNames.length - 3}</Chip>
+                  )}
+                </span>
+              </span>
+            </button>
+          )}
 
           {!query && recentGames.length > 0 && (
             <div className={styles.chips} aria-label="Recent games">
@@ -564,12 +658,27 @@ export default function LogFlow({ profile, games, initialGuests, recentGameIds }
           <button
             type="button"
             className={styles.cta}
-            disabled={saving}
+            disabled={phase !== "idle"}
             onClick={save}
           >
-            {saving ? "Saving" : "Save session"}
+            {phase === "idle" ? (
+              "Save session"
+            ) : (
+              <>
+                <span className={styles.spinner} aria-hidden="true" />
+                {phase === "saving" ? "Saving your session" : "Saved"}
+              </>
+            )}
           </button>
         </>
+      )}
+      {phase !== "idle" && (
+        <div className={styles.overlay} role="status" aria-live="polite">
+          <div className={styles.overlayCard}>
+            <span className={styles.spinner} aria-hidden="true" />
+            {phase === "saving" ? "Saving your session" : "Saved. Opening Home"}
+          </div>
+        </div>
       )}
     </FlowShell>
   );

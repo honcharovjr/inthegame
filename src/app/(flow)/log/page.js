@@ -35,7 +35,7 @@ async function LogData() {
       .order("created_at"),
     supabase
       .from("sessions")
-      .select("game_id")
+      .select("game_id, session_participants(guest_id)")
       .order("played_at", { ascending: false })
       .limit(30),
   ]);
@@ -55,12 +55,24 @@ async function LogData() {
     ...new Set((recentResult.data ?? []).map((row) => row.game_id)),
   ].slice(0, 4);
 
+  // The latest session, so the flow can offer to play it again.
+  const latest = recentResult.data?.[0];
+  const lastSession = latest
+    ? {
+        gameId: latest.game_id,
+        guestIds: latest.session_participants
+          .map((p) => p.guest_id)
+          .filter(Boolean),
+      }
+    : null;
+
   return (
     <LogFlow
       profile={{ id: profile.id, nickname: profile.nickname }}
       games={gamesResult.data}
       initialGuests={guestsResult.data ?? []}
       recentGameIds={recentGameIds}
+      lastSession={lastSession}
     />
   );
 }

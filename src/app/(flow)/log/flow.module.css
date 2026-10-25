@@ -558,3 +558,59 @@
   padding: 22px 18px;
   background: var(--color-turquoise);
 }
+
+/* Saving: a clear sign that something is happening */
+.spinner {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  border: 3px solid rgba(18, 10, 26, 0.18);
+  border-top-color: var(--color-ink);
+  animation: spin 0.7s linear infinite;
+}
+
+.cta:has(.spinner) {
+  gap: 12px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(3px);
+  animation: enter 0.25s ease both;
+}
+
+.overlayCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 26px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+/* Play the previous game again with the same players */
+.again {
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-button);
+}
+
+.againIcon {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 14px;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
