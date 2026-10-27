@@ -1,11 +1,12 @@
 """Builds the character art the site loads, from the cut layers.
 
-Input: art/character-bases/cut/ and art/character-hair/cut/, made by
-scripts/key_character_bases.py and scripts/key_character_hair.py.
+Input: art/character-outfits/cut/ and art/character-hair/cut/, made by
+scripts/key_character_outfits.py and scripts/key_character_hair.py.
 Output:
 - public/character/{name}.webp: every layer at 3/4 size, light for the web
 - public/character/eyes-{race}.webp: the eye whites alone, drawn untinted
   over the skin, and a mask for the irises
+- public/character/outfit-basic-{race}.webp: the clothes, tinted in the app
 - public/character/horns-tiefling.webp: the horns again, drawn over the hair
 - src/lib/character/art.json: the measures the renderer needs, in pixels of
   the full 1024 x 1536 canvas
@@ -20,8 +21,10 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
+from key_character_hair import head as head_measures, horn_mask
+
 ROOT = Path(__file__).resolve().parent.parent
-BASES = ROOT / "art" / "character-bases" / "cut"
+BASES = ROOT / "art" / "character-outfits" / "cut"
 HAIR = ROOT / "art" / "character-hair" / "cut"
 OUT = ROOT / "public" / "character"
 ART_JSON = ROOT / "src" / "lib" / "character" / "art.json"
@@ -30,8 +33,7 @@ RACES = ["human", "elf", "dwarf", "orc", "tiefling"]
 W, H = 1024, 1536
 WEB_SCALE = 0.75
 
-# The full figure: wide enough for the broadest arms, down to the waist.
-FULL = {"x": 96, "y": 0, "w": 832, "h": 1180}
+OUTFITS = ["basic"]
 
 
 def save_web(img, name):
@@ -70,13 +72,24 @@ def eye_whites(rgba):
     return Image.fromarray(out), boxes
 
 
-def horns(rgba):
-    """The tiefling's horns: what is above the skull, outside a disc around it."""
-    ys, xs = np.mgrid[0:H, 0:W]
-    skull = ((xs - 511) / 108.0) ** 2 + ((ys - 240) / 100.0) ** 2 <= 1
+def horns(rgba, h):
+    """The tiefling's horns alone."""
     out = rgba.copy()
-    out[(ys >= 250) | skull] = 0
+    out[~horn_mask(rgba[..., 3] > 0, h)] = 0
     return Image.fromarray(out)
+
+
+def full_box(figures):
+    """The whole figure of every race, with a margin: one shared box, so all
+    full views have the same size."""
+    solid = np.zeros((H, W), bool)
+    for alpha in figures:
+        solid |= alpha > 128
+    ys, xs = np.where(solid)
+    pad = 24
+    x0, x1 = max(0, xs.min() - pad), min(W, xs.max() + pad)
+    y0 = max(0, ys.min() - pad)
+    return {"x": int(x0), "y": int(y0), "w": int(x1 - x0), "h": int(H - y0)}
 
 
 def main():
@@ -84,6 +97,7 @@ def main():
     anchors = json.loads((BASES / "anchors.json").read_text())["races"]
     fit = json.loads((HAIR / "fit.json").read_text())
     races = {}
+    figures = []
     for race in RACES:
         img = Image.open(BASES / f"{race}.png").convert("RGBA")
         rgba = np.array(img)
@@ -91,7 +105,11 @@ def main():
         whites, eyes = eye_whites(rgba)
         save_web(whites, f"eyes-{race}")
         if race == "tiefling":
-            save_web(horns(rgba), "horns-tiefling")
+            save_web(horns(rgba, head_measures(race, anchors)), "horns-tiefling")
+        for outfit in OUTFITS:
+            layer = Image.open(BASES / f"outfit-{outfit}-{race}.png").convert("RGBA")
+            save_web(layer, f"outfit-{outfit}-{race}")
+            figures.append(np.maximum(rgba[..., 3], np.array(layer)[..., 3]))
 
         a = anchors[race]
         solid = rgba[..., 3] > 128
@@ -100,8 +118,10 @@ def main():
         head = a["eyeY"] - top
         size = head * 2.9
         eye_x = (eyes[0]["cx"] + eyes[1]["cx"]) / 2
-        # The skin's own grey, so a tint shows the chosen colour, not a darker one.
-        skin = rgba[..., :3][solid & (rgba[..., :3].min(axis=2) < 225)].mean(axis=1)
+        # The skin's own grey, so a tint shows the chosen colour, not a darker
+        # one. Only the skin that shows: not under the clothes, not the eyes.
+        bare = np.array(Image.open(BASES / f"outfit-basic-{race}.png"))[..., 3] < 10
+        skin = rgba[..., :3][solid & bare & (rgba[..., :3].min(axis=2) < 225)].mean(axis=1)
         races[race] = {
             "eyes": eyes,
             "skinGrey": round(float(np.median(skin)), 1),
@@ -119,7 +139,7 @@ def main():
     for name in parts:
         save_web(Image.open(HAIR / f"{name}.png").convert("RGBA"), name)
 
-    art = {"width": W, "height": H, "full": FULL, "races": races}
+    art = {"width": W, "height": H, "full": full_box(figures), "races": races}
     ART_JSON.write_text(json.dumps(art, indent=2) + "\n")
     total = sum(p.stat().st_size for p in OUT.glob("*.webp"))
     print(f"{len(list(OUT.glob('*.webp')))} files, {total / 1024:.0f} KB")
