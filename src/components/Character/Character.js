@@ -143,6 +143,7 @@ function Figure({ scene, uid, height, fade }) {
 // the first letter of the name.
 // view: "portrait" (a round avatar around the head) or "full" (the whole
 // figure down to the waist, in a rounded card; size is then its width).
+// size "fill": as wide as the parent, keeping the shape of the view.
 // perks: show the animated perks of the accessory. Use it where the character
 // is large. The gold ring of the laurel wreath always shows.
 export default function Character({
@@ -161,6 +162,7 @@ export default function Character({
   const perk = accessory?.perk;
   const letter = name.trim().charAt(0).toUpperCase() || "?";
   const full = view === "full";
+  const fill = size === "fill";
 
   const patternId = `bg-${uid}`;
   const clipId = `clip-${uid}`;
@@ -181,11 +183,16 @@ export default function Character({
   return (
     <span
       className={classes}
-      style={{ width: size, height: (size * height) / 100 }}
+      style={fill ? { width: "100%", aspectRatio: `100 / ${height}` } : { width: size, height: (size * height) / 100 }}
       role="img"
       aria-label={name ? `${name}'s character` : "Character"}
     >
-      <svg viewBox={`0 0 100 ${height}`} width={size} height={(size * height) / 100} className={styles.svg}>
+      <svg
+        viewBox={`0 0 100 ${height}`}
+        width={fill ? "100%" : size}
+        height={fill ? "100%" : (size * height) / 100}
+        className={styles.svg}
+      >
         <defs>
           <clipPath id={clipId}>
             {full ? <rect width="100" height={height} rx="8" /> : <circle cx="50" cy="50" r="50" />}

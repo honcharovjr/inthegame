@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import art from "./art.json";
 import { DEFAULT_CHARACTER } from "./items";
-import { characterScene, fitTransform, tintFactors, viewBox } from "./render";
+import { camera, characterScene, fitTransform, tintFactors, viewBox } from "./render";
 
 describe("tintFactors", () => {
   it("scales each channel by the grey of the art", () => {
@@ -79,6 +79,31 @@ describe("viewBox", () => {
         expect(eye.cx).toBeLessThan(box.x + box.w);
         expect(eye.cy).toBeGreaterThan(box.y);
         expect(eye.cy).toBeLessThan(box.y + box.h);
+      }
+    }
+  });
+});
+
+describe("camera", () => {
+  it("shows the whole figure for the body", () => {
+    expect(camera("human", "body")).toEqual({ x: 0.5, y: 0.5, scale: 1 });
+  });
+
+  it("zooms in on the head, closer still on the eyes", () => {
+    const head = camera("dwarf", "head");
+    const eyes = camera("dwarf", "eyes");
+    expect(head.scale).toBeGreaterThan(1.5);
+    expect(eyes.scale).toBeGreaterThan(head.scale);
+    expect(head.y).toBeLessThan(0.5);
+  });
+
+  it("never looks past the edges of the card", () => {
+    for (const race of Object.keys(art.races)) {
+      for (const focus of ["head", "eyes", "bust", "body"]) {
+        const { x, y, scale } = camera(race, focus);
+        expect(x - 0.5 / scale).toBeGreaterThanOrEqual(-1e-9);
+        expect(y - 0.5 / scale).toBeGreaterThanOrEqual(-0.001);
+        expect(x + 0.5 / scale).toBeLessThanOrEqual(1.001);
       }
     }
   });

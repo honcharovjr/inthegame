@@ -54,7 +54,9 @@ Everywhere a registered player's letter disc appears today: profile, Home, leade
 
 ## 5. Customizer
 
-On the profile, a "Customize" screen with a large live preview and one row of options per group. Locked items are shown dimmed with the achievement that unlocks them. Saving checks on the server that every chosen item is free or earned.
+On the profile, a "Customize" screen like a game's character creator. The character stays in view on the left (on top on a phone) with Save and Reset under it; the options are on the right in tabs: Race (and skin tone), Hair, Beard, Eyes, Outfit, Background. Each tab shows its styles first, then their colours. Switching tabs moves the camera to that part (closer for hair, beard and eyes, the whole figure for outfits), and every change fades in over 0.16 seconds. Locked items are shown dimmed with the achievement that unlocks them. Saving checks on the server that every chosen item is free or earned.
+
+Accessories and badges are not in the customizer for now. A player who already wears one keeps it.
 
 ## 6. Storage (proposal)
 

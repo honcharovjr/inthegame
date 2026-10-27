@@ -7,57 +7,164 @@
 
 .title {
   padding: 0 4px;
-  font-size: clamp(36px, 11vw, 44px);
-  line-height: 0.92;
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.03em;
 }
 
-.body {
-  display: flex;
-  flex-direction: column;
+/* Phone: the character on top, kept in view; the options and the buttons
+   below it. */
+.layout {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "stage" "panel" "actions";
   gap: var(--space-3);
 }
 
+/* Only groups the stage and the buttons on a desktop */
+.side {
+  display: contents;
+}
+
 .stage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 24px 16px;
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-float);
+  grid-area: stage;
+  position: sticky;
+  top: 8px;
+  z-index: 2;
 }
 
-.stageText {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-.stageName {
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.card {
-  padding: 16px;
+.panel {
+  grid-area: panel;
+  min-width: 0;
+  padding: 14px;
   border-radius: var(--radius-card);
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
 }
 
-.cardTitle {
+.actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* The stage: a window onto the character, which the camera moves inside. */
+.frame {
+  position: relative;
+  width: min(100%, calc(40dvh * 0.656));
+  margin: 0 auto;
+  aspect-ratio: 0.656;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
+}
+
+.lens {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.shot {
+  position: absolute;
+  inset: 0;
+}
+
+/* The look being replaced fades out over the new one. */
+.leaving {
+  z-index: 1;
+  animation: fade-out 0.16s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.name {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 3;
+  max-width: calc(100% - 20px);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The tabs */
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.tab:active {
+  transform: scale(0.96);
+}
+
+.tabOn {
+  background: var(--color-pink-deep);
+  color: #ffffff;
+}
+
+.tab:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.tabBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  animation: tab-in 0.18s ease-out;
+}
+
+@keyframes tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.groupTitle {
   font-size: 13px;
   font-weight: 600;
   color: var(--color-muted);
 }
 
-.tiles {
+.tiles,
+.swatches {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -74,8 +181,13 @@
   justify-content: center;
   background: var(--color-chip);
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* A taller tile for options shown on the whole figure */
+.tileTall {
+  height: 104px;
 }
 
 @media (hover: hover) {
@@ -83,6 +195,10 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 18px rgba(18, 10, 26, 0.14);
   }
+}
+
+.tile:active:not(.tileLocked) {
+  transform: scale(0.95);
 }
 
 .tileOn {
@@ -114,7 +230,8 @@
   color: var(--color-muted);
 }
 
-.tile:focus-visible {
+.tile:focus-visible,
+.swatch:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
@@ -132,55 +249,30 @@
   height: 40px;
   border-radius: 50%;
   box-shadow: inset 0 0 0 2px rgba(18, 10, 26, 0.12);
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.badgeChip {
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 16px;
-  background: var(--color-chip);
-  font-size: 13px;
-  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease;
 }
 
-.badgeOn {
-  background: var(--color-pink-deep);
-  color: #ffffff;
+@media (hover: hover) {
+  .swatch:hover {
+    transform: scale(1.1);
+  }
 }
 
-.badgeChip:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.empty {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-muted);
+.swatchOn {
+  box-shadow: inset 0 0 0 2px rgba(18, 10, 26, 0.12), 0 0 0 3px #ffffff,
+    0 0 0 6px var(--color-pink-deep);
+  transform: scale(1.05);
 }
 
 .error {
+  flex-basis: 100%;
   padding: 10px 16px;
   border-radius: var(--radius-chip);
   background: var(--color-danger-tint);
   color: var(--color-danger-ink);
   font-size: 14px;
   font-weight: 700;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
 }
 
 .reset,
@@ -204,46 +296,54 @@
   cursor: default;
 }
 
+/* Desktop: the character on the left at about 40% of the width, kept in
+   view while the options on the right scroll. */
 @media (min-width: 900px) {
   .page {
-    padding: 56px 56px 48px;
+    padding: 40px 56px 48px;
     gap: 16px;
   }
 
-  .title {
-    font-size: clamp(48px, 6vw, 76px);
+  .layout {
+    grid-template-columns: minmax(260px, 2fr) 3fr;
+    grid-template-areas: "side panel";
+    align-items: start;
+    column-gap: 24px;
   }
 
-  .body {
-    max-width: 860px;
+  .side {
+    grid-area: side;
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
   .stage {
-    flex-direction: row;
-    gap: 28px;
-    padding: 28px 32px;
+    position: static;
   }
 
-  .stageText {
-    align-items: flex-start;
-    text-align: left;
+  /* As large as the column allows, and short enough to leave the buttons
+     in view. */
+  .frame {
+    width: min(100%, calc((100dvh - 190px) * 0.656));
   }
 
-  .stageName {
-    font-size: 36px;
+  .panel {
+    padding: 20px;
   }
 }
 
-/* An option with no picture, like an accessory waiting for its art */
-.tileText {
-  padding: 0 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.15;
-  text-align: center;
-}
+@media (prefers-reduced-motion: reduce) {
+  .lens,
+  .tabBody,
+  .leaving {
+    transition: none;
+    animation: none;
+  }
 
-/* A taller tile for options shown on the whole figure */
-.tileTall {
-  height: 104px;
+  .leaving {
+    opacity: 0;
+  }
 }

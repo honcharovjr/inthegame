@@ -3,12 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Character from "@/components/Character/Character";
-import Chip from "@/components/Chip/Chip";
 import { LockIcon } from "@/components/icons";
 import { findAchievement } from "@/lib/achievements/catalog";
 import { saveCharacter } from "@/lib/character/actions";
 import {
-  ACCESSORIES,
   BACKGROUNDS,
   BEARDS,
   DEFAULT_CHARACTER,
@@ -22,7 +20,19 @@ import {
   isUnlocked,
   resolveCharacter,
 } from "@/lib/character/items";
+import { camera } from "@/lib/character/render";
 import styles from "./customize.module.css";
+
+// The tabs of the panel. Each shows its styles first, then their colours,
+// and points the camera at the part it changes.
+const TABS = [
+  { code: "race", label: "Race", focus: "bust", style: ["race", RACES], color: ["skin", SKINS, "Skin tone"] },
+  { code: "hair", label: "Hair", focus: "head", style: ["hair", HAIRSTYLES], color: ["hairColor", HAIR_COLORS, "Hair colour"] },
+  { code: "beard", label: "Beard", focus: "head", style: ["beard", BEARDS], color: ["hairColor", HAIR_COLORS, "Hair colour"] },
+  { code: "eyes", label: "Eyes", focus: "eyes", color: ["eyeColor", EYE_COLORS, "Eye colour"] },
+  { code: "outfit", label: "Outfit", focus: "body", style: ["outfit", OUTFITS], color: ["outfitColor", OUTFIT_COLORS, "Cloth colour"], full: true },
+  { code: "background", label: "Background", focus: "body", style: ["background", BACKGROUNDS] },
+];
 
 // One option tile. A locked tile is dimmed and says what unlocks it.
 function Tile({ selected, locked, tip, label, onClick, tall = false, children }) {
@@ -47,53 +57,54 @@ function Tile({ selected, locked, tip, label, onClick, tall = false, children })
   );
 }
 
-// A row of options, each shown as the current character wearing it.
-// full: show the whole figure, for options worn on the body.
-function Options({ title, list, part, choice, set, preview, full = false }) {
-  return (
-    <section className={styles.card} aria-label={title}>
-      <div className={styles.cardTitle}>{title}</div>
-      <div className={styles.tiles}>
-        {list.map((item) => (
-          <Tile key={item.code} label={item.label} selected={choice[part] === item.code} tall={full} onClick={() => set(part, item.code)}>
-            <Character character={preview(part, item.code)} size={full ? 60 : 56} view={full ? "full" : "portrait"} />
-          </Tile>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// A row of colours.
-function Swatches({ title, list, part, choice, set }) {
-  return (
-    <section className={styles.card} aria-label={title}>
-      <div className={styles.cardTitle}>{title}</div>
-      <div className={styles.tiles}>
-        {list.map((item) => (
-          <Tile key={item.code} label={item.label} selected={choice[part] === item.code} onClick={() => set(part, item.code)}>
-            <span className={styles.swatch} style={{ background: item.hex }} />
-          </Tile>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function unlockTip(item) {
   const achievement = findAchievement(item.unlockedBy);
   return `Locked. Earn ${achievement?.name}: ${achievement?.description}`;
 }
 
-// The customizer: a live preview and a row of options for every part.
+// The character on its stage. A change fades over the last look instead of
+// swapping at once, and the camera glides to the part being edited.
+function Stage({ frames, name, focus }) {
+  const current = frames[frames.length - 1].choice;
+  const shot = camera(current.race, focus);
+  const lens = {
+    transform: `scale(${shot.scale}) translate(${-(shot.x - 0.5 / shot.scale) * 100}%, ${-(shot.y - 0.5 / shot.scale) * 100}%)`,
+  };
+  return (
+    <div className={styles.frame}>
+      <div className={styles.lens} style={lens}>
+        {frames.map((frame, i) => (
+          <div key={frame.id} className={`${styles.shot} ${i < frames.length - 1 ? styles.leaving : ""}`}>
+            <Character character={frame.choice} name={name} size="fill" view="full" perks={i === frames.length - 1} />
+          </div>
+        ))}
+      </div>
+      <span className={styles.name}>{name}</span>
+    </div>
+  );
+}
+
+// The customizer: the character on the left, always in view, and a panel of
+// tabs on the right. On a phone the character sits on top.
 export default function Customizer({ name, initial, earned }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [choice, setChoice] = useState(resolveCharacter(initial));
+  // The last two looks: the one fading out and the one now shown.
+  const [frames, setFrames] = useState([{ id: 0, choice: resolveCharacter(initial) }]);
+  const [tab, setTab] = useState(TABS[0]);
   const [error, setError] = useState(null);
   const owned = new Set(earned);
+  const choice = frames[frames.length - 1].choice;
 
-  const set = (part, value) => setChoice((current) => ({ ...current, [part]: value }));
+  function show(next) {
+    setFrames((list) => {
+      const last = list[list.length - 1];
+      return [last, { id: last.id + 1, choice: next }];
+    });
+  }
+  const set = (part, value) => {
+    if (choice[part] !== value) show({ ...choice, [part]: value });
+  };
   // A small preview of one option, worn on the current choice
   const preview = (part, value) => ({ ...choice, [part]: value });
 
@@ -109,122 +120,100 @@ export default function Customizer({ name, initial, earned }) {
     });
   }
 
-  const badges = earned.map(findAchievement).filter(Boolean);
+  const [stylePart, styleList] = tab.style ?? [];
+  const [colorPart, colorList, colorTitle] = tab.color ?? [];
 
   return (
-    <div className={`${styles.body} stagger`}>
-      <section className={styles.stage} aria-label="Preview">
-        <Character character={choice} name={name} size={200} view="full" perks />
-        <div className={styles.stageText}>
-          <span className={styles.stageName}>{name}</span>
-          {choice.accessory && (
-            <Chip size="s" tone="yellow">
-              {ACCESSORIES.find((a) => a.code === choice.accessory)?.perkText}
-            </Chip>
+    <div className={styles.layout}>
+      {/* On a desktop the character and the buttons stay in view together */}
+      <div className={styles.side}>
+        <section className={styles.stage} aria-label="Preview">
+          <Stage frames={frames} name={name} focus={tab.focus} />
+        </section>
+        <div className={styles.actions}>
+          {error && (
+            <p role="alert" className={styles.error}>
+              {error}
+            </p>
+          )}
+          <button
+            type="button"
+            className={`${styles.reset} btn-secondary`}
+            onClick={() => show({ ...DEFAULT_CHARACTER, accessory: choice.accessory, badge: choice.badge })}
+          >
+            Reset
+          </button>
+          <button type="button" className={`${styles.save} btn-primary`} onClick={save} disabled={pending}>
+            {pending ? "Saving" : "Save character"}
+          </button>
+        </div>
+      </div>
+
+      <section className={styles.panel} aria-label="Options">
+        <div className={styles.tabs} role="tablist">
+          {TABS.map((item) => (
+            <button
+              key={item.code}
+              type="button"
+              role="tab"
+              aria-selected={tab.code === item.code}
+              className={`${styles.tab} ${tab.code === item.code ? styles.tabOn : ""}`}
+              onClick={() => setTab(item)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div key={tab.code} className={styles.tabBody} role="tabpanel" aria-label={tab.label}>
+          {stylePart && (
+            <div>
+              <div className={styles.groupTitle}>Style</div>
+              <div className={styles.tiles}>
+                {styleList.map((item) => (
+                  <Tile
+                    key={item.code}
+                    label={item.label}
+                    selected={choice[stylePart] === item.code}
+                    locked={!isUnlocked(item, owned)}
+                    tip={item.unlockedBy ? unlockTip(item) : ""}
+                    tall={tab.full}
+                    onClick={() => set(stylePart, item.code)}
+                  >
+                    <Character
+                      character={preview(stylePart, item.code)}
+                      size={tab.full ? 60 : 56}
+                      view={tab.full ? "full" : "portrait"}
+                    />
+                  </Tile>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {colorPart && (
+            <div>
+              <div className={styles.groupTitle}>{colorTitle}</div>
+              <div className={styles.swatches}>
+                {colorList.map((item) => (
+                  <button
+                    key={item.code}
+                    type="button"
+                    className={`${styles.swatch} ${choice[colorPart] === item.code ? styles.swatchOn : ""}`}
+                    style={{ background: item.hex }}
+                    aria-pressed={choice[colorPart] === item.code}
+                    aria-label={item.label}
+                    data-tip={item.label}
+                    data-tip-pos="below"
+                    onClick={() => set(colorPart, item.code)}
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </section>
 
-      <Options title="Race" list={RACES} part="race" choice={choice} set={set} preview={preview} />
-      <Swatches title="Skin tone" list={SKINS} part="skin" choice={choice} set={set} />
-      <Options title="Hair" list={HAIRSTYLES} part="hair" choice={choice} set={set} preview={preview} />
-      <Swatches title="Hair colour" list={HAIR_COLORS} part="hairColor" choice={choice} set={set} />
-      <Options title="Beard" list={BEARDS} part="beard" choice={choice} set={set} preview={preview} />
-      <Swatches title="Eye colour" list={EYE_COLORS} part="eyeColor" choice={choice} set={set} />
-      <Options title="Outfit" list={OUTFITS} part="outfit" choice={choice} set={set} preview={preview} full />
-      <Swatches title="Outfit colour" list={OUTFIT_COLORS} part="outfitColor" choice={choice} set={set} />
-
-      <section className={styles.card} aria-label="Background">
-        <div className={styles.cardTitle}>Background</div>
-        <div className={styles.tiles}>
-          {BACKGROUNDS.map((item) => (
-            <Tile
-              key={item.code}
-              label={item.label}
-              selected={choice.background === item.code}
-              locked={!isUnlocked(item, owned)}
-              tip={item.unlockedBy ? unlockTip(item) : ""}
-              onClick={() => set("background", item.code)}
-            >
-              <Character character={preview("background", item.code)} size={56} />
-            </Tile>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.card} aria-label="Accessory">
-        <div className={styles.cardTitle}>Accessory</div>
-        <div className={styles.tiles}>
-          <Tile label="None" selected={!choice.accessory} onClick={() => set("accessory", null)}>
-            <span className={styles.tileText}>None</span>
-          </Tile>
-          {ACCESSORIES.map((item) => (
-            <Tile
-              key={item.code}
-              label={item.label}
-              selected={choice.accessory === item.code}
-              locked={!isUnlocked(item, owned)}
-              tip={unlockTip(item)}
-              onClick={() => set("accessory", item.code)}
-            >
-              <span className={styles.tileText}>{item.label}</span>
-            </Tile>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.card} aria-label="Badge">
-        <div className={styles.cardTitle}>Badge</div>
-        {badges.length === 0 ? (
-          <p className={styles.empty}>Earn an achievement to wear it as a badge.</p>
-        ) : (
-          <div className={styles.chips}>
-            <button
-              type="button"
-              className={`${styles.badgeChip} ${!choice.badge ? styles.badgeOn : ""}`}
-              aria-pressed={!choice.badge}
-              onClick={() => set("badge", null)}
-            >
-              None
-            </button>
-            {badges.map((item) => (
-              <button
-                key={item.code}
-                type="button"
-                className={`${styles.badgeChip} ${choice.badge === item.code ? styles.badgeOn : ""}`}
-                aria-pressed={choice.badge === item.code}
-                onClick={() => set("badge", item.code)}
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {error && (
-        <p role="alert" className={styles.error}>
-          {error}
-        </p>
-      )}
-
-      <div className={styles.actions}>
-        <button
-          type="button"
-          className={`${styles.reset} btn-secondary`}
-          onClick={() => setChoice({ ...DEFAULT_CHARACTER })}
-        >
-          Reset
-        </button>
-        <button
-          type="button"
-          className={`${styles.save} btn-primary`}
-          onClick={save}
-          disabled={pending}
-        >
-          {pending ? "Saving" : "Save character"}
-        </button>
-      </div>
     </div>
   );
 }
