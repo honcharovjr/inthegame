@@ -91,24 +91,39 @@ export function characterScene(raw, view = "portrait") {
 
 // Where the customizer's camera looks for each kind of option, and how close.
 // Returns the point to centre (x, y as shares of the full view) and the zoom.
-// The point is held back from the edges, so the zoomed view never shows
-// past the figure's card.
+// The zoom stays small (15% at most): the art is not sharp enough for close
+// ups. The body is still zoomed a little, to crop the card's edges. The point
+// is held back from the edges, so the zoomed view never shows past the card.
 export function camera(race, focus) {
   const full = art.full;
   const { portrait: p, eyes } = art.races[race];
   const headX = p.x + p.w / 2;
   const shots = {
-    head: [headX, p.y + p.h / 2, full.w / (p.w * 1.15)],
-    eyes: [headX, (eyes[0].cy + eyes[1].cy) / 2, full.w / (p.w * 0.7)],
-    bust: [headX, p.y + p.h * 0.85, full.w / (p.w * 1.7)],
-    body: [full.x + full.w / 2, full.y + full.h / 2, 1],
+    head: [headX, p.y + p.h / 2, 1.15],
+    eyes: [headX, (eyes[0].cy + eyes[1].cy) / 2, 1.15],
+    bust: [headX, p.y + p.h * 0.85, 1.12],
+    body: [full.x + full.w / 2, full.y + full.h / 2, 1.06],
   };
-  const [cx, cy, zoom] = shots[focus] ?? shots.body;
-  const scale = Math.max(1, Math.round(zoom * 100) / 100);
+  const [cx, cy, scale] = shots[focus] ?? shots.body;
   const hold = (v) => Math.min(Math.max(v, 0.5 / scale), 1 - 0.5 / scale);
   return {
     x: Math.round(hold((cx - full.x) / full.w) * 1000) / 1000,
     y: Math.round(hold((cy - full.y) / full.h) * 1000) / 1000,
     scale,
+  };
+}
+
+// Where the round portrait sits inside the full view, as shares of the full
+// view's width, and the full view's height to width. The profile grows the
+// avatar from one into the other.
+export function portraitInFull(race) {
+  const full = art.full;
+  const p = art.races[race].portrait;
+  const share = (v) => Math.round((v / full.w) * 1000) / 1000;
+  return {
+    x: share(p.x - full.x),
+    y: share(p.y - full.y),
+    w: share(p.w),
+    aspect: Math.round((full.h / full.w) * 1000) / 1000,
   };
 }

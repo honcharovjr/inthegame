@@ -177,6 +177,17 @@ export function resolveCharacter(raw) {
   return character;
 }
 
+// A random look from the unlocked items, for the dice of the customizer. The
+// accessory and the badge are kept. random: a function like Math.random.
+export function randomCharacter(current, earned, random = Math.random) {
+  const character = { ...resolveCharacter(current) };
+  for (const [part, list] of PARTS) {
+    const open = list.filter((item) => isUnlocked(item, earned));
+    character[part] = open[Math.floor(random() * open.length)].code;
+  }
+  return character;
+}
+
 // Checks a choice before it is saved. Every part must exist, and an earned
 // item must really be earned. Returns { character } or { error }.
 export function validateCharacter(input, earned) {

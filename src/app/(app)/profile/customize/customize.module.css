@@ -69,9 +69,35 @@
   transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* Breathes slowly while idle */
+.alive {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.012) translateY(-0.4%);
+  }
+}
+
 .shot {
   position: absolute;
   inset: 0;
+}
+
+/* A small pose as each new look comes in */
+.entering {
+  transform-origin: 50% 100%;
+  animation: pose 0.32s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+@keyframes pose {
+  from {
+    transform: translateY(1.2%) scale(0.985);
+  }
 }
 
 /* The look being replaced fades out over the new one. */
@@ -87,20 +113,122 @@
   }
 }
 
+/* The name, like a nameplate in a game */
 .name {
   position: absolute;
-  left: 10px;
-  top: 10px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
   z-index: 3;
-  max-width: calc(100% - 20px);
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
-  font-weight: 800;
+  font-family: var(--font-display), serif;
+  font-size: clamp(16px, 4.5vw, 24px);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--color-ink);
+  text-shadow: 0 0 2px #fff, 0 0 10px #fff, 0 0 18px rgba(255, 255, 255, 0.9);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The dice: a random look */
+.dice {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(18, 10, 26, 0.16);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .dice:hover {
+    transform: rotate(-12deg) scale(1.06);
+  }
+}
+
+.dice:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.diceRolling svg {
+  animation: roll 0.55s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+@keyframes roll {
+  to {
+    transform: rotate(720deg);
+  }
+}
+
+/* The cheer after saving: a burst and a word */
+.cheer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.cheer i {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  background: var(--c);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: cheer-burst 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes cheer-burst {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0) scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-120px) scale(1.4);
+  }
+}
+
+.cheerText {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-pink-deep);
+  color: #fff;
+  font-family: var(--font-display), serif;
+  font-size: 18px;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: var(--shadow-float);
+  animation: cheer-pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+@keyframes cheer-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 /* The tabs */
@@ -206,6 +334,12 @@
   box-shadow: 0 0 0 3px var(--color-pink-deep);
 }
 
+@media (hover: hover) {
+  .tileOn:hover:not(.tileLocked) {
+    box-shadow: 0 0 0 3px var(--color-pink-deep), 0 8px 18px rgba(18, 10, 26, 0.14);
+  }
+}
+
 .tileLocked {
   cursor: help;
 }
@@ -234,14 +368,6 @@
 .swatch:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
-}
-
-/* Tooltips of locked tiles are longer than one word */
-.tile[data-tip]::after {
-  white-space: normal;
-  width: 190px;
-  line-height: 1.3;
-  text-align: center;
 }
 
 .swatch {
@@ -338,7 +464,10 @@
 @media (prefers-reduced-motion: reduce) {
   .lens,
   .tabBody,
-  .leaving {
+  .leaving,
+  .alive,
+  .entering,
+  .diceRolling svg {
     transition: none;
     animation: none;
   }

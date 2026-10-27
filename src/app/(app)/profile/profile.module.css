@@ -206,17 +206,90 @@
   }
 }
 
-/* The whole character, opened from the profile card */
-.fullView summary {
-  width: fit-content;
+/* The top of the profile. The avatar grows from a disc into the whole
+   figure and pushes the details to the right; on a narrow screen they move
+   below it. */
+.hero {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.hero .identity {
+  min-width: 170px;
+}
+
+.heroArt {
+  position: relative;
+  flex: none;
+}
+
+.heroBox {
+  position: relative;
+  overflow: hidden;
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.heroFigure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: 0;
+  transform-origin: 0 0;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.heroToggle {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  box-shadow: 0 4px 12px rgba(18, 10, 26, 0.18);
+  color: var(--color-ink);
   cursor: pointer;
-  list-style: none;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.fullView summary::-webkit-details-marker {
-  display: none;
+.heroOpen .heroToggle {
+  right: 8px;
+  bottom: 8px;
 }
 
-.fullView[open] summary {
-  margin-bottom: 12px;
+@media (hover: hover) {
+  .heroToggle:hover {
+    transform: scale(1.1);
+  }
+}
+
+.heroToggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.customize {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroBox,
+  .heroFigure {
+    transition: none;
+  }
 }

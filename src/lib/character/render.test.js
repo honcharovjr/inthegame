@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import art from "./art.json";
 import { DEFAULT_CHARACTER } from "./items";
-import { camera, characterScene, fitTransform, tintFactors, viewBox } from "./render";
+import { camera, characterScene, fitTransform, portraitInFull, tintFactors, viewBox } from "./render";
 
 describe("tintFactors", () => {
   it("scales each channel by the grey of the art", () => {
@@ -85,16 +85,17 @@ describe("viewBox", () => {
 });
 
 describe("camera", () => {
-  it("shows the whole figure for the body", () => {
-    expect(camera("human", "body")).toEqual({ x: 0.5, y: 0.5, scale: 1 });
+  it("shows almost the whole figure for the body", () => {
+    expect(camera("human", "body")).toEqual({ x: 0.5, y: 0.5, scale: 1.06 });
   });
 
-  it("zooms in on the head, closer still on the eyes", () => {
+  it("zooms in on the head by 15% at most", () => {
     const head = camera("dwarf", "head");
-    const eyes = camera("dwarf", "eyes");
-    expect(head.scale).toBeGreaterThan(1.5);
-    expect(eyes.scale).toBeGreaterThan(head.scale);
+    expect(head.scale).toBe(1.15);
     expect(head.y).toBeLessThan(0.5);
+    for (const focus of ["head", "eyes", "bust", "body"]) {
+      expect(camera("orc", focus).scale).toBeLessThanOrEqual(1.15);
+    }
   });
 
   it("never looks past the edges of the card", () => {
@@ -105,6 +106,20 @@ describe("camera", () => {
         expect(y - 0.5 / scale).toBeGreaterThanOrEqual(-0.001);
         expect(x + 0.5 / scale).toBeLessThanOrEqual(1.001);
       }
+    }
+  });
+});
+
+describe("portraitInFull", () => {
+  it("places the head box inside the full view", () => {
+    for (const race of Object.keys(art.races)) {
+      const { x, y, w, aspect } = portraitInFull(race);
+      expect(w).toBeGreaterThan(0.2);
+      expect(w).toBeLessThan(0.6);
+      expect(x).toBeGreaterThan(0);
+      expect(x + w).toBeLessThan(1);
+      expect(y).toBeGreaterThan(-0.1);
+      expect(aspect).toBeCloseTo(art.full.h / art.full.w, 3);
     }
   });
 });

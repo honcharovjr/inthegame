@@ -169,3 +169,31 @@ export function LockIcon(props) {
     </Icon>
   );
 }
+
+export function DiceIcon(props) {
+  return (
+    <Icon {...props}>
+      <rect x="4" y="4" width="16" height="16" rx="4" />
+      <circle cx="9" cy="9" r="1.1" fill="currentColor" />
+      <circle cx="15" cy="15" r="1.1" fill="currentColor" />
+      <circle cx="15" cy="9" r="1.1" fill="currentColor" />
+      <circle cx="9" cy="15" r="1.1" fill="currentColor" />
+    </Icon>
+  );
+}
+
+export function ExpandIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
+    </Icon>
+  );
+}
+
+export function CollapseIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M20 10h-6V4M4 14h6v6M14 10l7-7M10 14l-7 7" />
+    </Icon>
+  );
+}

@@ -81,6 +81,28 @@ def horns(rgba, h):
     return Image.fromarray(out)
 
 
+def solid_hair(img):
+    """Hair and beards fully opaque inside, soft only at the outer edge. The
+    keying reads light strands as half see-through, and the skin showed
+    through braids."""
+    rgba = np.array(img)
+    alpha = rgba[..., 3]
+    shape = alpha > 40
+    # Pinholes between strands are closed; real gaps, like the mouth under a
+    # moustache, stay open.
+    holes, count = ndimage.label(ndimage.binary_fill_holes(shape) & ~shape)
+    sizes = ndimage.sum(holes > 0, holes, index=range(1, count + 1))
+    pin = np.isin(holes, [i + 1 for i, s in enumerate(sizes) if s < 60])
+    _, (iy, ix) = ndimage.distance_transform_edt(~shape, return_indices=True)
+    rgba[pin, :3] = rgba[iy[pin], ix[pin], :3]
+    shape |= pin
+    inner = ndimage.binary_erosion(shape, iterations=2)
+    # A two-pixel ramp from the inner shape out to the original edge
+    near = ndimage.binary_dilation(inner, iterations=1) & ~inner
+    rgba[..., 3] = np.where(inner, 255, np.where(near, np.maximum(alpha, 200), alpha))
+    return Image.fromarray(rgba)
+
+
 def full_box(figures):
     """The whole figure of every race, with a margin: one shared box, so all
     full views have the same size."""
@@ -144,7 +166,7 @@ def main():
 
     parts = sorted(p.stem for p in HAIR.glob("*.png"))
     for name in parts:
-        save_web(Image.open(HAIR / f"{name}.png").convert("RGBA"), name)
+        save_web(solid_hair(Image.open(HAIR / f"{name}.png").convert("RGBA")), name)
 
     art = {"width": W, "height": H, "full": full_box(figures), "races": races}
     ART_JSON.write_text(json.dumps(art, indent=2) + "\n")
