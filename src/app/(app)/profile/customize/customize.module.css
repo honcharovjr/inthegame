@@ -242,3 +242,8 @@
   line-height: 1.15;
   text-align: center;
 }
+
+/* A taller tile for options shown on the whole figure */
+.tileTall {
+  height: 104px;
+}
