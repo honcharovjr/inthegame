@@ -2,11 +2,10 @@ import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
-import Character from "@/components/Character/Character";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
-import { LogoutIcon } from "@/components/icons";
+import { LogoutIcon, PenIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { nameStyle } from "@/lib/character/items";
 import { signOut } from "@/lib/auth/actions";
@@ -14,6 +13,7 @@ import { getProfile } from "@/lib/auth/session";
 import { deleteGuest } from "@/lib/profile/actions";
 import { createClient } from "@/lib/supabase/server";
 import NicknameForm from "./NicknameForm";
+import ProfileHero from "./ProfileHero";
 import styles from "./profile.module.css";
 
 export const metadata = { title: "Profile" };
@@ -49,30 +49,30 @@ async function ProfileContent() {
     .eq("owner_id", profile?.id)
     .order("created_at");
 
+  const identity = (
+    <>
+      <NicknameForm nickname={profile?.nickname ?? ""} nameClass={nameStyle(profile?.character)} />
+      {profile?.created_at && <PlayingSince date={profile.created_at} />}
+      <Link href="/profile/customize" className={`${styles.customize} btn-secondary`}>
+        <PenIcon size={16} />
+        Customize character
+      </Link>
+    </>
+  );
+
   return (
     <div className={`${styles.body} stagger`}>
       <section className={styles.card} aria-label="You">
-        <Avatar
-          name={profile?.nickname}
-          size={104}
-          color="#ff4fa3"
-          registered
-          character={profile?.character}
-          perks
-        />
-        <div className={styles.identity}>
-          <NicknameForm
-            nickname={profile?.nickname ?? ""}
-            nameClass={nameStyle(profile?.character)}
-          />
-          {profile?.created_at && <PlayingSince date={profile.created_at} />}
-          {profile?.character && (
-            <details className={styles.fullView}>
-              <summary className="btn-text">See full size</summary>
-              <Character character={profile.character} name={profile.nickname} size={240} view="full" />
-            </details>
-          )}
-        </div>
+        {profile?.character ? (
+          <ProfileHero character={profile.character} name={profile.nickname}>
+            {identity}
+          </ProfileHero>
+        ) : (
+          <>
+            <Avatar name={profile?.nickname} size={104} color="#ff4fa3" registered character={null} />
+            <div className={styles.identity}>{identity}</div>
+          </>
+        )}
       </section>
 
       <section className={styles.card} aria-label="Your guests">

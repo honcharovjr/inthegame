@@ -5,6 +5,7 @@ import {
   BACKGROUNDS,
   DEFAULT_CHARACTER,
   nameStyle,
+  randomCharacter,
   resolveCharacter,
   validateCharacter,
 } from "./items";
@@ -76,5 +77,24 @@ describe("nameStyle", () => {
     expect(nameStyle({ accessory: "monocle" })).toBe("name-gold");
     expect(nameStyle({ accessory: "cape" })).toBe("");
     expect(nameStyle(null)).toBe("");
+  });
+});
+
+describe("randomCharacter", () => {
+  it("picks only unlocked items and keeps the accessory", () => {
+    const current = { ...DEFAULT_CHARACTER, accessory: "party-hat" };
+    for (let i = 0; i < 50; i++) {
+      const look = randomCharacter(current, none);
+      expect(validateCharacter({ ...look, accessory: null }, none).character).toBeTruthy();
+      expect(look.accessory).toBe("party-hat");
+    }
+  });
+
+  it("follows the random source", () => {
+    const first = randomCharacter(DEFAULT_CHARACTER, none, () => 0);
+    expect(first.background).toBe(BACKGROUNDS[0].code);
+    const last = randomCharacter(DEFAULT_CHARACTER, none, () => 0.999);
+    const open = BACKGROUNDS.filter((b) => !b.unlockedBy);
+    expect(last.background).toBe(open[open.length - 1].code);
   });
 });

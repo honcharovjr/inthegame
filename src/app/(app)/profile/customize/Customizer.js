@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Character from "@/components/Character/Character";
-import { LockIcon } from "@/components/icons";
+import { DiceIcon, LockIcon } from "@/components/icons";
 import { findAchievement } from "@/lib/achievements/catalog";
 import { saveCharacter } from "@/lib/character/actions";
 import {
@@ -18,6 +18,7 @@ import {
   RACES,
   SKINS,
   isUnlocked,
+  randomCharacter,
   resolveCharacter,
 } from "@/lib/character/items";
 import { camera } from "@/lib/character/render";
@@ -62,9 +63,10 @@ function unlockTip(item) {
   return `Locked. Earn ${achievement?.name}: ${achievement?.description}`;
 }
 
-// The character on its stage. A change fades over the last look instead of
-// swapping at once, and the camera glides to the part being edited.
-function Stage({ frames, name, focus }) {
+// The character on its stage. A change fades over the last look with a small
+// bounce instead of swapping at once, the character breathes while idle, and
+// the camera glides to the part being edited.
+function Stage({ frames, name, focus, rolling, onRoll, saved }) {
   const current = frames[frames.length - 1].choice;
   const shot = camera(current.race, focus);
   const lens = {
@@ -73,13 +75,37 @@ function Stage({ frames, name, focus }) {
   return (
     <div className={styles.frame}>
       <div className={styles.lens} style={lens}>
-        {frames.map((frame, i) => (
-          <div key={frame.id} className={`${styles.shot} ${i < frames.length - 1 ? styles.leaving : ""}`}>
-            <Character character={frame.choice} name={name} size="fill" view="full" perks={i === frames.length - 1} />
-          </div>
-        ))}
+        <div className={styles.alive}>
+          {frames.map((frame, i) => (
+            <div
+              key={frame.id}
+              className={`${styles.shot} ${i < frames.length - 1 ? styles.leaving : frame.id > 0 ? styles.entering : ""}`}
+            >
+              <Character character={frame.choice} name={name} size="fill" view="full" perks={i === frames.length - 1} />
+            </div>
+          ))}
+        </div>
       </div>
       <span className={styles.name}>{name}</span>
+      <button
+        type="button"
+        className={`${styles.dice} ${rolling ? styles.diceRolling : ""}`}
+        onClick={onRoll}
+        aria-label="Roll a random look"
+        data-tip="Roll a random look"
+        data-tip-align="end"
+        data-tip-pos="below"
+      >
+        <DiceIcon size={22} />
+      </button>
+      {saved && (
+        <div className={styles.cheer} aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => (
+            <i key={i} style={{ "--a": `${i * 30}deg`, "--c": ["#ff4fa3", "#ffc928", "#2fd6d6", "#8f7bff"][i % 4] }} />
+          ))}
+          <span className={styles.cheerText}>Looking sharp!</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -93,6 +119,8 @@ export default function Customizer({ name, initial, earned }) {
   const [frames, setFrames] = useState([{ id: 0, choice: resolveCharacter(initial) }]);
   const [tab, setTab] = useState(TABS[0]);
   const [error, setError] = useState(null);
+  const [rolling, setRolling] = useState(false);
+  const [saved, setSaved] = useState(false);
   const owned = new Set(earned);
   const choice = frames[frames.length - 1].choice;
 
@@ -108,6 +136,20 @@ export default function Customizer({ name, initial, earned }) {
   // A small preview of one option, worn on the current choice
   const preview = (part, value) => ({ ...choice, [part]: value });
 
+  // The dice: a few quick random looks, settling on the last one.
+  function roll() {
+    if (rolling) return;
+    setRolling(true);
+    let left = 5;
+    const step = () => {
+      show(randomCharacter(choice, owned));
+      left -= 1;
+      if (left > 0) setTimeout(step, 110);
+      else setRolling(false);
+    };
+    step();
+  }
+
   function save() {
     setError(null);
     startTransition(async () => {
@@ -116,6 +158,9 @@ export default function Customizer({ name, initial, earned }) {
         setError(result.error);
         return;
       }
+      // A short cheer before going back to the profile
+      setSaved(true);
+      await new Promise((resolve) => setTimeout(resolve, 900));
       router.push("/profile");
     });
   }
@@ -128,7 +173,7 @@ export default function Customizer({ name, initial, earned }) {
       {/* On a desktop the character and the buttons stay in view together */}
       <div className={styles.side}>
         <section className={styles.stage} aria-label="Preview">
-          <Stage frames={frames} name={name} focus={tab.focus} />
+          <Stage frames={frames} name={name} focus={tab.focus} rolling={rolling} onRoll={roll} saved={saved} />
         </section>
         <div className={styles.actions}>
           {error && (
@@ -144,7 +189,7 @@ export default function Customizer({ name, initial, earned }) {
             Reset
           </button>
           <button type="button" className={`${styles.save} btn-primary`} onClick={save} disabled={pending}>
-            {pending ? "Saving" : "Save character"}
+            {saved ? "Saved" : pending ? "Saving" : "Save character"}
           </button>
         </div>
       </div>
@@ -213,7 +258,6 @@ export default function Customizer({ name, initial, earned }) {
           )}
         </div>
       </section>
-
     </div>
   );
 }
