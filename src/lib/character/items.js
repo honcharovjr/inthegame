@@ -67,6 +67,18 @@ export const EYE_COLORS = [
   { code: "violet", label: "Violet", hex: "#8a55c8" },
 ];
 
+// The colour of the basic outfit every character wears.
+export const OUTFIT_COLORS = [
+  { code: "earth", label: "Earth", hex: "#8a6a48" },
+  { code: "forest", label: "Forest", hex: "#4f7a52" },
+  { code: "wine", label: "Wine", hex: "#8a3e48" },
+  { code: "navy", label: "Navy", hex: "#3f5684" },
+  { code: "charcoal", label: "Charcoal", hex: "#4a4650" },
+  { code: "sand", label: "Sand", hex: "#c8b088" },
+  { code: "plum", label: "Plum", hex: "#6e4a86" },
+  { code: "rust", label: "Rust", hex: "#a5582e" },
+];
+
 // kind: plain colour or a pattern drawn over a colour
 export const BACKGROUNDS = [
   { code: "cream", label: "Cream", kind: "plain", fill: "#fff3e0" },
@@ -105,6 +117,7 @@ export const DEFAULT_CHARACTER = {
   hairColor: "brown",
   beard: "none",
   eyeColor: "brown",
+  outfitColor: "earth",
   background: "cream",
   accessory: null,
   badge: null,
@@ -118,6 +131,7 @@ const PARTS = [
   ["hairColor", HAIR_COLORS, "hair colour"],
   ["beard", BEARDS, "beard"],
   ["eyeColor", EYE_COLORS, "eye colour"],
+  ["outfitColor", OUTFIT_COLORS, "outfit colour"],
   ["background", BACKGROUNDS, "background"],
 ];
 

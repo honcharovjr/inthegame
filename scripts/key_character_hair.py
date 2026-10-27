@@ -8,7 +8,8 @@ to be tinted to any hair colour in the app, and
 art/character-hair/cut/fit.json, which says how to scale each part to fit the
 head of each race. art/character-hair/preview.png shows them on the races.
 
-Run after scripts/key_character_bases.py, with pillow, numpy and scipy:
+Run after scripts/key_character_bases.py and
+scripts/key_character_outfits.py, with pillow, numpy and scipy:
     python3 scripts/key_character_hair.py
 """
 
@@ -22,7 +23,9 @@ from scipy import ndimage
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "art" / "character-hair"
 BASE = ROOT / "art" / "character-bases" / "human.png"
-BODIES = ROOT / "art" / "character-bases" / "cut"
+# The bare human the hair was drawn on, and the dressed figures it goes on.
+REF = ROOT / "art" / "character-bases" / "cut"
+BODIES = ROOT / "art" / "character-outfits" / "cut"
 OUT = SRC / "cut"
 
 HAIR = ["hair-short", "hair-long", "hair-topknot", "hair-braids", "hair-mohawk"]
@@ -88,10 +91,10 @@ def extract(edit, base):
     return out
 
 
-def head(race, anchors):
+def head(race, anchors, folder=BODIES):
     """The measures of a race's head that hair and beards are fitted to."""
     a = anchors[race]
-    alpha = np.array(Image.open(BODIES / f"{race}.png"))[..., 3] > 128
+    alpha = np.array(Image.open(folder / f"{race}.png"))[..., 3] > 128
     cx = int(round(a["centerX"]))
     # The top of the skull straight above the nose, so horns do not count.
     top = int(np.where(alpha[:, cx - 6 : cx + 7].any(axis=1))[0][0])
@@ -109,10 +112,11 @@ def head(race, anchors):
     }
 
 
-def fits(anchors):
-    """How to move each kind of part from the human onto each race:
-    scale around the eyes of the human, then move to the eyes of the race."""
-    human = head("human", anchors)
+def fits(anchors, ref_anchors):
+    """How to move each kind of part from the bare human it was drawn on onto
+    each dressed race: scale around the eyes of the human, then move to the
+    eyes of the race."""
+    human = head("human", ref_anchors, REF)
     out = {}
     for race in RACES:
         h = head(race, anchors)
@@ -145,7 +149,7 @@ def tint(img, rgb):
     return Image.fromarray(a.astype(np.uint8))
 
 
-def preview(parts, fit):
+def preview(parts, fit, anchors):
     """Every race with a few hair and beard pairs, in a few colours."""
     skins = [(241, 205, 178), (198, 140, 100), (120, 82, 60), (150, 170, 120), (170, 90, 100)]
     pairs = [
@@ -161,8 +165,10 @@ def preview(parts, fit):
     cw, ch = int((crop[2] - crop[0]) * scale), int((crop[3] - crop[1]) * scale)
     sheet = Image.new("RGB", (cw * len(pairs), ch * len(RACES)), (243, 240, 250))
     for row, race in enumerate(RACES):
-        body = Image.open(BODIES / f"{race}.png").convert("RGBA")
-        body = tint(body, skins[row])
+        bare = Image.open(BODIES / f"{race}.png").convert("RGBA")
+        body = tint(bare, skins[row])
+        body.alpha_composite(tint(Image.open(BODIES / f"outfit-basic-{race}.png"), (110, 85, 60)))
+        h = head(race, anchors)
         for col, (hair, beard, colour) in enumerate(pairs):
             canvas = Image.new("RGBA", body.size, (243, 240, 250, 255))
             canvas.alpha_composite(body)
@@ -170,28 +176,30 @@ def preview(parts, fit):
                 if name:
                     canvas.alpha_composite(tint(place(parts[name], fit[race], kind), colour))
             if race == "tiefling":
-                canvas.alpha_composite(horns(body))
+                canvas.alpha_composite(horns(tint(bare, skins[row]), h))
             tile = canvas.crop(crop).resize((cw, ch), Image.LANCZOS)
             sheet.paste(tile.convert("RGB"), (col * cw, row * ch))
     return sheet
 
 
-def horns(body):
+def horns(body, h):
     """The tiefling's horns, drawn again over the hair."""
     a = np.array(body)
-    mask = horn_mask(a[..., 3] > 0)
+    mask = horn_mask(a[..., 3] > 0, h)
     a[~mask] = 0
     return Image.fromarray(a)
 
 
-def horn_mask(solid):
+def horn_mask(solid, h):
     """Everything of the tiefling above its skull: the horns. The skull is the
-    round middle, so cut a disc around the head's centre and keep the rest of
-    the top band."""
-    h, w = solid.shape
-    ys, xs = np.mgrid[0:h, 0:w]
-    skull = ((xs - 511) / 108.0) ** 2 + ((ys - 240) / 100.0) ** 2 <= 1
-    return solid & (ys < 250) & ~skull
+    round middle, so cut an oval around it and keep the rest of the top band.
+    h: the head measures from head(). Sizes are shares of the height from the
+    top of the skull to the eyes."""
+    size = h["eyeY"] - h["top"]
+    ys, xs = np.mgrid[0 : solid.shape[0], 0 : solid.shape[1]]
+    cy = h["top"] + 0.66 * size
+    skull = ((xs - h["eyeX"]) / (0.71 * size)) ** 2 + ((ys - cy) / (0.66 * size)) ** 2 <= 1
+    return solid & (ys < h["top"] + 0.72 * size) & ~skull
 
 
 def main():
@@ -204,9 +212,10 @@ def main():
         img.save(OUT / f"{name}.png", optimize=True)
         parts[name] = img
     anchors = json.loads((BODIES / "anchors.json").read_text())["races"]
-    fit = fits(anchors)
+    ref_anchors = json.loads((REF / "anchors.json").read_text())["races"]
+    fit = fits(anchors, ref_anchors)
     (OUT / "fit.json").write_text(json.dumps(fit, indent=2) + "\n")
-    preview(parts, fit).save(SRC / "preview.png", optimize=True)
+    preview(parts, fit, anchors).save(SRC / "preview.png", optimize=True)
     print(json.dumps(fit, indent=1))
 
 

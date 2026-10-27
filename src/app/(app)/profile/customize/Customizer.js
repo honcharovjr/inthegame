@@ -15,6 +15,7 @@ import {
   EYE_COLORS,
   HAIR_COLORS,
   HAIRSTYLES,
+  OUTFIT_COLORS,
   RACES,
   SKINS,
   isUnlocked,
@@ -128,6 +129,7 @@ export default function Customizer({ name, initial, earned }) {
       <Swatches title="Hair colour" list={HAIR_COLORS} part="hairColor" choice={choice} set={set} />
       <Options title="Beard" list={BEARDS} part="beard" choice={choice} set={set} preview={preview} />
       <Swatches title="Eye colour" list={EYE_COLORS} part="eyeColor" choice={choice} set={set} />
+      <Swatches title="Outfit colour" list={OUTFIT_COLORS} part="outfitColor" choice={choice} set={set} />
 
       <section className={styles.card} aria-label="Background">
         <div className={styles.cardTitle}>Background</div>

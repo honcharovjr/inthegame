@@ -4,8 +4,9 @@
 //
 // Coordinates are pixels of the full art canvas (art.json: 1024 x 1536),
 // written by scripts/build_character_web.py. Every layer covers the whole
-// canvas; hair and beards are drawn for the human and moved onto the head of
-// the chosen race.
+// canvas. Each race is one dressed figure: its skin and its outfit come from
+// the same drawing. Hair and beards are drawn for the human and moved onto
+// the head of the chosen race.
 
 import art from "./art.json";
 import {
@@ -13,6 +14,7 @@ import {
   EYE_COLORS,
   HAIR_COLORS,
   HAIRSTYLES,
+  OUTFIT_COLORS,
   SKINS,
   resolveCharacter,
 } from "./items";
@@ -20,6 +22,7 @@ import {
 // The grey that hair is stored in, around its middle. A tint is scaled by it,
 // so the hair shows the chosen colour rather than a darker one.
 const HAIR_GREY = 185;
+const OUTFIT_GREY = 170;
 
 export const CANVAS = { width: art.width, height: art.height };
 
@@ -41,7 +44,7 @@ export function fitTransform(fit, kind) {
 }
 
 // The visible part of the canvas: "portrait" is a square around the head,
-// "full" the whole figure down to the waist.
+// "full" the whole figure, the same box for every race.
 export function viewBox(race, view) {
   const box = view === "full" ? art.full : art.races[race].portrait;
   return { x: box.x, y: box.y, w: box.w, h: box.h };
@@ -56,6 +59,11 @@ export function characterScene(raw, view = "portrait") {
   const beard = BEARDS.find((item) => item.code === c.beard).layer;
 
   const layers = [{ key: "body", href: href(c.race), tint: skin }];
+  layers.push({
+    key: "outfit",
+    href: href(`outfit-basic-${c.race}`),
+    tint: tintFactors(hex(OUTFIT_COLORS, c.outfitColor), OUTFIT_GREY),
+  });
   layers.push({ key: "eyes", href: href(`eyes-${c.race}`) });
   if (beard) {
     layers.push({ key: "beard", href: href(beard), tint: hairTint, transform: fitTransform(race.fit, "beard") });
