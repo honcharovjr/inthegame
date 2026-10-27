@@ -19,22 +19,23 @@ describe("fitTransform", () => {
 describe("characterScene", () => {
   it("draws the default human with short hair and no beard", () => {
     const scene = characterScene(DEFAULT_CHARACTER);
-    expect(scene.layers.map((l) => l.key)).toEqual(["body", "outfit", "eyes", "hair"]);
+    expect(scene.layers.map((l) => l.key)).toEqual(["body", "cloth", "trim", "hands", "eyes", "hair"]);
     expect(scene.layers[0].href).toBe("/character/human.webp");
-    expect(scene.layers[1].href).toBe("/character/outfit-basic-human.webp");
-    expect(scene.layers[3].href).toBe("/character/hair-short.webp");
+    expect(scene.layers[1].href).toBe("/character/outfit-tunic-human-cloth.webp");
+    expect(scene.layers[2].href).toBe("/character/outfit-tunic-human-trim.webp");
+    expect(scene.layers[5].href).toBe("/character/hair-short.webp");
     expect(scene.irises).toHaveLength(2);
   });
 
   it("puts the beard under the hair and the horns over it", () => {
     const scene = characterScene({ ...DEFAULT_CHARACTER, race: "tiefling", beard: "long" });
-    expect(scene.layers.map((l) => l.key)).toEqual(["body", "outfit", "eyes", "beard", "hair", "horns"]);
-    expect(scene.layers[5].tint).toEqual(scene.layers[0].tint);
+    expect(scene.layers.map((l) => l.key)).toEqual(["body", "cloth", "trim", "hands", "eyes", "beard", "hair", "horns"]);
+    expect(scene.layers[7].tint).toEqual(scene.layers[0].tint);
   });
 
   it("leaves out hair and horns for a bald tiefling, whose horns are part of the body", () => {
     const scene = characterScene({ ...DEFAULT_CHARACTER, race: "tiefling", hair: "none" });
-    expect(scene.layers.map((l) => l.key)).toEqual(["body", "outfit", "eyes"]);
+    expect(scene.layers.map((l) => l.key)).toEqual(["body", "cloth", "trim", "hands", "eyes"]);
   });
 
   it("fits hair to the head of each race", () => {
@@ -42,6 +43,13 @@ describe("characterScene", () => {
       const hair = characterScene({ ...DEFAULT_CHARACTER, race }).layers.find((l) => l.key === "hair");
       expect(hair.transform).toBe(fitTransform(art.races[race].fit, "hair"));
     }
+  });
+
+  it("draws the chosen outfit for the race, with its own trim colour", () => {
+    const plate = characterScene({ ...DEFAULT_CHARACTER, race: "orc", outfit: "plate" }).layers;
+    const robe = characterScene({ ...DEFAULT_CHARACTER, race: "orc", outfit: "robe" }).layers;
+    expect(plate[2].href).toBe("/character/outfit-plate-orc-trim.webp");
+    expect(plate[2].tint).not.toEqual(robe[2].tint);
   });
 
   it("tints the outfit in the chosen colour", () => {

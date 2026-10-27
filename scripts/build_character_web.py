@@ -6,7 +6,9 @@ Output:
 - public/character/{name}.webp: every layer at 3/4 size, light for the web
 - public/character/eyes-{race}.webp: the eye whites alone, drawn untinted
   over the skin, and a mask for the irises
-- public/character/outfit-basic-{race}.webp: the clothes, tinted in the app
+- public/character/hands-{race}.webp: the bare hands, drawn over the clothes
+- public/character/outfit-{name}-{race}-cloth.webp and -trim.webp: each
+  outfit fitted to each race, tinted in the app
 - public/character/horns-tiefling.webp: the horns again, drawn over the hair
 - src/lib/character/art.json: the measures the renderer needs, in pixels of
   the full 1024 x 1536 canvas
@@ -33,7 +35,7 @@ RACES = ["human", "elf", "dwarf", "orc", "tiefling"]
 W, H = 1024, 1536
 WEB_SCALE = 0.75
 
-OUTFITS = ["basic"]
+OUTFITS = ["tunic", "leather", "chainmail", "plate", "robe", "ranger", "doublet", "fur", "coat", "cleric"]
 
 
 def save_web(img, name):
@@ -106,10 +108,14 @@ def main():
         save_web(whites, f"eyes-{race}")
         if race == "tiefling":
             save_web(horns(rgba, head_measures(race, anchors)), "horns-tiefling")
+        save_web(Image.open(BASES / f"hands-{race}.png").convert("RGBA"), f"hands-{race}")
+        worn = np.zeros((H, W), np.uint8)
         for outfit in OUTFITS:
-            layer = Image.open(BASES / f"outfit-{outfit}-{race}.png").convert("RGBA")
-            save_web(layer, f"outfit-{outfit}-{race}")
-            figures.append(np.maximum(rgba[..., 3], np.array(layer)[..., 3]))
+            for part in ("cloth", "trim"):
+                layer = Image.open(BASES / f"outfit-{outfit}-{race}-{part}.png").convert("RGBA")
+                save_web(layer, f"outfit-{outfit}-{race}-{part}")
+                worn = np.maximum(worn, np.array(layer)[..., 3])
+        figures.append(np.maximum(rgba[..., 3], worn))
 
         a = anchors[race]
         solid = rgba[..., 3] > 128
@@ -120,7 +126,8 @@ def main():
         eye_x = (eyes[0]["cx"] + eyes[1]["cx"]) / 2
         # The skin's own grey, so a tint shows the chosen colour, not a darker
         # one. Only the skin that shows: not under the clothes, not the eyes.
-        bare = np.array(Image.open(BASES / f"outfit-basic-{race}.png"))[..., 3] < 10
+        tunic = [np.array(Image.open(BASES / f"outfit-tunic-{race}-{p}.png"))[..., 3] for p in ("cloth", "trim")]
+        bare = np.maximum(*tunic) < 10
         skin = rgba[..., :3][solid & bare & (rgba[..., :3].min(axis=2) < 225)].mean(axis=1)
         races[race] = {
             "eyes": eyes,

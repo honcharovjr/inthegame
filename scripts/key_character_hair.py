@@ -167,7 +167,8 @@ def preview(parts, fit, anchors):
     for row, race in enumerate(RACES):
         bare = Image.open(BODIES / f"{race}.png").convert("RGBA")
         body = tint(bare, skins[row])
-        body.alpha_composite(tint(Image.open(BODIES / f"outfit-basic-{race}.png"), (110, 85, 60)))
+        for part in ("cloth", "trim"):
+            body.alpha_composite(tint(Image.open(BODIES / f"outfit-tunic-{race}-{part}.png"), (110, 85, 60)))
         h = head(race, anchors)
         for col, (hair, beard, colour) in enumerate(pairs):
             canvas = Image.new("RGBA", body.size, (243, 240, 250, 255))

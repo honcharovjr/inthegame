@@ -15,6 +15,7 @@ import {
   HAIR_COLORS,
   HAIRSTYLES,
   OUTFIT_COLORS,
+  OUTFITS,
   SKINS,
   resolveCharacter,
 } from "./items";
@@ -59,11 +60,12 @@ export function characterScene(raw, view = "portrait") {
   const beard = BEARDS.find((item) => item.code === c.beard).layer;
 
   const layers = [{ key: "body", href: href(c.race), tint: skin }];
-  layers.push({
-    key: "outfit",
-    href: href(`outfit-basic-${c.race}`),
-    tint: tintFactors(hex(OUTFIT_COLORS, c.outfitColor), OUTFIT_GREY),
-  });
+  const outfit = `outfit-${c.outfit}-${c.race}`;
+  const trim = OUTFITS.find((item) => item.code === c.outfit).trim;
+  layers.push({ key: "cloth", href: href(`${outfit}-cloth`), tint: tintFactors(hex(OUTFIT_COLORS, c.outfitColor), OUTFIT_GREY) });
+  layers.push({ key: "trim", href: href(`${outfit}-trim`), tint: tintFactors(trim, OUTFIT_GREY) });
+  // The hands hang in front of the clothes.
+  layers.push({ key: "hands", href: href(`hands-${c.race}`), tint: skin });
   layers.push({ key: "eyes", href: href(`eyes-${c.race}`) });
   if (beard) {
     layers.push({ key: "beard", href: href(beard), tint: hairTint, transform: fitTransform(race.fit, "beard") });

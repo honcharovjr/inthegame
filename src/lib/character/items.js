@@ -67,7 +67,22 @@ export const EYE_COLORS = [
   { code: "violet", label: "Violet", hex: "#8a55c8" },
 ];
 
-// The colour of the basic outfit every character wears.
+// The basic set of outfits, all free. Cloth takes the player's outfit colour;
+// trim (metal, leather, fur) has a fixed colour per outfit.
+export const OUTFITS = [
+  { code: "tunic", label: "Tunic", trim: "#7a5434" },
+  { code: "leather", label: "Leather", trim: "#8a5d3b" },
+  { code: "chainmail", label: "Chainmail", trim: "#9aa0a8" },
+  { code: "plate", label: "Plate", trim: "#9a9fa7" },
+  { code: "robe", label: "Robe", trim: "#c9a24a" },
+  { code: "ranger", label: "Ranger", trim: "#7a5434" },
+  { code: "doublet", label: "Doublet", trim: "#c9a24a" },
+  { code: "fur", label: "Fur coat", trim: "#b49a78" },
+  { code: "coat", label: "Long coat", trim: "#6e4a30" },
+  { code: "cleric", label: "Cleric", trim: "#d1ad55" },
+];
+
+// The colour of the outfit's cloth.
 export const OUTFIT_COLORS = [
   { code: "earth", label: "Earth", hex: "#8a6a48" },
   { code: "forest", label: "Forest", hex: "#4f7a52" },
@@ -117,6 +132,7 @@ export const DEFAULT_CHARACTER = {
   hairColor: "brown",
   beard: "none",
   eyeColor: "brown",
+  outfit: "tunic",
   outfitColor: "earth",
   background: "cream",
   accessory: null,
@@ -131,6 +147,7 @@ const PARTS = [
   ["hairColor", HAIR_COLORS, "hair colour"],
   ["beard", BEARDS, "beard"],
   ["eyeColor", EYE_COLORS, "eye colour"],
+  ["outfit", OUTFITS, "outfit"],
   ["outfitColor", OUTFIT_COLORS, "outfit colour"],
   ["background", BACKGROUNDS, "background"],
 ];

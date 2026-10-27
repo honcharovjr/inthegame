@@ -16,6 +16,7 @@ import {
   HAIR_COLORS,
   HAIRSTYLES,
   OUTFIT_COLORS,
+  OUTFITS,
   RACES,
   SKINS,
   isUnlocked,
@@ -24,11 +25,11 @@ import {
 import styles from "./customize.module.css";
 
 // One option tile. A locked tile is dimmed and says what unlocks it.
-function Tile({ selected, locked, tip, label, onClick, children }) {
+function Tile({ selected, locked, tip, label, onClick, tall = false, children }) {
   return (
     <button
       type="button"
-      className={`${styles.tile} ${selected ? styles.tileOn : ""} ${locked ? styles.tileLocked : ""}`}
+      className={`${styles.tile} ${tall ? styles.tileTall : ""} ${selected ? styles.tileOn : ""} ${locked ? styles.tileLocked : ""}`}
       aria-pressed={selected}
       aria-disabled={locked || undefined}
       aria-label={locked ? `${label}, locked. ${tip}` : label}
@@ -47,14 +48,15 @@ function Tile({ selected, locked, tip, label, onClick, children }) {
 }
 
 // A row of options, each shown as the current character wearing it.
-function Options({ title, list, part, choice, set, preview }) {
+// full: show the whole figure, for options worn on the body.
+function Options({ title, list, part, choice, set, preview, full = false }) {
   return (
     <section className={styles.card} aria-label={title}>
       <div className={styles.cardTitle}>{title}</div>
       <div className={styles.tiles}>
         {list.map((item) => (
-          <Tile key={item.code} label={item.label} selected={choice[part] === item.code} onClick={() => set(part, item.code)}>
-            <Character character={preview(part, item.code)} size={56} />
+          <Tile key={item.code} label={item.label} selected={choice[part] === item.code} tall={full} onClick={() => set(part, item.code)}>
+            <Character character={preview(part, item.code)} size={full ? 60 : 56} view={full ? "full" : "portrait"} />
           </Tile>
         ))}
       </div>
@@ -129,6 +131,7 @@ export default function Customizer({ name, initial, earned }) {
       <Swatches title="Hair colour" list={HAIR_COLORS} part="hairColor" choice={choice} set={set} />
       <Options title="Beard" list={BEARDS} part="beard" choice={choice} set={set} preview={preview} />
       <Swatches title="Eye colour" list={EYE_COLORS} part="eyeColor" choice={choice} set={set} />
+      <Options title="Outfit" list={OUTFITS} part="outfit" choice={choice} set={set} preview={preview} full />
       <Swatches title="Outfit colour" list={OUTFIT_COLORS} part="outfitColor" choice={choice} set={set} />
 
       <section className={styles.card} aria-label="Background">
