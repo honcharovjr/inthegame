@@ -39,7 +39,7 @@ One row per registered user. Created by a trigger on sign-up (Assumption: trigge
 | user_id | uuid, unique | References `auth.users(id)` on delete set null. Null after the account is deleted |
 | nickname | text, not null | 2 to 30 characters |
 | avatar_url | text | Optional, points to Storage |
-| character | jsonb | Optional. The chosen item codes of the character, see docs/character.md. Null means the default blob. Must be a JSON object |
+| character | jsonb | Optional. The chosen item codes of the character, see docs/character.md. Null means no character yet. Must be a JSON object |
 | created_at | timestamptz, not null | Default `now()` |
 
 Account deletion (FR-05, Pilot): the auth user is deleted, `user_id` becomes null, and the row is anonymized (placeholder nickname, no avatar) instead of removed, so sessions of other players stay consistent.

@@ -35,7 +35,8 @@ describe("validateCharacter", () => {
   });
 
   it("rejects an unknown part", () => {
-    expect(validateCharacter({ ...DEFAULT_CHARACTER, eyes: "laser" }, none).error).toBeTruthy();
+    expect(validateCharacter({ ...DEFAULT_CHARACTER, eyeColor: "laser" }, none).error).toBeTruthy();
+    expect(validateCharacter({ ...DEFAULT_CHARACTER, race: "goblin" }, none).error).toBeTruthy();
   });
 
   it("rejects a locked accessory and accepts it once earned", () => {
@@ -60,7 +61,12 @@ describe("validateCharacter", () => {
 describe("resolveCharacter", () => {
   it("falls back to defaults for null and unknown codes", () => {
     expect(resolveCharacter(null)).toEqual(DEFAULT_CHARACTER);
-    expect(resolveCharacter({ body: "cube", accessory: "jetpack" })).toEqual(DEFAULT_CHARACTER);
+    expect(resolveCharacter({ race: "goblin", accessory: "jetpack" })).toEqual(DEFAULT_CHARACTER);
+  });
+
+  it("turns a saved blob creature into the default character, keeping what still exists", () => {
+    const blob = { body: "round", color: "pink", eyes: "dots", mouth: "smile", background: "stars", accessory: "cape", badge: "first-win" };
+    expect(resolveCharacter(blob)).toEqual({ ...DEFAULT_CHARACTER, background: "stars", accessory: "cape", badge: "first-win" });
   });
 });
 

@@ -2,8 +2,8 @@
 
 Input: art/character-bases/{race}.png, 1024 x 1536, drawn on flat magenta
 (#FF00FF) with a flat green (#00FF00) placeholder below the waist.
-Output: public/character/bases/{race}.png, full canvas, transparent where the
-magenta and green were, and public/character/bases/anchors.json with the
+Output: art/character-bases/cut/{race}.png, full canvas, transparent where the
+magenta and green were, and art/character-bases/cut/anchors.json with the
 landmarks of every body. art/character-bases/preview.png shows all five on a
 light and a dark background, to check the edges.
 
@@ -20,7 +20,7 @@ from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "art" / "character-bases"
-OUT = ROOT / "public" / "character" / "bases"
+OUT = SRC / "cut"
 
 RACES = ["human", "elf", "dwarf", "orc", "tiefling"]
 W, H = 1024, 1536

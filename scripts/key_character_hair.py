@@ -3,9 +3,9 @@
 Input: art/character-hair/{name}.png, the human body from
 art/character-bases/human.png with one hairstyle or beard added in pure blue.
 Blue appears nowhere else, so the blue shows exactly what was added.
-Output: public/character/hair/{name}.png, full canvas, grey and transparent,
+Output: art/character-hair/cut/{name}.png, full canvas, grey and transparent,
 to be tinted to any hair colour in the app, and
-public/character/hair/fit.json, which says how to scale each part to fit the
+art/character-hair/cut/fit.json, which says how to scale each part to fit the
 head of each race. art/character-hair/preview.png shows them on the races.
 
 Run after scripts/key_character_bases.py, with pillow, numpy and scipy:
@@ -22,8 +22,8 @@ from scipy import ndimage
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "art" / "character-hair"
 BASE = ROOT / "art" / "character-bases" / "human.png"
-BODIES = ROOT / "public" / "character" / "bases"
-OUT = ROOT / "public" / "character" / "hair"
+BODIES = ROOT / "art" / "character-bases" / "cut"
+OUT = SRC / "cut"
 
 HAIR = ["hair-short", "hair-long", "hair-topknot", "hair-braids", "hair-mohawk"]
 BEARDS = ["beard-short", "beard-long", "beard-braided", "beard-goatee", "beard-moustache"]
@@ -32,6 +32,10 @@ RACES = ["human", "elf", "dwarf", "orc", "tiefling"]
 # The grey range the hair is stored in. Light enough that a tint by
 # multiplying keeps its colour, dark enough that the shading still reads.
 GREY_DARK, GREY_LIGHT = 70.0, 235.0
+
+# Where the human's ears are on the canvas: rows, and columns of each ear.
+EAR_ROWS = (250, 380)
+EAR_COLUMNS = [(330, 430), (594, 694)]
 
 
 def blueness(rgb):
@@ -67,6 +71,18 @@ def extract(edit, base):
     level = hair[..., 2] * 0.8 + hair[..., :2].mean(axis=2) * 0.2
     lo, hi = np.percentile(level[sure], [2, 98])
     grey = GREY_DARK + np.clip((level - lo) / max(hi - lo, 1), 0, 1) * (GREY_LIGHT - GREY_DARK)
+    # A faint edge pixel holds too little hair to solve its colour, which
+    # leaves a light rim. It takes the grey of the nearest solid hair instead.
+    solid = alpha > 0.6
+    _, (iy, ix) = ndimage.distance_transform_edt(~solid, return_indices=True)
+    grey = np.where(solid, grey, grey[iy, ix])
+    # The human's ears were drawn in front of long hair, which leaves an
+    # ear-shaped hole in it. Other races have their ears elsewhere, so the
+    # hole would show the background: fill it with the hair around it.
+    for x0, x1 in EAR_COLUMNS:
+        box = (slice(EAR_ROWS[0], EAR_ROWS[1]), slice(x0, x1))
+        hole = ndimage.binary_fill_holes(alpha[box] > 0.5) & (alpha[box] <= 0.5)
+        alpha[box][hole] = 1.0
     out = np.dstack([grey, grey, grey, alpha * 255]).astype(np.uint8)
     out[alpha < 0.04] = 0
     return out

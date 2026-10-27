@@ -12,6 +12,12 @@
   overflow: hidden;
 }
 
+/* The full figure: a rounded card instead of a disc */
+.full,
+.full .svg {
+  border-radius: 8%;
+}
+
 /* Laurel wreath: a gold ring even on small avatars */
 .ring {
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ffc928;
@@ -27,17 +33,9 @@
 }
 
 .perk_sway .figure {
+  transform-box: fill-box;
   transform-origin: 50% 90%;
   animation: sway 3.6s ease-in-out infinite;
-}
-
-.shineBar {
-  animation: shine 4.5s ease-in-out infinite;
-}
-
-.wrap:not(.perk_shine) .shineBar {
-  animation: none;
-  opacity: 0;
 }
 
 .confetti,
@@ -100,13 +98,6 @@
   50% { transform: rotate(3deg); }
 }
 
-@keyframes shine {
-  0%, 55% { transform: translateX(0); opacity: 0; }
-  60% { opacity: 0.9; }
-  85% { transform: translateX(90px); opacity: 0.9; }
-  100% { transform: translateX(90px); opacity: 0; }
-}
-
 @keyframes burst {
   0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(0.6); }
   100% { opacity: 0; transform: rotate(var(--a)) translateY(-190%) scale(1); }
@@ -126,7 +117,6 @@
 @media (prefers-reduced-motion: reduce) {
   .perk_glow,
   .perk_sway .figure,
-  .shineBar,
   .sparkles i {
     animation: none;
   }
