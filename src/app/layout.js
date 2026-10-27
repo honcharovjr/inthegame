@@ -14,7 +14,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={bricolage.variable}>
-      <body>{children}</body>
+      {/* Browser extensions add attributes to body before React loads */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
