@@ -5,7 +5,7 @@ Version 0.1, draft for review. Covers FR-24 and FR-25 and answers open question 
 ## 1. Goals
 
 - Every registered player has a character that is theirs, shown wherever their name appears
-- A flat blob creature drawn in SVG in the project colours. It is not a meeple and not a pixel figure
+- A fantasy figure from layered art: a body per race, with hair and beards on top. Flat cel-shaded style, not a meeple and not a pixel figure
 - Start simple and let achievements add visible upgrades (FR-25)
 - Perks are cosmetic only. They never change ratings, statistics or what the app allows
 
@@ -15,19 +15,21 @@ A character is a choice of one item in each group. Free items are open from the 
 
 | Group | Free items | Earned items |
 |---|---|---|
-| Body shape | Round, Squircle, Tall, Wobbly, Droplet | none |
-| Body colour | 10 colours from the project palette | none |
-| Eyes | Dots, Wide, Sleepy, Happy, Wink | none |
-| Mouth | Smile, Grin, Flat, Open, Tongue | none |
+| Race | Human, Elf, Dwarf, Orc, Tiefling | none |
+| Skin tone | 10 tones, natural and fantasy | none |
+| Hair | Bald, Short, Long, Topknot, Braids, Mohawk | none |
+| Hair colour | 10 colours | none |
+| Beard | None, Short, Long, Braided, Goatee, Moustache | none |
+| Eye colour | 8 colours | none |
 | Background | 8 free: 5 plain colours, Dots, Stripes, Rings | 4 patterns: Confetti (Winner's Circle), Zigzag (Globetrotter), Stars (Centurion), Checker (Weekly Habit) |
 | Badge | none | Any earned achievement can be worn as a small badge on the character |
 | Accessory | none | 10 accessories, see section 3 |
 
-A character can wear one accessory and one badge at a time. Guests and players who have not chosen anything see a default blob in their own colour, with the first letter of the name on it.
+A character can wear one accessory and one badge at a time. Guests and players who have not chosen anything see a disc in their own colour with the first letter of the name. Lists show a round portrait of the head; the profile can open the full figure.
 
 ## 3. Accessories and their perks
 
-Every accessory is unlocked by one achievement from docs/achievements.md. A locked accessory shows the achievement that unlocks it (US-F2). Every accessory also has one cosmetic perk.
+Every accessory is unlocked by one achievement from docs/achievements.md. The accessories are not drawn on the new figures yet: their art is a later step, and until then an accessory gives only its perk. A locked accessory shows the achievement that unlocks it (US-F2). Every accessory also has one cosmetic perk.
 
 | Accessory | Unlocked by | Perk (cosmetic) |
 |---|---|---|
@@ -56,7 +58,7 @@ On the profile, a "Customize" screen with a large live preview and one row of op
 
 - `achievements`: the catalog of the 30 achievements, filled by a migration. Columns: id, code, name, description, tier, sort order
 - `user_achievements`: who earned what and when. Columns: profile id, achievement id, earned at. One row per pair
-- `profiles.character`: one JSON column with the chosen item codes, for example `{"body":"round","color":"pink","eyes":"wide","mouth":"smile","background":"dots","accessory":"party-hat","badge":"first-win"}`. Null means the default blob
+- `profiles.character`: one JSON column with the chosen item codes, for example `{"race":"elf","skin":"olive","hair":"long","hairColor":"platinum","beard":"none","eyeColor":"green","background":"dots","accessory":"party-hat","badge":"first-win"}`. Null means no character yet. A saved choice from the first blob version keeps its background, accessory and badge, and the rest falls back to the defaults
 - Item codes are defined in code (`src/lib/character/items.js`) together with the achievement that unlocks each accessory, so adding an item needs no migration
 - Row Level Security: achievements readable by every logged-in user. `user_achievements` readable like a profile, written by the server only. `profiles.character` is written by its owner through the existing profile update rules
 
@@ -65,3 +67,12 @@ On the profile, a "Customize" screen with a large live preview and one row of op
 1. 10 accessories and 5 free options per group are enough for the pilot. Mass content creation comes after the MVP
 2. Other players see only the items a player wears, never the locked ones
 3. New items later are new codes in `items.js`, with no migration
+
+## 7. Art pipeline
+
+All layers share one 1024 x 1536 canvas, so a choice is a matter of stacking images.
+
+1. `art/character-bases/{race}.png`: one body per race, drawn on flat magenta with a green placeholder below the waist. `scripts/key_character_bases.py` cuts them out
+2. `art/character-hair/{name}.png`: the human body with one hairstyle or beard added in pure blue. `scripts/key_character_hair.py` lifts the blue out as grey and measures how to fit it to each race's head
+3. `scripts/build_character_web.py` writes the light WebP layers to `public/character/` and the measures to `src/lib/character/art.json`
+4. Skin and hair are grey in the art and tinted in the browser, so colours need no new art. `src/lib/character/render.js` turns a choice into the list of layers

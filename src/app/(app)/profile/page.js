@@ -2,6 +2,7 @@ import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
+import Character from "@/components/Character/Character";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
@@ -65,6 +66,12 @@ async function ProfileContent() {
             nameClass={nameStyle(profile?.character)}
           />
           {profile?.created_at && <PlayingSince date={profile.created_at} />}
+          {profile?.character && (
+            <details className={styles.fullView}>
+              <summary className="btn-text">See full size</summary>
+              <Character character={profile.character} name={profile.nickname} size={240} view="full" />
+            </details>
+          )}
         </div>
       </section>
 

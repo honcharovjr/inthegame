@@ -1,90 +1,10 @@
 import { useId } from "react";
 import { findAchievement } from "@/lib/achievements/catalog";
-import {
-  findAccessory,
-  findBackground,
-  findColor,
-  resolveCharacter,
-} from "@/lib/character/items";
+import { findAccessory, findBackground, resolveCharacter } from "@/lib/character/items";
+import { CANVAS, characterScene } from "@/lib/character/render";
 import styles from "./Character.module.css";
 
 const INK = "#120a1a";
-
-const BODY_SHAPES = {
-  round: <circle cx="50" cy="57" r="28" />,
-  squircle: <rect x="22" y="29" width="56" height="56" rx="22" />,
-  tall: <ellipse cx="50" cy="56" rx="23" ry="31" />,
-  wobbly: (
-    <path d="M50 27c14 0 28 8 29 24 1 14-6 30-22 33-16 3-36-6-37-23-1-17 14-34 30-34z" />
-  ),
-  droplet: (
-    <path d="M50 22C58 36 78 46 78 62a28 28 0 0 1-56 0C22 46 42 36 50 22z" />
-  ),
-};
-
-function Eyes({ kind }) {
-  const stroke = { fill: "none", stroke: INK, strokeWidth: 3, strokeLinecap: "round" };
-  switch (kind) {
-    case "wide":
-      return (
-        <g>
-          <ellipse cx="40" cy="52" rx="6.5" ry="7.5" fill="#fff" />
-          <ellipse cx="60" cy="52" rx="6.5" ry="7.5" fill="#fff" />
-          <circle cx="41" cy="53" r="3.2" fill={INK} />
-          <circle cx="59" cy="53" r="3.2" fill={INK} />
-        </g>
-      );
-    case "sleepy":
-      return (
-        <g {...stroke}>
-          <path d="M34 52q6 5 12 0" />
-          <path d="M54 52q6 5 12 0" />
-        </g>
-      );
-    case "happy":
-      return (
-        <g {...stroke}>
-          <path d="M34 54q6-7 12 0" />
-          <path d="M54 54q6-7 12 0" />
-        </g>
-      );
-    case "wink":
-      return (
-        <g>
-          <circle cx="40" cy="52" r="3.6" fill={INK} />
-          <path d="M54 54q6-7 12 0" {...stroke} />
-        </g>
-      );
-    default:
-      return (
-        <g fill={INK}>
-          <circle cx="40" cy="52" r="3.6" />
-          <circle cx="60" cy="52" r="3.6" />
-        </g>
-      );
-  }
-}
-
-function Mouth({ kind }) {
-  const stroke = { fill: "none", stroke: INK, strokeWidth: 3, strokeLinecap: "round" };
-  switch (kind) {
-    case "grin":
-      return <path d="M39 63h22a11 10 0 0 1-22 0z" fill={INK} />;
-    case "flat":
-      return <path d="M43 68h14" {...stroke} />;
-    case "open":
-      return <ellipse cx="50" cy="68" rx="5.5" ry="6.5" fill={INK} />;
-    case "tongue":
-      return (
-        <g>
-          <path d="M41 64q9 9 18 0" {...stroke} />
-          <path d="M46 68.5q4 8 8 0z" fill="#ff4f6d" stroke={INK} strokeWidth="1.5" />
-        </g>
-      );
-    default:
-      return <path d="M41 64q9 9 18 0" {...stroke} />;
-  }
-}
 
 function Pattern({ id, background }) {
   const { kind, ink } = background;
@@ -142,95 +62,6 @@ function Pattern({ id, background }) {
   }
 }
 
-// Things drawn behind the body or in front of it. They sit in a 100 x 100 box.
-function Behind({ accessory }) {
-  if (accessory === "cape") {
-    return <path d="M30 62L16 95h68L70 62z" fill="#8f7bff" />;
-  }
-  return null;
-}
-
-function Front({ accessory, shineId }) {
-  const gold = "#ffc928";
-  switch (accessory) {
-    case "party-hat":
-      return (
-        <g>
-          <path d="M50 6L36 33h28z" fill="#d6247a" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-          <circle cx="45" cy="22" r="2" fill="#ffe14d" />
-          <circle cx="54" cy="27" r="2" fill="#2fd6d6" />
-          <circle cx="50" cy="6" r="4" fill="#ffe14d" stroke={INK} strokeWidth="1.5" />
-        </g>
-      );
-    case "round-glasses":
-      return (
-        <g fill="none" stroke={INK} strokeWidth="2.6">
-          <circle cx="40" cy="52" r="9" fill="rgba(255,255,255,0.25)" />
-          <circle cx="60" cy="52" r="9" fill="rgba(255,255,255,0.25)" />
-          <path d="M49 52h2" />
-          <g clipPath={`url(#${shineId})`} stroke="none">
-            <rect className={styles.shineBar} x="-20" y="40" width="7" height="26" fill="#fff" opacity="0.8" transform="rotate(20 40 52)" />
-          </g>
-        </g>
-      );
-    case "bow-tie":
-      return (
-        <g stroke={INK} strokeWidth="1.8" strokeLinejoin="round">
-          <path d="M50 83l-11-7v14z" fill="#d6247a" />
-          <path d="M50 83l11-7v14z" fill="#d6247a" />
-          <circle cx="50" cy="83" r="3.2" fill="#b0145f" />
-        </g>
-      );
-    case "headband":
-      return (
-        <g>
-          <path d="M26 40q24-17 48 0" fill="none" stroke="#2fd6d6" strokeWidth="6" strokeLinecap="round" />
-          <path d="M50 27l2 4.2 4.6.6-3.4 3.2.9 4.5L50 37.2l-4.1 2.3.9-4.5-3.4-3.2 4.6-.6z" fill="#ffe14d" stroke={INK} strokeWidth="1.2" />
-        </g>
-      );
-    case "headphones":
-      return (
-        <g>
-          <path d="M24 56q0-30 26-30t26 30" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-          <rect x="19" y="50" width="11" height="19" rx="5" fill="#ff4fa3" stroke={INK} strokeWidth="2" />
-          <rect x="70" y="50" width="11" height="19" rx="5" fill="#ff4fa3" stroke={INK} strokeWidth="2" />
-        </g>
-      );
-    case "laurel-wreath":
-      return (
-        <g fill="#5fb85f" stroke="#2f7a2f" strokeWidth="1">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <g key={i}>
-              <ellipse cx={24 + i * 1.5} cy={78 - i * 11} rx="6.5" ry="3.2" transform={`rotate(${-50 - i * 8} ${24 + i * 1.5} ${78 - i * 11})`} />
-              <ellipse cx={76 - i * 1.5} cy={78 - i * 11} rx="6.5" ry="3.2" transform={`rotate(${50 + i * 8} ${76 - i * 1.5} ${78 - i * 11})`} />
-            </g>
-          ))}
-        </g>
-      );
-    case "captain-hat":
-      return (
-        <g stroke={INK} strokeWidth="2" strokeLinejoin="round">
-          <path d="M28 38q22-18 44 0v5H28z" fill="#f6f1ff" />
-          <path d="M26 43h48q-3 6-24 6t-24-6z" fill={INK} />
-          <circle cx="50" cy="33" r="4" fill={gold} />
-        </g>
-      );
-    case "star-crown":
-      return (
-        <path d="M32 33l4-17 8 9 6-12 6 12 8-9 4 17z" fill={gold} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-      );
-    case "monocle":
-      return (
-        <g fill="none" stroke={gold} strokeWidth="2.6">
-          <circle cx="60" cy="52" r="9" fill="rgba(255,255,255,0.25)" />
-          <path d="M68 58q8 12 0 24" strokeWidth="1.6" />
-        </g>
-      );
-    default:
-      return null;
-  }
-}
-
 const BADGE_COLORS = { 1: "#c98b4a", 2: "#c3ccd6", 3: "#ffc928" };
 
 function Badge({ code }) {
@@ -244,9 +75,74 @@ function Badge({ code }) {
   );
 }
 
-// The flat blob creature of a player. Drawn as an SVG, so it is sharp at any
-// size. character is the saved choice (or null). Without one, the blob wears
-// the first letter of the name in the given colour.
+// One layer of the art, tinted by multiplying its grey with a colour.
+function Tint({ id, factors }) {
+  const [r, g, b] = factors;
+  return (
+    <filter id={id} colorInterpolationFilters="sRGB">
+      <feColorMatrix type="matrix" values={`${r} 0 0 0 0 0 ${g} 0 0 0 0 0 ${b} 0 0 0 0 0 1 0`} />
+    </filter>
+  );
+}
+
+// The figure itself, in canvas pixels, seen through the box of the view.
+function Figure({ scene, uid, height, fade }) {
+  const { box, layers, irises, eyesHref } = scene;
+  const image = { width: CANVAS.width, height: CANVAS.height, preserveAspectRatio: "none" };
+  const fadeId = `fade-${uid}`;
+  return (
+    <svg x="0" y="0" width="100" height={height} viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`}>
+      <defs>
+        {layers.map((layer) =>
+          layer.tint ? <Tint key={layer.key} id={`${layer.key}-${uid}`} factors={layer.tint} /> : null,
+        )}
+        <mask id={`iris-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={CANVAS.width} height={CANVAS.height}>
+          <image href={eyesHref} {...image} />
+        </mask>
+        {fade && (
+          <linearGradient id={`${fadeId}-g`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0.86" stopColor="#fff" />
+            <stop offset="1" stopColor="#000" />
+          </linearGradient>
+        )}
+        {fade && (
+          <mask id={fadeId} maskUnits="userSpaceOnUse" x={box.x} y={box.y} width={box.w} height={box.h}>
+            <rect x={box.x} y={box.y} width={box.w} height={box.h} fill={`url(#${fadeId}-g)`} />
+          </mask>
+        )}
+      </defs>
+      <g className={styles.figure} mask={fade ? `url(#${fadeId})` : undefined}>
+        {layers.map((layer) => (
+          <g key={layer.key}>
+            <image
+              href={layer.href}
+              {...image}
+              filter={layer.tint ? `url(#${layer.key}-${uid})` : undefined}
+              transform={layer.transform}
+            />
+            {layer.key === "eyes" && (
+              <g mask={`url(#iris-${uid})`}>
+                {irises.map((iris) => (
+                  <g key={iris.cx}>
+                    <circle cx={iris.cx} cy={iris.cy} r={iris.r} fill={iris.color} stroke="rgba(0,0,0,0.35)" strokeWidth={iris.r * 0.18} />
+                    <circle cx={iris.cx} cy={iris.cy} r={iris.r * 0.42} fill="#1a1216" />
+                    <circle cx={iris.cx - iris.r * 0.3} cy={iris.cy - iris.r * 0.3} r={iris.r * 0.18} fill="#fff" opacity="0.8" />
+                  </g>
+                ))}
+              </g>
+            )}
+          </g>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+// The character of a player, drawn from layered art as an SVG. character is
+// the saved choice (or null). Without one, a disc in the given colour wears
+// the first letter of the name.
+// view: "portrait" (a round avatar around the head) or "full" (the whole
+// figure down to the waist, in a rounded card; size is then its width).
 // perks: show the animated perks of the accessory. Use it where the character
 // is large. The gold ring of the laurel wreath always shows.
 export default function Character({
@@ -255,24 +151,28 @@ export default function Character({
   size = 44,
   color = "#ff4fa3",
   perks = false,
+  view = "portrait",
 }) {
-  const uid = useId().replace(/:/g, "");
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const chosen = Boolean(character);
   const parts = resolveCharacter(character);
-  const body = chosen ? (findColor(parts.color)?.hex ?? color) : color;
   const background = findBackground(parts.background);
   const accessory = findAccessory(parts.accessory);
   const perk = accessory?.perk;
   const letter = name.trim().charAt(0).toUpperCase() || "?";
+  const full = view === "full";
 
   const patternId = `bg-${uid}`;
   const clipId = `clip-${uid}`;
-  const shineId = `shine-${uid}`;
   const showPerks = perks && perk;
+  const scene = chosen ? characterScene(character, view) : null;
+  // The outer drawing is 100 wide; a full view is as tall as its box.
+  const height = full && scene ? Math.round((100 * scene.box.h) / scene.box.w) : 100;
 
   const classes = [
     styles.wrap,
-    perk === "ring" && styles.ring,
+    full && styles.full,
+    perk === "ring" && !full && styles.ring,
     showPerks && styles[`perk_${perk}`],
   ]
     .filter(Boolean)
@@ -281,53 +181,39 @@ export default function Character({
   return (
     <span
       className={classes}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: (size * height) / 100 }}
       role="img"
       aria-label={name ? `${name}'s character` : "Character"}
     >
-      <svg viewBox="0 0 100 100" width={size} height={size} className={styles.svg}>
+      <svg viewBox={`0 0 100 ${height}`} width={size} height={(size * height) / 100} className={styles.svg}>
         <defs>
           <clipPath id={clipId}>
-            <circle cx="50" cy="50" r="50" />
+            {full ? <rect width="100" height={height} rx="8" /> : <circle cx="50" cy="50" r="50" />}
           </clipPath>
           {background.kind !== "plain" && <Pattern id={patternId} background={background} />}
-          <clipPath id={shineId}>
-            <circle cx="40" cy="52" r="9" />
-            <circle cx="60" cy="52" r="9" />
-          </clipPath>
         </defs>
 
         <g clipPath={`url(#${clipId})`}>
-          <rect width="100" height="100" fill={background.fill} />
+          <rect width="100" height={height} fill={background.fill} />
           {background.kind !== "plain" && (
-            <rect width="100" height="100" fill={`url(#${patternId})`} />
+            <rect width="100" height={height} fill={`url(#${patternId})`} />
           )}
-          <g className={styles.figure}>
-            <Behind accessory={parts.accessory} />
-            <g fill={body} stroke={INK} strokeWidth="2.4" strokeLinejoin="round">
-              {BODY_SHAPES[parts.body]}
-            </g>
-            {chosen ? (
-              <>
-                <Eyes kind={parts.eyes} />
-                <Mouth kind={parts.mouth} />
-              </>
-            ) : (
-              <text
-                x="50"
-                y="68"
-                textAnchor="middle"
-                fontSize="34"
-                fontWeight="800"
-                fill={INK}
-                fontFamily="inherit"
-              >
-                {letter}
-              </text>
-            )}
-            <Front accessory={parts.accessory} shineId={shineId} />
-          </g>
-          {chosen && parts.badge && <Badge code={parts.badge} />}
+          {scene ? (
+            <Figure scene={scene} uid={uid} height={height} fade={full} />
+          ) : (
+            <text
+              x="50"
+              y="68"
+              textAnchor="middle"
+              fontSize="44"
+              fontWeight="800"
+              fill={INK}
+              fontFamily="inherit"
+            >
+              {letter}
+            </text>
+          )}
+          {chosen && parts.badge && !full && <Badge code={parts.badge} />}
         </g>
       </svg>
 

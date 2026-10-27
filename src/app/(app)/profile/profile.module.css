@@ -205,3 +205,18 @@
     max-width: 640px;
   }
 }
+
+/* The whole character, opened from the profile card */
+.fullView summary {
+  width: fit-content;
+  cursor: pointer;
+  list-style: none;
+}
+
+.fullView summary::-webkit-details-marker {
+  display: none;
+}
+
+.fullView[open] summary {
+  margin-bottom: 12px;
+}

@@ -10,11 +10,13 @@ import { saveCharacter } from "@/lib/character/actions";
 import {
   ACCESSORIES,
   BACKGROUNDS,
-  BODIES,
-  COLORS,
+  BEARDS,
   DEFAULT_CHARACTER,
-  EYES,
-  MOUTHS,
+  EYE_COLORS,
+  HAIR_COLORS,
+  HAIRSTYLES,
+  RACES,
+  SKINS,
   isUnlocked,
   resolveCharacter,
 } from "@/lib/character/items";
@@ -40,6 +42,38 @@ function Tile({ selected, locked, tip, label, onClick, children }) {
         </span>
       )}
     </button>
+  );
+}
+
+// A row of options, each shown as the current character wearing it.
+function Options({ title, list, part, choice, set, preview }) {
+  return (
+    <section className={styles.card} aria-label={title}>
+      <div className={styles.cardTitle}>{title}</div>
+      <div className={styles.tiles}>
+        {list.map((item) => (
+          <Tile key={item.code} label={item.label} selected={choice[part] === item.code} onClick={() => set(part, item.code)}>
+            <Character character={preview(part, item.code)} size={56} />
+          </Tile>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// A row of colours.
+function Swatches({ title, list, part, choice, set }) {
+  return (
+    <section className={styles.card} aria-label={title}>
+      <div className={styles.cardTitle}>{title}</div>
+      <div className={styles.tiles}>
+        {list.map((item) => (
+          <Tile key={item.code} label={item.label} selected={choice[part] === item.code} onClick={() => set(part, item.code)}>
+            <span className={styles.swatch} style={{ background: item.hex }} />
+          </Tile>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -77,7 +111,7 @@ export default function Customizer({ name, initial, earned }) {
   return (
     <div className={`${styles.body} stagger`}>
       <section className={styles.stage} aria-label="Preview">
-        <Character character={choice} name={name} size={168} perks />
+        <Character character={choice} name={name} size={200} view="full" perks />
         <div className={styles.stageText}>
           <span className={styles.stageName}>{name}</span>
           {choice.accessory && (
@@ -88,49 +122,12 @@ export default function Customizer({ name, initial, earned }) {
         </div>
       </section>
 
-      <section className={styles.card} aria-label="Body shape">
-        <div className={styles.cardTitle}>Body shape</div>
-        <div className={styles.tiles}>
-          {BODIES.map((item) => (
-            <Tile key={item.code} label={item.label} selected={choice.body === item.code} onClick={() => set("body", item.code)}>
-              <Character character={preview("body", item.code)} size={56} />
-            </Tile>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.card} aria-label="Colour">
-        <div className={styles.cardTitle}>Colour</div>
-        <div className={styles.tiles}>
-          {COLORS.map((item) => (
-            <Tile key={item.code} label={item.label} selected={choice.color === item.code} onClick={() => set("color", item.code)}>
-              <span className={styles.swatch} style={{ background: item.hex }} />
-            </Tile>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.card} aria-label="Eyes">
-        <div className={styles.cardTitle}>Eyes</div>
-        <div className={styles.tiles}>
-          {EYES.map((item) => (
-            <Tile key={item.code} label={item.label} selected={choice.eyes === item.code} onClick={() => set("eyes", item.code)}>
-              <Character character={preview("eyes", item.code)} size={56} />
-            </Tile>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.card} aria-label="Mouth">
-        <div className={styles.cardTitle}>Mouth</div>
-        <div className={styles.tiles}>
-          {MOUTHS.map((item) => (
-            <Tile key={item.code} label={item.label} selected={choice.mouth === item.code} onClick={() => set("mouth", item.code)}>
-              <Character character={preview("mouth", item.code)} size={56} />
-            </Tile>
-          ))}
-        </div>
-      </section>
+      <Options title="Race" list={RACES} part="race" choice={choice} set={set} preview={preview} />
+      <Swatches title="Skin tone" list={SKINS} part="skin" choice={choice} set={set} />
+      <Options title="Hair" list={HAIRSTYLES} part="hair" choice={choice} set={set} preview={preview} />
+      <Swatches title="Hair colour" list={HAIR_COLORS} part="hairColor" choice={choice} set={set} />
+      <Options title="Beard" list={BEARDS} part="beard" choice={choice} set={set} preview={preview} />
+      <Swatches title="Eye colour" list={EYE_COLORS} part="eyeColor" choice={choice} set={set} />
 
       <section className={styles.card} aria-label="Background">
         <div className={styles.cardTitle}>Background</div>
@@ -154,7 +151,7 @@ export default function Customizer({ name, initial, earned }) {
         <div className={styles.cardTitle}>Accessory</div>
         <div className={styles.tiles}>
           <Tile label="None" selected={!choice.accessory} onClick={() => set("accessory", null)}>
-            <Character character={preview("accessory", null)} size={56} />
+            <span className={styles.tileText}>None</span>
           </Tile>
           {ACCESSORIES.map((item) => (
             <Tile
@@ -165,7 +162,7 @@ export default function Customizer({ name, initial, earned }) {
               tip={unlockTip(item)}
               onClick={() => set("accessory", item.code)}
             >
-              <Character character={preview("accessory", item.code)} size={56} />
+              <span className={styles.tileText}>{item.label}</span>
             </Tile>
           ))}
         </div>

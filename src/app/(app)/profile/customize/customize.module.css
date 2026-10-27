@@ -233,3 +233,12 @@
     font-size: 36px;
   }
 }
+
+/* An option with no picture, like an accessory waiting for its art */
+.tileText {
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
