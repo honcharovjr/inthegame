@@ -1,5 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { monthStartIso, monthStats, ordinal, resultLabel } from "./month";
+import { monthHeadline, monthStartIso, monthStats, ordinal, resultLabel } from "./month";
+
+describe("monthHeadline", () => {
+  it("invites a first game of the month", () => {
+    expect(monthHeadline({ played: 0, wins: 0, winRate: null })).toBe(
+      "no games yet this month. deal the cards.",
+    );
+  });
+
+  it("counts games before the first win", () => {
+    expect(monthHeadline({ played: 1, wins: 0, winRate: 0 })).toBe(
+      "1 game this month. the first win is close.",
+    );
+    expect(monthHeadline({ played: 4, wins: 0, winRate: 0 })).toMatch(/^4 games/);
+  });
+
+  it("cheers a winning month of at least 3 games", () => {
+    expect(monthHeadline({ played: 4, wins: 3, winRate: 75 })).toBe(
+      "3 wins this month. the table is yours.",
+    );
+  });
+
+  it("keeps a short or losing month modest", () => {
+    expect(monthHeadline({ played: 2, wins: 1, winRate: 50 })).toBe(
+      "1 win this month. keep it rolling.",
+    );
+    expect(monthHeadline({ played: 5, wins: 2, winRate: 40 })).toBe(
+      "2 wins this month. keep it rolling.",
+    );
+  });
+});
 
 describe("monthStats", () => {
   it("counts sessions, wins and win rate", () => {

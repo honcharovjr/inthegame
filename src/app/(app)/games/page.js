@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Die from "@/components/Die/Die";
 import LoginGuard from "@/components/LoginGuard/LoginGuard";
+import Poster from "@/components/Poster/Poster";
 import styles from "./welcome.module.css";
 
 export const metadata = { title: "games" };
@@ -10,29 +11,10 @@ const HEADLINE = "Play or track?";
 // The Games tab starts here: play a game inside the app, or track one played
 // at the table.
 export default function GamesWelcome() {
-  const words = HEADLINE.split(" ");
-
   return (
     <main className={styles.page}>
       <LoginGuard />
-      <section className={styles.poster}>
-        <div className={styles.shapes} aria-hidden="true">
-          <span className={styles.circle} />
-          <span className={styles.square} />
-          <Die face={5} size={78} className={styles.floatDie} />
-        </div>
-        <p className={styles.kicker}>Games</p>
-        <h1 className={styles.headline} aria-label={HEADLINE}>
-          {words.map((word, index) => (
-            <span key={index}>
-              <span className={styles.word} style={{ "--w": index }} aria-hidden="true">
-                {word}
-              </span>
-              {index < words.length - 1 ? " " : ""}
-            </span>
-          ))}
-        </h1>
-      </section>
+      <Poster kicker="Games" headline={HEADLINE} />
 
       <div className={`${styles.choices} stagger`}>
         <Link href="/games/play" className={`${styles.choice} ${styles.play}`}>
