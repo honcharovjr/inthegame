@@ -1,6 +1,6 @@
 // The games a team has played, most played first, then by name.
-// sessions: [{ gameId, game: { name, type, emoji } }].
-// Returns [{ id, name, type, emoji, sessions }].
+// sessions: [{ gameId, game: { name, type, emoji, created_by } }].
+// Returns [{ id, name, type, emoji, created_by, sessions }].
 export function teamGames(sessions) {
   const games = new Map();
   for (const session of sessions) {
@@ -10,6 +10,7 @@ export function teamGames(sessions) {
       name: session.game?.name ?? "Game",
       type: session.game?.type,
       emoji: session.game?.emoji,
+      created_by: session.game?.created_by ?? null,
       sessions: 0,
     };
     entry.sessions += 1;

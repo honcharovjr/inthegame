@@ -9,11 +9,14 @@ const ACTIONS = {
   "player.unblock": "unblocked",
 };
 
-// "added Uno", "blocked Anna"
-export function describeAction(entry) {
-  const verb = ACTIONS[entry.action] ?? entry.action;
-  const name = entry.details?.name ?? entry.details?.nickname ?? "";
-  return `${verb} ${name}`.trim();
+// The verb of an admin action, for example "added" or "blocked".
+export function actionVerb(entry) {
+  return ACTIONS[entry.action] ?? entry.action;
+}
+
+// The name the action was about, as it was then.
+export function actionTarget(entry) {
+  return entry.details?.name ?? entry.details?.nickname ?? "";
 }
 
 // Oct 28, 2026, or Oct 28 with short.

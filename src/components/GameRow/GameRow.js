@@ -1,5 +1,6 @@
 import Chip from "@/components/Chip/Chip";
 import GameMeta from "@/components/GameMeta/GameMeta";
+import { GameName } from "@/components/UserText/UserText";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import styles from "./GameRow.module.css";
@@ -13,7 +14,9 @@ export default function GameRow({ game }) {
         {gameEmoji(game)}
       </div>
       <div className={styles.text}>
-        <div className={styles.name}>{game.name}</div>
+        <div className={styles.name}>
+          <GameName game={game} />
+        </div>
         <GameMeta game={game} />
         <div className={styles.chips}>
           {game.is_classic && (

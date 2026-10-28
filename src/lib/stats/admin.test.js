@@ -5,8 +5,8 @@ const NOW = Date.parse("2026-10-28T12:00:00Z");
 const daysAgo = (days) => new Date(NOW - days * 24 * 60 * 60 * 1000).toISOString();
 
 const games = [
-  { id: "g1", name: "Chess" },
-  { id: "g2", name: "Yahtzee" },
+  { id: "g1", name: "Chess", created_by: null },
+  { id: "g2", name: "Yahtzee", created_by: "p1" },
 ];
 
 function stats(data) {
@@ -77,9 +77,9 @@ describe("dashboardStats", () => {
       ],
     });
     expect(result.topGames).toEqual([
-      { id: "g2", name: "Yahtzee", sessions: 2 },
-      { id: "g1", name: "Chess", sessions: 1 },
-      { id: "gx", name: "Unknown game", sessions: 1 },
+      { id: "g2", name: "Yahtzee", custom: true, sessions: 2 },
+      { id: "g1", name: "Chess", custom: false, sessions: 1 },
+      { id: "gx", name: "Unknown game", custom: false, sessions: 1 },
     ]);
   });
 

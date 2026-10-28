@@ -3,7 +3,7 @@ import Die from "@/components/Die/Die";
 import LoginGuard from "@/components/LoginGuard/LoginGuard";
 import styles from "./welcome.module.css";
 
-export const metadata = { title: "Games" };
+export const metadata = { title: "games" };
 
 const HEADLINE = "Play or track?";
 

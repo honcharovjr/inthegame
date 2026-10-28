@@ -12,11 +12,12 @@ import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
 import { deleteGuest } from "@/lib/profile/actions";
 import { createClient } from "@/lib/supabase/server";
+import UserText from "@/components/UserText/UserText";
 import NicknameForm from "./NicknameForm";
 import ProfileHero from "./ProfileHero";
 import styles from "./profile.module.css";
 
-export const metadata = { title: "Profile" };
+export const metadata = { title: "profile" };
 
 export default function ProfilePage() {
   return (
@@ -85,10 +86,10 @@ async function ProfileContent() {
             {guests.map((guest) => (
               <li key={guest.id} className={styles.guestRow}>
                 <Avatar name={guest.name} size={38} color="#c9bcc8" />
-                <span className={styles.guestName}>{guest.name}</span>
+                <span className={`${styles.guestName} keep-case`}>{guest.name}</span>
                 <ConfirmButton
                   title="Remove this guest?"
-                  message={`${guest.name} will be removed from your guest list.`}
+                  message={<><UserText>{guest.name}</UserText> will be removed from your guest list.</>}
                   confirmLabel="Remove guest"
                   ariaLabel={`Remove ${guest.name}`}
                   action={deleteGuest.bind(null, guest.id)}

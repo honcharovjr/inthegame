@@ -68,8 +68,8 @@ export default function UserList({ users }) {
             <Link href={`/admin/users/${user.id}`} className={`${styles.row} ${styles.rowLink}`}>
               <Avatar name={user.nickname} size={44} color={playerColor(index)} registered={!user.deleted} character={user.character} />
               <span className={styles.rowText}>
-                <span className={styles.rowName}>{user.nickname}</span>
-                <span className={styles.rowMeta}>{user.email ?? "No account"}</span>
+                <span className={`${styles.rowName} keep-case`}>{user.nickname}</span>
+                <span className={`${styles.rowMeta} ${user.email ? "keep-case" : ""}`}>{user.email ?? "No account"}</span>
                 <span className={styles.rowMeta}>
                   Joined {formatDate(user.createdAt)} · last login {formatDate(user.lastSignIn)} ·{" "}
                   {user.sessions} sessions · {user.teams} teams

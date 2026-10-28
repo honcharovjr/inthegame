@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Die from "@/components/Die/Die";
+import UserText from "@/components/UserText/UserText";
 import { ArrowLeftIcon, PlusIcon } from "@/components/icons";
 import {
   LOWER,
@@ -243,7 +244,12 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
                 <span>
                   {stored.participants.length === 1
                     ? "Solo"
-                    : stored.participants.map((item) => item.name).join(", ")}{" "}
+                    : stored.participants.map((item, index) => (
+                        <span key={item.key}>
+                          {index > 0 && ", "}
+                          <UserText>{item.name}</UserText>
+                        </span>
+                      ))}{" "}
                   · round {round(stored.game)} of {ROUNDS}
                 </span>
               </div>
@@ -300,7 +306,9 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
               <div key={item.key} className={styles.lineupItem}>
                 <span className={styles.order}>{index + 1}</span>
                 <Avatar name={item.name} size={52} color={item.color} registered={item.registered} character={item.character} />
-                <span className={styles.lineupName}>{item.key === "me" ? "You" : item.name}</span>
+                <span className={styles.lineupName}>
+                  {item.key === "me" ? "You" : <UserText>{item.name}</UserText>}
+                </span>
               </div>
             ))}
           </div>
@@ -323,7 +331,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
                   aria-pressed={teamId === item.id}
                   onClick={() => chooseTeam(item.id)}
                 >
-                  {item.name}
+                  <UserText>{item.name}</UserText>
                 </button>
               ))}
             </div>
@@ -343,7 +351,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
                     onClick={() => togglePick(item.key)}
                   >
                     <Avatar name={item.name} size={34} color={on ? lineup.find((p) => p.key === item.key)?.color : "#5b4a63"} registered={item.registered} character={item.character} />
-                    <span className={styles.poolName}>{item.name}</span>
+                    <span className={`${styles.poolName} keep-case`}>{item.name}</span>
                     <span className={styles.poolTag}>{item.tag}</span>
                   </button>
                 );
@@ -399,7 +407,9 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
         ? `You scored ${scores.me}!`
         : winners.length > 1
         ? "A tie at the top!"
-        : `${winners[0].key === "me" ? "You win" : `${winners[0].name} wins`}!`;
+        : winners[0].key === "me"
+          ? "You win!"
+          : <><UserText>{winners[0].name}</UserText> wins!</>;
 
     return (
       <main className={styles.page}>
@@ -421,7 +431,9 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
                   {participants.length > 1 && <span className={styles.place}>{places[item.key]}</span>}
                   <Avatar name={item.name} size={44} color={item.color} registered={item.registered} character={item.character} />
                   <span className={styles.resultText}>
-                    <span className={styles.resultName}>{item.key === "me" ? "You" : item.name}</span>
+                    <span className={styles.resultName}>
+                      {item.key === "me" ? "You" : <UserText>{item.name}</UserText>}
+                    </span>
                     <span className={styles.resultMeta}>
                       Upper {sum.upper}
                       {sum.upperBonus ? ` +${sum.upperBonus}` : ""} · Lower {sum.lower}
@@ -507,7 +519,9 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
                 aria-label={`${item.name}: ${totals(game.sheets[item.key]).total} points. Show sheet`}
               >
                 <Avatar name={item.name} size={30} color={item.color} registered={item.registered} character={item.character} />
-                <span className={styles.playerName}>{item.key === "me" ? "You" : item.name}</span>
+                <span className={styles.playerName}>
+                  {item.key === "me" ? "You" : <UserText>{item.name}</UserText>}
+                </span>
                 <span className={styles.playerTotal}>{totals(game.sheets[item.key]).total}</span>
               </button>
             );
@@ -517,7 +531,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
         <div className={styles.layout}>
           <section className={styles.table} aria-label="Dice">
             <p className={styles.turn}>
-              {active === "me" ? "Your turn" : `${person(active).name}'s turn`}
+              {active === "me" ? "Your turn" : <><UserText>{person(active).name}</UserText>&apos;s turn</>}
             </p>
             <div className={styles.tray}>
               {game.dice.map((face, index) => {
@@ -576,7 +590,9 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
           <section className={styles.sheet} aria-label="Score sheet">
             {!own && (
               <div className={styles.viewing}>
-                <span>{person(sheetKey).name}&apos;s sheet</span>
+                <span>
+                  <UserText>{person(sheetKey).name}</UserText>&apos;s sheet
+                </span>
                 <button type="button" className={styles.link} onClick={() => setViewing(null)}>
                   Back to the turn
                 </button>
@@ -619,16 +635,16 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
         <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Next player">
           <div className={styles.handoff}>
             <p className={styles.handoffLast}>
-              {handoff.who === "me" ? "You" : person(handoff.who).name} scored{" "}
+              {handoff.who === "me" ? "You" : <UserText>{person(handoff.who).name}</UserText>} scored{" "}
               <strong>{handoff.points}</strong> in {LABELS[handoff.category]}
             </p>
             <Avatar name={next.name} size={96} color={next.color} registered={next.registered} character={next.character} />
             <p className={styles.handoffName}>
-              {next.key === "me" ? "Your turn" : `${next.name}'s turn`}
+              {next.key === "me" ? "Your turn" : <><UserText>{next.name}</UserText>&apos;s turn</>}
             </p>
             <p className={styles.handoffHint}>Pass the phone</p>
             <button type="button" className={`${styles.primary} ${styles.big}`} onClick={() => setHandoff(null)} autoFocus>
-              {next.key === "me" ? "Let's go" : `I'm ${next.name}`}
+              {next.key === "me" ? "Let's go" : <span>I&apos;m <UserText>{next.name}</UserText></span>}
             </button>
           </div>
         </div>

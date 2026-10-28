@@ -93,6 +93,7 @@ scripts/          helper scripts (Python or Node)
 - Do not create tables or columns beyond docs/data-model.md without asking
 - Write tests for rating and statistics logic
 - Code, comments, commit messages and UI text are in English
+- UI text is all lowercase, even at the start of a sentence, including page titles. A global CSS rule lowercases the app; text a player typed (nicknames, guest and team names, custom game names, emails) keeps its case: wrap it in `UserText`, or use `GameName` for game names
 - If requirements are unclear or a decision is missing, ask instead of guessing. State uncertainty explicitly
 - Do not claim that free-tier limits or prices are current. They must be checked on the service websites
 

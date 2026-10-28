@@ -86,7 +86,7 @@ function Stage({ frames, name, focus, rolling, onRoll, saved }) {
           ))}
         </div>
       </div>
-      <span className={styles.name}>{name}</span>
+      <span className={`${styles.name} keep-case`}>{name}</span>
       <button
         type="button"
         className={`${styles.dice} ${rolling ? styles.diceRolling : ""}`}

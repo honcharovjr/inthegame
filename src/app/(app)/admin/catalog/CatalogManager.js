@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import { PenIcon, PlusIcon } from "@/components/icons";
 import { deleteCatalogGame, promoteGame, saveCatalogGame } from "@/lib/admin/actions";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -85,7 +86,7 @@ export default function CatalogManager({ catalog, custom }) {
               </button>
               {game.sessionsCount === 0 ? (
                 <ConfirmButton
-                  title={`Delete ${game.name}?`}
+                  title={<>Delete <GameName game={game} />?</>}
                   message="It leaves the catalog for everyone. No session uses it."
                   ariaLabel={`Delete ${game.name}`}
                   action={() => deleteCatalogGame(game.id)}
@@ -115,7 +116,7 @@ export default function CatalogManager({ catalog, custom }) {
               <li key={game.id} className={`${styles.row} ${styles.rowFlat}`}>
                 <GameSummary game={game} author={game.author} />
                 <ConfirmButton
-                  title={`Add ${game.name} to the catalog?`}
+                  title={<>Add <GameName game={game} /> to the catalog?</>}
                   message="Every player will see it. Its author can no longer edit it."
                   confirmLabel="Add to catalog"
                   triggerLabel="Add to catalog"
@@ -141,14 +142,16 @@ function GameSummary({ game, author }) {
         {gameEmoji(game)}
       </span>
       <span className={styles.rowText}>
-        <span className={styles.rowName}>{game.name}</span>
+        <span className={styles.rowName}>
+          <GameName game={game} />
+        </span>
         <span className={styles.rowMeta}>
           {game.min_players === game.max_players
             ? `${game.min_players} players`
             : `${game.min_players} to ${game.max_players} players`}
           {game.typical_duration_min ? ` · ${game.typical_duration_min} min` : ""}
           {` · ${game.sessionsCount} sessions`}
-          {author ? ` · by ${author}` : ""}
+          {author ? <> · by <UserText>{author}</UserText></> : ""}
         </span>
         <span className={styles.rowChips}>
           <Chip size="s" tone={type.tone}>
@@ -187,7 +190,7 @@ function GameForm({ initial, onDone }) {
 
   return (
     <form className={styles.form} onSubmit={submit}>
-      <h2 className={styles.cardTitle}>{form.id ? `Edit ${initial.name}` : "New catalog game"}</h2>
+      <h2 className={styles.cardTitle}>{form.id ? <>Edit {initial.name}</> : "New catalog game"}</h2>
       <div className={styles.fields}>
         <label className={`${styles.field} ${styles.wide}`}>
           <span>Name</span>

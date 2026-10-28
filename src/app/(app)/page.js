@@ -6,6 +6,7 @@ import PlayingSince from "@/components/PlayingSince/PlayingSince";
 import ResultBadge from "@/components/ResultBadge/ResultBadge";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Toast from "@/components/Toast/Toast";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import { getProfile } from "@/lib/auth/session";
 import { nameStyle } from "@/lib/character/items";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -73,13 +74,13 @@ async function HomeContent({ searchParams }) {
         supabase
           .from("sessions")
           .select(
-            "id, played_at, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
+            "id, played_at, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
           )
           .order("played_at", { ascending: false })
           .limit(3),
         supabase
           .from("ratings")
-          .select("rating, games_count, games(name, type, emoji)")
+          .select("rating, games_count, games(name, created_by, type, emoji)")
           .eq("profile_id", profile.id)
           .order("rating", { ascending: false })
           .limit(4),
@@ -88,7 +89,7 @@ async function HomeContent({ searchParams }) {
 
   const ratings = (ratingResult.data ?? []).map((row, index) => ({
     id: `${row.games?.name}-${index}`,
-    game: row.games?.name ?? "Game",
+    game: <GameName game={row.games} />,
     emoji: gameEmoji(row.games),
     tone: findGameType(row.games?.type).tone,
     rating: Math.round(Number(row.rating)),
@@ -112,7 +113,7 @@ async function HomeContent({ searchParams }) {
     return {
       id: session.id,
       playedAt: session.played_at,
-      game: session.games?.name ?? "Game",
+      game: <GameName game={session.games} />,
       emoji: gameEmoji(session.games),
       tone: findGameType(session.games?.type).tone,
       others,
@@ -128,7 +129,9 @@ async function HomeContent({ searchParams }) {
       <div className={`${styles.content} stagger`}>
       <header className={styles.header}>
         <div className={styles.date}>{dateFormat.format(new Date())}</div>
-        <h1 className={styles.title}>Hey, {profile?.nickname ?? "player"}</h1>
+        <h1 className={styles.title}>
+          Hey, {profile?.nickname ? <UserText>{profile.nickname}</UserText> : "player"}
+        </h1>
       </header>
 
       {error && (
@@ -149,7 +152,7 @@ async function HomeContent({ searchParams }) {
           />
           <div className={styles.identity}>
             <div className={`${styles.name} ${nameStyle(profile?.character)}`}>
-              {profile?.nickname}
+              <UserText>{profile?.nickname}</UserText>
             </div>
           </div>
           <Link href="/log" className={`${styles.logButton} btn-primary`} aria-label="Log a session">
@@ -229,7 +232,7 @@ async function HomeContent({ searchParams }) {
                     <Chip size="s">{shortDate.format(new Date(session.playedAt))}</Chip>
                     {session.others.slice(0, 2).map((name) => (
                       <Chip key={name} size="s">
-                        {name}
+                        <UserText>{name}</UserText>
                       </Chip>
                     ))}
                     {session.others.length > 2 && (

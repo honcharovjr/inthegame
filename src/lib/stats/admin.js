@@ -13,7 +13,7 @@ function weeksAgo(time, now) {
 // profiles: [{ id, created_at }]
 // sessions: [{ id, game_id, created_by, played_at }]
 // participants: [{ session_id, profile_id }] (guests have a null profile_id)
-// games: [{ id, name }]
+// games: [{ id, name, created_by }]; a custom game is marked in topGames
 export function dashboardStats({
   profiles,
   sessions,
@@ -57,7 +57,7 @@ export function dashboardStats({
   const activeInWindow = weeksByPlayer.size;
   const returning = [...weeksByPlayer.values()].filter((set) => set.size >= 2).length;
 
-  const names = new Map(games.map((g) => [g.id, g.name]));
+  const byId = new Map(games.map((g) => [g.id, g]));
   const counts = new Map();
   for (const s of sessions) {
     const time = playedAt.get(s.id);
@@ -65,7 +65,12 @@ export function dashboardStats({
     counts.set(s.game_id, (counts.get(s.game_id) ?? 0) + 1);
   }
   const topGames = [...counts.entries()]
-    .map(([id, count]) => ({ id, name: names.get(id) ?? "Unknown game", sessions: count }))
+    .map(([id, count]) => ({
+      id,
+      name: byId.get(id)?.name ?? "Unknown game",
+      custom: Boolean(byId.get(id)?.created_by),
+      sessions: count,
+    }))
     .sort((a, b) => b.sessions - a.sessions || a.name.localeCompare(b.name))
     .slice(0, 5);
 

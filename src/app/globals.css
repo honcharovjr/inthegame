@@ -63,6 +63,21 @@ html {
   height: 100%;
 }
 
+/* Browsers reset the case of buttons and lists; let them follow the app. */
+button,
+select {
+  text-transform: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  text-transform: lowercase;
+}
+
+.keep-case {
+  text-transform: none;
+}
+
 html,
 body {
   max-width: 100vw;
@@ -76,6 +91,10 @@ body {
   color: var(--color-ink);
   background: var(--color-bg);
   font-family: var(--font-bricolage), system-ui, sans-serif;
+  /* The app speaks in lowercase. Only text players typed keeps its case:
+     wrap it in UserText (class keep-case). Typed values in fields stay
+     as typed, placeholders follow the app. */
+  text-transform: lowercase;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

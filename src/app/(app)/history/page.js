@@ -1,6 +1,7 @@
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -13,7 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import HistoryFilters from "./HistoryFilters";
 import styles from "./history.module.css";
 
-export const metadata = { title: "History" };
+export const metadata = { title: "history" };
 
 const PAGE_SIZE = 20;
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -84,7 +85,7 @@ async function HistoryList({ searchParams }) {
   let query = supabase
     .from("sessions")
     .select(
-      `id, played_at, created_by, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))${
+      `id, played_at, created_by, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))${
         byResult ? ", mine:session_participants!inner(place)" : ""
       }`,
       { count: "exact" },
@@ -102,7 +103,7 @@ async function HistoryList({ searchParams }) {
 
   const [{ data, count, error }, gamesResult] = await Promise.all([
     query,
-    supabase.from("games").select("id, name").order("name"),
+    supabase.from("games").select("id, name, created_by").order("name"),
   ]);
   const filtered = Object.values(filters).some(Boolean);
 
@@ -114,7 +115,8 @@ async function HistoryList({ searchParams }) {
       id: session.id,
       playedAt: session.played_at,
       mine: session.created_by === profile?.id,
-      game: session.games?.name ?? "Game",
+      game: <GameName game={session.games} />,
+      gameText: session.games?.name ?? "Game",
       emoji: gameEmoji(session.games),
       tone: findGameType(session.games?.type).tone,
       others: people
@@ -157,7 +159,7 @@ async function HistoryList({ searchParams }) {
                 <Chip size="s">{dateFormat.format(new Date(session.playedAt))}</Chip>
                 {session.others.filter(Boolean).map((name) => (
                   <Chip key={name} size="s">
-                    {name}
+                    <UserText>{name}</UserText>
                   </Chip>
                 ))}
               </span>
@@ -167,9 +169,14 @@ async function HistoryList({ searchParams }) {
               {session.mine && (
                 <ConfirmButton
                   title="Delete this session?"
-                  message={`${session.game} on ${dateFormat.format(new Date(session.playedAt))} will be removed and your ratings will be recalculated.`}
+                  message={
+                    <>
+                      {session.game} on {dateFormat.format(new Date(session.playedAt))} will be
+                      removed and your ratings will be recalculated.
+                    </>
+                  }
                   confirmLabel="Delete session"
-                  ariaLabel={`Delete the ${session.game} session`}
+                  ariaLabel={`Delete the ${session.gameText} session`}
                   action={deleteSession.bind(null, session.id)}
                 />
               )}

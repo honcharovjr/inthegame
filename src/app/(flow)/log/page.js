@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import LogFlow from "./LogFlow";
 import styles from "./flow.module.css";
 
-export const metadata = { title: "Log a session" };
+export const metadata = { title: "log a session" };
 
 export default function LogPage() {
   return (
@@ -25,7 +25,7 @@ async function LogData() {
     supabase
       .from("games")
       .select(
-        "id, name, type, emoji, is_classic, min_players, max_players, typical_duration_min",
+        "id, name, type, emoji, is_classic, min_players, max_players, typical_duration_min, created_by",
       )
       .order("name"),
     supabase

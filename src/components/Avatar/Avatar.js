@@ -3,7 +3,7 @@ import styles from "./Avatar.module.css";
 
 // A player in a list or a header. A registered player is drawn as their
 // character, so pass registered and the saved character (or null). A guest
-// stays a coloured disc with the first letter.
+// stays a coloured disc with the first letter, as the player typed it.
 export default function Avatar({
   name = "",
   size = 44,
@@ -24,10 +24,10 @@ export default function Avatar({
     );
   }
 
-  const letter = name.trim().charAt(0).toUpperCase() || "?";
+  const letter = name.trim().charAt(0) || "?";
   return (
     <span
-      className={styles.avatar}
+      className={`${styles.avatar} keep-case`}
       style={{
         width: size,
         height: size,

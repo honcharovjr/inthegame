@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition } from "react";
 import { TrashIcon } from "@/components/icons";
 import styles from "./ConfirmButton.module.css";
 
@@ -18,6 +18,9 @@ export default function ConfirmButton({
   action,
 }) {
   const dialogRef = useRef(null);
+  // The title may hold a player's name in UserText, so the dialog is named
+  // by its heading rather than by a plain string.
+  const titleId = useId();
   const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
 
@@ -68,7 +71,7 @@ export default function ConfirmButton({
       <dialog
         ref={dialogRef}
         className={styles.dialog}
-        aria-label={title}
+        aria-labelledby={titleId}
         onClick={(event) => {
           // A click on the dimmed background closes the pop-up.
           if (event.target === event.currentTarget && !pending) close();
@@ -78,7 +81,7 @@ export default function ConfirmButton({
           <span className={styles.badge} aria-hidden="true">
             {icon ?? <TrashIcon size={26} />}
           </span>
-          <h2 className={styles.title}>{title}</h2>
+          <h2 id={titleId} className={styles.title}>{title}</h2>
           {message && <p className={styles.message}>{message}</p>}
           {error && (
             <p role="alert" className={styles.error}>

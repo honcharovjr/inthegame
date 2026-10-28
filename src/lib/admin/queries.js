@@ -28,7 +28,7 @@ export async function loadDashboard(now = Date.now()) {
         .from("session_participants")
         .select("session_id, profile_id, sessions!inner(played_at)")
         .gte("sessions.played_at", since),
-      admin.from("games").select("id, name"),
+      admin.from("games").select("id, name, created_by"),
       loadAudit(admin, 8),
     ]);
 
@@ -164,14 +164,14 @@ export async function loadUser(profileId) {
       .eq("profile_id", profileId),
     admin
       .from("sessions")
-      .select("id, played_at, games(name), session_participants!inner(place, score, profile_id)")
+      .select("id, played_at, games(name, created_by), session_participants!inner(place, score, profile_id)")
       .eq("session_participants.profile_id", profileId)
       .order("played_at", { ascending: false })
       .limit(10),
     admin.from("team_members").select("role, joined_at, teams(id, name)").eq("profile_id", profileId),
     admin
       .from("ratings")
-      .select("rating, games_count, games(name)")
+      .select("rating, games_count, games(name, created_by)")
       .eq("profile_id", profileId)
       .order("rating", { ascending: false }),
     admin
@@ -196,6 +196,7 @@ export async function loadUser(profileId) {
       id: row.id,
       playedAt: row.played_at,
       game: row.games?.name ?? "Unknown game",
+      custom: Boolean(row.games?.created_by),
       place: row.session_participants[0]?.place,
       score: row.session_participants[0]?.score ?? null,
     })),
@@ -204,6 +205,7 @@ export async function loadUser(profileId) {
       .map((row) => ({ id: row.teams.id, name: row.teams.name, role: row.role })),
     ratings: (ratings.data ?? []).map((row) => ({
       game: row.games?.name ?? "Unknown game",
+      custom: Boolean(row.games?.created_by),
       rating: Math.round(Number(row.rating)),
       games: row.games_count,
     })),

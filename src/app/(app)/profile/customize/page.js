@@ -6,7 +6,7 @@ import { getProfile } from "@/lib/auth/session";
 import Customizer from "./Customizer";
 import styles from "./customize.module.css";
 
-export const metadata = { title: "Your character" };
+export const metadata = { title: "your character" };
 
 export default function CustomizePage() {
   return (

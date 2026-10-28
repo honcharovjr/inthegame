@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
@@ -17,7 +18,7 @@ import CopyLink from "./CopyLink";
 import InviteToggle from "./InviteToggle";
 import styles from "../teams.module.css";
 
-export const metadata = { title: "Team" };
+export const metadata = { title: "team" };
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -71,7 +72,7 @@ async function TeamContent({ params }) {
     supabase
       .from("sessions")
       .select(
-        "id, played_at, games(name, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
+        "id, played_at, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
       )
       .eq("team_id", id)
       .order("played_at", { ascending: false })
@@ -108,7 +109,7 @@ async function TeamContent({ params }) {
 
   return (
     <div className={`${styles.body} stagger`}>
-      <h1 className={styles.title}>{team.name}</h1>
+      <h1 className={`${styles.title} keep-case`}>{team.name}</h1>
 
       <section className={styles.card} aria-label="Members">
         <div className={styles.cardHead}>
@@ -125,7 +126,7 @@ async function TeamContent({ params }) {
                 registered
                 character={member.character}
               />
-              {member.name}
+              <UserText>{member.name}</UserText>
               {member.role === "owner" && (
                 <Chip size="s" tone="pink">
                   Owner
@@ -179,7 +180,7 @@ async function TeamContent({ params }) {
                 registered
                 character={members.find((m) => m.id === row.id)?.character}
               />
-              <span className={styles.boardName}>{row.name}</span>
+              <span className={`${styles.boardName} keep-case`}>{row.name}</span>
               <span className={styles.boardChips}>
                 <Chip size="s">
                   {row.games} {row.games === 1 ? "game" : "games"}
@@ -211,7 +212,7 @@ async function TeamContent({ params }) {
                   </span>
                   <span className={styles.sessionText}>
                     <span className={styles.sessionName}>
-                      {session.games?.name ?? "Game"}
+                      <GameName game={session.games} />
                     </span>
                     <span className={styles.chips}>
                       <Chip size="s">
@@ -219,14 +220,16 @@ async function TeamContent({ params }) {
                       </Chip>
                       {names.slice(0, 3).map((name) => (
                         <Chip key={name} size="s">
-                          {name}
+                          <UserText>{name}</UserText>
                         </Chip>
                       ))}
                     </span>
                   </span>
                   {winner && (
                     <Chip tone="pink">
-                      {winner.profiles?.nickname ?? winner.guests?.name} won
+                      <span>
+                        <UserText>{winner.profiles?.nickname ?? winner.guests?.name}</UserText> won
+                      </span>
                     </Chip>
                   )}
                 </li>
@@ -239,7 +242,12 @@ async function TeamContent({ params }) {
       <div className={styles.leave}>
         <ConfirmButton
           title="Leave this team?"
-          message={`You will stop seeing ${team.name} and its sessions. You can rejoin with an invite link.`}
+          message={
+            <>
+              You will stop seeing <UserText>{team.name}</UserText> and its sessions. You can
+              rejoin with an invite link.
+            </>
+          }
           confirmLabel="Leave team"
           triggerLabel="Leave team"
           action={leaveTeam.bind(null, team.id)}

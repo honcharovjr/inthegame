@@ -14,8 +14,8 @@ const cinzel = Cinzel({
 });
 
 export const metadata = {
-  title: "In the Game",
-  description: "Log your board and card game sessions.",
+  title: "in the game",
+  description: "log your board and card game sessions.",
 };
 
 export default function RootLayout({ children }) {

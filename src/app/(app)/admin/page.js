@@ -1,12 +1,13 @@
 import { Suspense } from "react";
 import Skeleton from "@/components/Skeleton/Skeleton";
+import UserText from "@/components/UserText/UserText";
 import { requireSuperAdmin } from "@/lib/admin/access";
 import { loadDashboard } from "@/lib/admin/queries";
 import AdminHeader from "./AdminHeader";
-import { describeAction, formatDate } from "./format";
+import { actionTarget, actionVerb, formatDate } from "./format";
 import styles from "./admin.module.css";
 
-export const metadata = { title: "Admin" };
+export const metadata = { title: "admin" };
 
 export default function AdminOverview() {
   return (
@@ -92,7 +93,7 @@ async function Overview() {
               {stats.topGames.map((game, index) => (
                 <li key={game.id} className={styles.rankRow}>
                   <span className={styles.rankNo}>{index + 1}</span>
-                  <span className={styles.rankName}>{game.name}</span>
+                  <span className={`${styles.rankName} ${game.custom ? "keep-case" : ""}`}>{game.name}</span>
                   <span className={styles.rankValue}>{game.sessions}</span>
                 </li>
               ))}
@@ -109,7 +110,8 @@ async function Overview() {
               {audit.map((entry) => (
                 <li key={entry.id} className={styles.logRow}>
                   <span className={styles.logText}>
-                    <strong>{entry.profiles?.nickname ?? "Admin"}</strong> {describeAction(entry)}
+                    <strong className="keep-case">{entry.profiles?.nickname ?? "Admin"}</strong>{" "}
+                    {actionVerb(entry)} <UserText>{actionTarget(entry)}</UserText>
                   </span>
                   <span className={styles.logDate}>{formatDate(entry.created_at)}</span>
                 </li>
