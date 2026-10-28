@@ -1,6 +1,6 @@
 # Character: In the Game
 
-Version 0.1, draft for review. Covers FR-24 and FR-25 and answers open question 3 of the specification. Items marked "Assumption" need confirmation.
+Version 0.2, Oct 28, 2026. Covers FR-24 and FR-25 and answers open question 3 of the specification. Items marked "Assumption" need confirmation.
 
 ## 1. Goals
 
@@ -58,7 +58,7 @@ On the profile, a "Customize" screen like a game's character creator. The charac
 
 Accessories and badges are not in the customizer for now. A player who already wears one keeps it.
 
-## 6. Storage (proposal)
+## 6. Storage
 
 - `achievements`: the catalog of the 30 achievements, filled by a migration. Columns: id, code, name, description, tier, sort order
 - `user_achievements`: who earned what and when. Columns: profile id, achievement id, earned at. One row per pair
@@ -68,11 +68,11 @@ Accessories and badges are not in the customizer for now. A player who already w
 
 ## 7. Decisions
 
-1. 10 accessories and 5 free options per group are enough for the pilot. Mass content creation comes after the MVP
+1. 10 accessories and at least 5 free options per group are enough for the pilot (outfits: 10 free). Mass content creation comes after the MVP
 2. Other players see only the items a player wears, never the locked ones
 3. New items later are new codes in `items.js`, with no migration
 
-## 7. Art pipeline
+## 8. Art pipeline
 
 All layers share one 1024 x 1536 canvas, so a choice is a matter of stacking images.
 
