@@ -3,7 +3,7 @@ import AuthShell from "@/components/AuthShell/AuthShell";
 import AuthForm from "@/components/AuthForm/AuthForm";
 import { signIn } from "@/lib/auth/actions";
 
-export const metadata = { title: "Log in" };
+export const metadata = { title: "log in" };
 
 export default function LoginPage({ searchParams }) {
   return (

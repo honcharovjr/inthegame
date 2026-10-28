@@ -6,7 +6,7 @@ import AdminHeader from "../AdminHeader";
 import UserList from "./UserList";
 import styles from "../admin.module.css";
 
-export const metadata = { title: "Admin: players" };
+export const metadata = { title: "admin: players" };
 
 export default function AdminUsers() {
   return (

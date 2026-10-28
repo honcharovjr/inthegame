@@ -10,7 +10,7 @@ import { formatDate } from "../../format";
 import BlockButton from "./BlockButton";
 import styles from "../../admin.module.css";
 
-export const metadata = { title: "Admin: player" };
+export const metadata = { title: "admin: player" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -48,8 +48,8 @@ async function Player({ params }) {
       <section className={styles.profileCard}>
         <Avatar name={user.nickname} size={88} registered={!user.deleted} character={user.character} />
         <div className={styles.profileText}>
-          <h1 className={styles.title}>{user.nickname}</h1>
-          <span className={styles.rowMeta}>{user.email ?? "No account"}</span>
+          <h1 className={`${styles.title} keep-case`}>{user.nickname}</h1>
+          <span className={`${styles.rowMeta} ${user.email ? "keep-case" : ""}`}>{user.email ?? "No account"}</span>
           <span className={styles.rowMeta}>
             Joined {formatDate(user.createdAt)} · last login {formatDate(user.lastSignIn)}
           </span>
@@ -89,7 +89,8 @@ async function Player({ params }) {
               {user.recent.map((session) => (
                 <li key={session.id} className={styles.logRow}>
                   <span className={styles.logText}>
-                    <strong>{session.game}</strong> · place {session.place}
+                    <strong className={session.custom ? "keep-case" : undefined}>{session.game}</strong> · place{" "}
+                    {session.place}
                     {session.score !== null ? ` · ${Number(session.score)} points` : ""}
                   </span>
                   <span className={styles.logDate}>{formatDate(session.playedAt)}</span>
@@ -107,7 +108,7 @@ async function Player({ params }) {
             <ol className={styles.rank}>
               {user.ratings.map((rating) => (
                 <li key={rating.game} className={styles.rankRow}>
-                  <span className={styles.rankName}>{rating.game}</span>
+                  <span className={`${styles.rankName} ${rating.custom ? "keep-case" : ""}`}>{rating.game}</span>
                   <span className={styles.rowMeta}>{rating.games} games</span>
                   <span className={styles.rankValue}>{rating.rating}</span>
                 </li>
@@ -124,7 +125,7 @@ async function Player({ params }) {
             <ul className={styles.log}>
               {user.teams.map((team) => (
                 <li key={team.id} className={styles.logRow}>
-                  <span className={styles.logText}>{team.name}</span>
+                  <span className={`${styles.logText} keep-case`}>{team.name}</span>
                   <Chip size="s" tone={team.role === "owner" ? "yellow" : "default"}>
                     {team.role === "owner" ? "Owner" : "Member"}
                   </Chip>

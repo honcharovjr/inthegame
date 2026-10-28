@@ -26,7 +26,6 @@
 .kicker {
   font-size: 13px;
   font-weight: 800;
-  text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-violet-ink);
 }

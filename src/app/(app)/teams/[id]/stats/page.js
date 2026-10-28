@@ -4,6 +4,7 @@ import Avatar from "@/components/Avatar/Avatar";
 import BackButton from "@/components/BackButton/BackButton";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import Chip from "@/components/Chip/Chip";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -13,7 +14,7 @@ import { teamLeaderboard } from "@/lib/stats/leaderboard";
 import { createClient } from "@/lib/supabase/server";
 import styles from "../../teams.module.css";
 
-export const metadata = { title: "Team stats" };
+export const metadata = { title: "team stats" };
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -57,7 +58,7 @@ async function StatsContent({ params, searchParams }) {
     supabase
       .from("sessions")
       .select(
-        "id, game_id, games(name, type, emoji), session_participants(place, profile_id)",
+        "id, game_id, games(name, created_by, type, emoji), session_participants(place, profile_id)",
       )
       .eq("team_id", id)
       .order("played_at", { ascending: false })
@@ -112,7 +113,9 @@ async function StatsContent({ params, searchParams }) {
     <FilterLoading>
     <div className={`${styles.body} stagger`}>
       <BackButton fallback={`/teams/${id}`} />
-      <h1 className={styles.title}>{team.name} stats</h1>
+      <h1 className={styles.title}>
+        <UserText>{team.name}</UserText> stats
+      </h1>
 
       {games.length > 0 && (
         <div className={styles.gameChips} aria-label="Game">
@@ -125,7 +128,9 @@ async function StatsContent({ params, searchParams }) {
               href={href(item.id)}
               tone={game?.id === item.id ? "active" : "white"}
             >
-              {gameEmoji(item)} {item.name}
+              <span>
+                {gameEmoji(item)} <GameName game={item} />
+              </span>
             </FilterChip>
           ))}
         </div>
@@ -143,7 +148,7 @@ async function StatsContent({ params, searchParams }) {
 
       <section className={styles.card} aria-label="Leaderboard">
         <div className={styles.cardTitle}>
-          {game ? `Leaderboard in ${game.name}` : "Overall leaderboard"}
+          {game ? <>Leaderboard in <GameName game={game} /></> : "Overall leaderboard"}
         </div>
         {shown.length === 0 ? (
           <p className={styles.empty}>No sessions logged in this team yet.</p>
@@ -169,7 +174,7 @@ async function StatsContent({ params, searchParams }) {
                   registered
                   character={members.find((m) => m.id === row.id)?.character}
                 />
-                <span className={styles.boardName}>{row.name}</span>
+                <span className={`${styles.boardName} keep-case`}>{row.name}</span>
                 <span className={styles.boardChips}>
                   <Chip size="s">
                     {row.games} {row.games === 1 ? "game" : "games"}

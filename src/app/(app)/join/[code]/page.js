@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import JoinButton from "./JoinButton";
 import styles from "../../teams/teams.module.css";
 
-export const metadata = { title: "Join a team" };
+export const metadata = { title: "join a team" };
 
 export default function JoinPage({ params }) {
   return (
@@ -54,7 +54,7 @@ async function Invite({ params }) {
   return (
     <section className={`${styles.card} stagger`} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <span className={styles.cardTitle}>You are invited to</span>
-      <h1 className={styles.title}>{team.name}</h1>
+      <h1 className={`${styles.title} keep-case`}>{team.name}</h1>
       <div className={styles.chips}>
         <Chip>
           {team.member_count} {Number(team.member_count) === 1 ? "member" : "members"}

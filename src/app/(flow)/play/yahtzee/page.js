@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import YahtzeeGame from "./YahtzeeGame";
 import styles from "./yahtzee.module.css";
 
-export const metadata = { title: "Yahtzee" };
+export const metadata = { title: "yahtzee" };
 
 const GAME = findPlayable("yahtzee");
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDownIcon, SearchIcon } from "@/components/icons";
+import { GameName } from "@/components/UserText/UserText";
 import styles from "./GameSelect.module.css";
 
 // A drop-down of games with a search box on top.
@@ -50,7 +51,7 @@ export default function GameSelect({ games, value, onChange }) {
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
       >
-        <span className={styles.value}>{selected?.name ?? "All games"}</span>
+        <span className={styles.value}>{selected ? <GameName game={selected} /> : "All games"}</span>
         <ChevronDownIcon size={18} />
       </button>
 
@@ -87,7 +88,7 @@ export default function GameSelect({ games, value, onChange }) {
                   className={`${styles.option} ${game.id === value ? styles.optionOn : ""}`}
                   onClick={() => choose(game.id)}
                 >
-                  {game.name}
+                  <GameName game={game} />
                 </button>
               </li>
             ))}

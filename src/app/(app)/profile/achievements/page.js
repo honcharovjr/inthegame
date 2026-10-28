@@ -8,7 +8,7 @@ import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./achievements.module.css";
 
-export const metadata = { title: "Achievements" };
+export const metadata = { title: "achievements" };
 
 export default function AchievementsPage() {
   return (

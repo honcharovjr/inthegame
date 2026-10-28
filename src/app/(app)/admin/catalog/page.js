@@ -6,7 +6,7 @@ import AdminHeader from "../AdminHeader";
 import CatalogManager from "./CatalogManager";
 import styles from "../admin.module.css";
 
-export const metadata = { title: "Admin: catalog" };
+export const metadata = { title: "admin: catalog" };
 
 export default function AdminCatalog() {
   return (

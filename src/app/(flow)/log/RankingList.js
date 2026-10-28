@@ -99,7 +99,7 @@ export default function RankingList({
             </span>
             <Avatar name={p.name} size={40} color={p.color} registered={p.registered} character={p.character} />
             <span className={styles.rowText}>
-              <span className={styles.rowName}>{p.name}</span>
+              <span className={`${styles.rowName} keep-case`}>{p.name}</span>
             </span>
             {first && (
               <span className={styles.trophy} role="img" aria-label="Winner">

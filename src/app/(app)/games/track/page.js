@@ -11,7 +11,7 @@ import AddGameButton from "./AddGameButton";
 import GamesToolbar from "./GamesToolbar";
 import styles from "./games.module.css";
 
-export const metadata = { title: "Track" };
+export const metadata = { title: "track" };
 
 const PAGE_SIZE = 20;
 const PLAYER_COUNTS = [1, 2, 3, 4, 5, 6];

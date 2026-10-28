@@ -160,7 +160,7 @@ export default function Character({
   const background = findBackground(parts.background);
   const accessory = findAccessory(parts.accessory);
   const perk = accessory?.perk;
-  const letter = name.trim().charAt(0).toUpperCase() || "?";
+  const letter = name.trim().charAt(0) || "?";
   const full = view === "full";
   const fill = size === "fill";
 
@@ -216,6 +216,7 @@ export default function Character({
               fontWeight="800"
               fill={INK}
               fontFamily="inherit"
+              className="keep-case"
             >
               {letter}
             </text>

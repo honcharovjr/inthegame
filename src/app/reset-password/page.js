@@ -2,7 +2,7 @@ import AuthShell from "@/components/AuthShell/AuthShell";
 import AuthForm from "@/components/AuthForm/AuthForm";
 import { updatePassword } from "@/lib/auth/actions";
 
-export const metadata = { title: "Choose a new password" };
+export const metadata = { title: "choose a new password" };
 
 export default function ResetPasswordPage() {
   return (

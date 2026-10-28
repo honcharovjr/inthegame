@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import AddGameForm from "@/components/AddGameForm/AddGameForm";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import FlowShell from "@/components/FlowShell/FlowShell";
 import IconButton from "@/components/IconButton/IconButton";
 import GameMeta from "@/components/GameMeta/GameMeta";
@@ -355,10 +356,14 @@ export default function LogFlow({
               </span>
               <span className={styles.againText}>
                 <span className={styles.againTitle}>
-                  Same again: {previousGame.name}
+                  Same again: <GameName game={previousGame} />
                 </span>
                 <span className={styles.againWho}>
-                  {["You", ...previousNames.slice(0, 3)].join(", ")}
+                  You{previousNames.slice(0, 3).map((name) => (
+                    <span key={name}>
+                      , <UserText>{name}</UserText>
+                    </span>
+                  ))}
                   {previousNames.length > 3 ? `, +${previousNames.length - 3}` : ""}
                 </span>
               </span>
@@ -405,7 +410,9 @@ export default function LogFlow({
                       {gameEmoji(item)}
                     </div>
                     <div className={styles.rowText}>
-                      <div className={styles.rowName}>{item.name}</div>
+                      <div className={styles.rowName}>
+                        <GameName game={item} />
+                      </div>
                       <GameMeta game={item} />
                       {item.is_classic && (
                         <div className={styles.chips}>
@@ -426,7 +433,9 @@ export default function LogFlow({
       {step === 2 && game && (
         <>
           <div className={styles.chips}>
-            <Chip tone="white">{game.name}</Chip>
+            <Chip tone="white">
+              <GameName game={game} />
+            </Chip>
             <Chip tone="white">
               {participants.length}{" "}
               {participants.length === 1 ? "player" : "players"}
@@ -451,7 +460,7 @@ export default function LogFlow({
                   aria-pressed={teamId === item.id}
                   onClick={() => chooseTeam(item.id)}
                 >
-                  {item.name}
+                  <UserText>{item.name}</UserText>
                 </button>
               ))}
             </div>
@@ -461,7 +470,7 @@ export default function LogFlow({
             {participants.map((p) => (
               <div key={p.key} className={styles.stripItem}>
                 <Avatar name={p.name} size={56} color={p.color} registered={p.registered} character={p.character} />
-                {p.name}
+                <UserText>{p.name}</UserText>
               </div>
             ))}
           </div>
@@ -470,7 +479,7 @@ export default function LogFlow({
             <li className={styles.row}>
               <Avatar name={profile.nickname} size={40} color={playerColor(0)} registered character={profile.character} />
               <span className={styles.rowText}>
-                <span className={styles.rowName}>{profile.nickname}</span>
+                <span className={`${styles.rowName} keep-case`}>{profile.nickname}</span>
               </span>
               <Chip size="s">You</Chip>
               <span className={`${styles.check} ${styles.checkOn}`} aria-hidden="true">
@@ -492,7 +501,7 @@ export default function LogFlow({
                   >
                     <Avatar name={member.nickname} size={40} color={color} registered character={member.character} />
                     <span className={styles.rowText}>
-                      <span className={styles.rowName}>{member.nickname}</span>
+                      <span className={`${styles.rowName} keep-case`}>{member.nickname}</span>
                     </span>
                     <Chip size="s" tone="turquoise">
                       Teammate
@@ -522,7 +531,7 @@ export default function LogFlow({
                   >
                     <Avatar name={guest.name} size={40} color={color} />
                     <span className={styles.rowText}>
-                      <span className={styles.rowName}>{guest.name}</span>
+                      <span className={`${styles.rowName} keep-case`}>{guest.name}</span>
                     </span>
                     <Chip size="s" tone="pink">
                       Guest
@@ -582,7 +591,9 @@ export default function LogFlow({
       {step === 3 && game && (
         <>
           <div className={styles.chips}>
-            <Chip tone="white">{game.name}</Chip>
+            <Chip tone="white">
+              <GameName game={game} />
+            </Chip>
             <Chip tone="white">{participants.length} players</Chip>
           </div>
 
@@ -618,7 +629,7 @@ export default function LogFlow({
                     >
                       <Avatar name={p.name} size={44} color={p.color} registered={p.registered} character={p.character} />
                       <span className={styles.rowText}>
-                        <span className={styles.rowName}>{p.name}</span>
+                        <span className={`${styles.rowName} keep-case`}>{p.name}</span>
                       </span>
                       <span
                         className={`${styles.pick} ${won ? styles.pickOn : ""}`}
@@ -656,7 +667,7 @@ export default function LogFlow({
                   >
                     <Avatar name={p.name} size={44} color={p.color} registered={p.registered} character={p.character} />
                     <label className={styles.rowText} htmlFor={`score_${p.key}`}>
-                      <span className={styles.rowName}>{p.name}</span>
+                      <span className={`${styles.rowName} keep-case`}>{p.name}</span>
                     </label>
                     {leads && <Trophy />}
                     <div className={styles.stepper}>
@@ -723,7 +734,7 @@ export default function LogFlow({
                           }}
                         >
                           <Avatar name={person.name} size={28} color={person.color} registered={person.registered} character={person.character} />
-                          {person.name}
+                          <UserText>{person.name}</UserText>
                         </button>
                       );
                     })}

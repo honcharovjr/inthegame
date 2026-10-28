@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import CreateTeamForm from "./CreateTeamForm";
 import styles from "./teams.module.css";
 
-export const metadata = { title: "Teams" };
+export const metadata = { title: "teams" };
 
 export default function TeamsPage() {
   return (
@@ -63,11 +63,11 @@ async function TeamList() {
           {teams.map((team) => (
             <li key={team.id}>
               <Link href={`/teams/${team.id}`} className={styles.teamRow}>
-                <span className={styles.tile} aria-hidden="true">
-                  {team.name.charAt(0).toUpperCase()}
+                <span className={`${styles.tile} keep-case`} aria-hidden="true">
+                  {team.name.charAt(0)}
                 </span>
                 <span className={styles.teamText}>
-                  <span className={styles.teamName}>{team.name}</span>
+                  <span className={`${styles.teamName} keep-case`}>{team.name}</span>
                   <span className={styles.chips}>
                     <Chip size="s">
                       {team.members} {team.members === 1 ? "member" : "members"}

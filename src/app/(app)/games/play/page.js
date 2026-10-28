@@ -5,7 +5,7 @@ import LoginGuard from "@/components/LoginGuard/LoginGuard";
 import { PLAYABLE_GAMES } from "@/lib/games/playable";
 import styles from "./play.module.css";
 
-export const metadata = { title: "Play" };
+export const metadata = { title: "play" };
 
 // The games that can be played inside the app. Play mode has its own dark
 // look, so it never feels like the tracking side.

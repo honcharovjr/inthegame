@@ -26,7 +26,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #35 | Project management documentation |
 | Oct 28 | #36 | Games tab split into Play and Track; Yahtzee playable on one device |
 | Oct 28 | #37 | Yahtzee modes: solo, one phone, invite placeholder; results not saved |
-| Oct 28 | (this branch) | Admin panel: overview, catalog management, players with blocking |
+| Oct 28 | #38 | Admin panel: overview, catalog management, players with blocking |
+| Oct 28 | (this branch) | All UI text in lowercase; player-typed text keeps its case |
 
 ## 3. Requirements status
 

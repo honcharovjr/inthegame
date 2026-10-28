@@ -22,7 +22,7 @@ export default function NicknameForm({ nickname, nameClass = "" }) {
   if (!editing) {
     return (
       <div className={styles.nameRow}>
-        <span className={`${styles.name} ${nameClass}`}>{nickname}</span>
+        <span className={`${styles.name} ${nameClass} keep-case`}>{nickname}</span>
         <IconButton
           icon={<PenIcon size={18} />}
           label="Change nickname"

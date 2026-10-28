@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { createGame } from "@/lib/games/actions";
 import { gameEmoji, lastEmoji } from "@/lib/games/emoji";
 import { GAME_TYPES } from "@/lib/games/types";
+import UserText from "@/components/UserText/UserText";
 import styles from "./AddGameForm.module.css";
 
 // The form for a custom game. It floats over the page, so opening it never
@@ -146,7 +147,7 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
 
       {duplicate && (
         <p role="status" className={`${styles.message} ${styles.warning}`}>
-          A game called {name.trim()} already exists.
+          A game called <UserText>{name.trim()}</UserText> already exists.
           {warned ? " Press Add game again to add yours anyway." : ""}
         </p>
       )}
