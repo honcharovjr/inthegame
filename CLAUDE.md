@@ -18,6 +18,8 @@ Read the relevant file before implementing a feature. If docs and code conflict,
 - `docs/user-stories.md`: user stories with acceptance criteria
 - `docs/data-model.md`: tables, relations, access rules
 - `docs/rating.md`: rating algorithm and test cases
+- `docs/achievements.md`, `docs/character.md`: achievements list, character parts and art pipeline
+- `docs/project/`: project management (charter, WBS, schedule, budget, risks, quality, changes, progress), mapped to the 20 elements of the university report. Update `progress.md` and the change log when scope, schedule or cost change
 
 Current scope: MVP, which is phases P1 and P2. Do not build features from later phases unless asked.
 
@@ -110,4 +112,4 @@ scripts/          helper scripts (Python or Node)
 
 - Styling approach (plain CSS, CSS modules or Tailwind)
 - TypeScript or JavaScript only (JavaScript is the current choice)
-- Exact list of achievements (to be written in docs/). The rating algorithm is drafted in docs/rating.md
+- The achievements list is in docs/achievements.md. The rating algorithm is drafted in docs/rating.md

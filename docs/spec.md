@@ -142,6 +142,8 @@ Not scheduled. These depend on open questions in section 9.
 | Pilot | 2 weeks | Test tournament held |
 | Final | 1 week | Final report, improvement backlog |
 
+Dates, the critical path and the actual progress are in [project/schedule.md](project/schedule.md) and [project/progress.md](project/progress.md).
+
 ## 6. Non-functional requirements
 
 | ID | Requirement |
@@ -162,7 +164,7 @@ Not scheduled. These depend on open questions in section 9.
 - Stack as in CLAUDE.md: Next.js, Supabase, Vercel, Recharts
 - Free-tier limits and prices have not been verified and must be checked on the service websites before relying on them
 - No legal entity is created during development
-- Budget and schedule are defined in the project plan, not in this document
+- Budget and schedule are defined in the project plan ([project/](project/README.md)), not in this document
 
 ## 8. Success criteria
 
@@ -194,6 +196,6 @@ Open questions:
 
 1. Rating parameters and how an overall leaderboard is defined (see docs/rating.md)
 2. Confirmation rules for the backlog: timeout for non-responding confirmers, dispute handling, how guests are covered
-3. Scope of character customization: what items exist and how many?
+3. Answered: scope of character customization is in [character.md](character.md) (5 races, hair, beards, eye colour, 10 free outfits, backgrounds; accessories need art)
 4. Is email verification required during the pilot?
 5. Data protection: are users in the EU, and is a privacy policy needed before public launch?
