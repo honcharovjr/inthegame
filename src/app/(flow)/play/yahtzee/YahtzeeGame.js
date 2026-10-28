@@ -27,12 +27,12 @@ import {
   totals,
 } from "@/lib/games/yahtzee/rules";
 import { playerColor } from "@/lib/sessions/colors";
-import { createGuest, saveSession } from "@/lib/sessions/actions";
+import { createGuest } from "@/lib/sessions/actions";
 import { placesFromScores } from "@/lib/sessions/places";
 import styles from "./yahtzee.module.css";
 
 // The game in progress lives in the browser, so a reload or a trip to
-// another tab never loses it. Cleared once the result is saved.
+// another tab never loses it. Cleared when the game ends.
 const STORAGE_KEY = "itg.yahtzee";
 
 const listeners = new Set();
@@ -72,18 +72,12 @@ function writeStored(value) {
 
 const LABELS = Object.fromEntries([...UPPER, ...LOWER].map((item) => [item.id, item.label]));
 
-// Yahtzee on one device: choose players, then pass the phone around. The
-// finished game is saved as a points session of the catalog game.
-export default function YahtzeeGame({
-  gameId,
-  profile,
-  initialGuests,
-  teams,
-  minPlayers,
-  maxPlayers,
-}) {
-  // setup | play | over
-  const [stage, setStage] = useState("setup");
+// Yahtzee in the app: solo, or with friends passing one phone. Playing with
+// friends on their own phones by invite is planned; its option is shown as
+// coming soon. Results are not saved to history or ratings yet.
+export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers }) {
+  // mode | setup | play | over
+  const [stage, setStage] = useState("mode");
   const raw = useSyncExternalStore(subscribe, readRaw, () => null);
   const stored = raw ? parseStored(raw, profile.id) : null;
 
@@ -106,15 +100,12 @@ export default function YahtzeeGame({
   const [moved, setMoved] = useState([]);
   const [flash, setFlash] = useState(false);
 
-  // Saving: idle | saving | saved | error
-  const [saveState, setSaveState] = useState("idle");
-  const [saveError, setSaveError] = useState(null);
-  const [, startSaving] = useTransition();
-
-  // Keep the game in the browser after every move.
+  // Keep the game in the browser after every move, and forget it once over.
   useEffect(() => {
-    if (stage === "setup" || !game) return;
-    writeStored({ profileId: profile.id, participants, teamId, game });
+    if (stage === "over") writeStored(null);
+    else if (stage === "play" && game) {
+      writeStored({ profileId: profile.id, participants, teamId, game });
+    }
   }, [stage, game, participants, teamId, profile.id]);
 
   const team = teams.find((item) => item.id === teamId) ?? null;
@@ -180,14 +171,12 @@ export default function YahtzeeGame({
     setSelected(null);
     setViewing(null);
     setHandoff(null);
-    setSaveError(null);
-    if (isOver(nextGame)) {
-      setStage("over");
-      save(players, nextGame, nextTeamId);
-    } else {
-      setSaveState("idle");
-      setStage("play");
-    }
+    setStage(isOver(nextGame) ? "over" : "play");
+  }
+
+  function startSolo() {
+    const solo = [{ ...me, color: playerColor(0) }];
+    begin(solo, newGame(["me"]), null);
   }
 
   function start() {
@@ -231,48 +220,20 @@ export default function YahtzeeGame({
     setViewing(null);
     if (isOver(next)) {
       setStage("over");
-      save(participants, next, teamId);
     } else if (participants.length > 1) {
       setHandoff({ who, category: selected, points });
     }
   }
 
-  // Saves a finished game as a points session. Runs once when the game ends,
-  // and again only if the player retries after an error.
-  function save(players, finished, finishedTeamId) {
-    setSaveState("saving");
-    setSaveError(null);
-    const scores = finalScores(finished);
-    startSaving(async () => {
-      const result = await saveSession({
-        gameId,
-        resultType: "points",
-        keys: players.map((item) => item.key),
-        scores: Object.fromEntries(
-          Object.entries(scores).map(([key, value]) => [key, String(value)]),
-        ),
-        teamId: finishedTeamId,
-      });
-      if (result.error) {
-        setSaveError(result.error);
-        setSaveState("error");
-        return;
-      }
-      writeStored(null);
-      setSaveState("saved");
-    });
-  }
-
-  if (stage === "setup") {
-    const enough = lineup.length >= minPlayers;
+  if (stage === "mode") {
     return (
       <main className={styles.page}>
         <div className={styles.column}>
           <TopBar backHref="/games/play" />
           <h1 className={styles.headline}>
-            Who&apos;s
+            How do
             <br />
-            playing?
+            you play?
           </h1>
 
           {stored && (
@@ -280,8 +241,10 @@ export default function YahtzeeGame({
               <div className={styles.resumeText}>
                 <strong>Game in progress</strong>
                 <span>
-                  {stored.participants.map((item) => item.name).join(", ")} · round{" "}
-                  {round(stored.game)} of {ROUNDS}
+                  {stored.participants.length === 1
+                    ? "Solo"
+                    : stored.participants.map((item) => item.name).join(", ")}{" "}
+                  · round {round(stored.game)} of {ROUNDS}
                 </span>
               </div>
               <div className={styles.resumeActions}>
@@ -294,6 +257,43 @@ export default function YahtzeeGame({
               </div>
             </section>
           )}
+
+          <div className={`${styles.modes} stagger`}>
+            <button type="button" className={`${styles.mode} ${styles.modeSolo}`} onClick={startSolo}>
+              <Die face={1} size={44} className={styles.modeDie} />
+              <span className={styles.modeTitle}>Solo</span>
+              <span className={styles.modeText}>Just you and the dice. Chase your best score.</span>
+            </button>
+
+            <p className={styles.modeLabel}>With friends</p>
+            <button type="button" className={`${styles.mode} ${styles.modePhone}`} onClick={() => setStage("setup")}>
+              <span className={styles.modeTitle}>On this phone</span>
+              <span className={styles.modeText}>Pass the phone around. Up to {maxPlayers} players.</span>
+            </button>
+            <div className={`${styles.mode} ${styles.modeSoon}`} aria-disabled="true">
+              <span className={styles.soonBadge}>Coming soon</span>
+              <span className={styles.modeTitle}>Invite friends</span>
+              <span className={styles.modeText}>
+                Send an invite. Friends get a notification and join from their own phones.
+              </span>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (stage === "setup") {
+    const enough = lineup.length >= 2;
+    return (
+      <main className={styles.page}>
+        <div className={styles.column}>
+          <TopBar onBack={() => setStage("mode")} />
+          <h1 className={styles.headline}>
+            Who&apos;s
+            <br />
+            playing?
+          </h1>
 
           <div className={styles.lineup} aria-label="Players in order">
             {lineup.map((item, index) => (
@@ -381,7 +381,7 @@ export default function YahtzeeGame({
           <button type="button" className={`${styles.primary} ${styles.big}`} disabled={!enough} onClick={start}>
             {enough
               ? `Start with ${lineup.length} players`
-              : `Add at least ${minPlayers - lineup.length} more player`}
+              : "Add at least 1 more player"}
           </button>
           <p className={styles.note}>Up to {maxPlayers} players. The order above is the turn order.</p>
         </div>
@@ -395,7 +395,9 @@ export default function YahtzeeGame({
     const ranked = [...participants].sort((a, b) => places[a.key] - places[b.key]);
     const winners = ranked.filter((item) => places[item.key] === 1);
     const headline =
-      winners.length > 1
+      participants.length === 1
+        ? `You scored ${scores.me}!`
+        : winners.length > 1
         ? "A tie at the top!"
         : `${winners[0].key === "me" ? "You win" : `${winners[0].name} wins`}!`;
 
@@ -416,7 +418,7 @@ export default function YahtzeeGame({
               const first = places[item.key] === 1;
               return (
                 <li key={item.key} className={`${styles.resultRow} ${first ? styles.resultWin : ""}`}>
-                  <span className={styles.place}>{places[item.key]}</span>
+                  {participants.length > 1 && <span className={styles.place}>{places[item.key]}</span>}
                   <Avatar name={item.name} size={44} color={item.color} registered={item.registered} character={item.character} />
                   <span className={styles.resultText}>
                     <span className={styles.resultName}>{item.key === "me" ? "You" : item.name}</span>
@@ -432,31 +434,16 @@ export default function YahtzeeGame({
             })}
           </ol>
 
-          <p className={styles.saveStatus} role="status" aria-live="polite">
-            {saveState === "saving" && (
-              <>
-                <span className={styles.spinner} aria-hidden="true" /> Saving to your history
-              </>
-            )}
-            {saveState === "saved" && "Saved to your history. Ratings and achievements are updated."}
-            {saveState === "error" && saveError}
-          </p>
-          {saveState === "error" && (
-            <button type="button" className={`${styles.primary} ${styles.big}`} onClick={() => save(participants, game, teamId)}>
-              Try saving again
-            </button>
-          )}
+          <p className={styles.note}>In-app games are not saved to your history yet.</p>
 
-          {saveState === "saved" && (
-            <div className={styles.endActions}>
-              <button type="button" className={`${styles.primary} ${styles.big}`} onClick={rematch}>
-                Play again
-              </button>
-              <Link href="/games/play" className={`${styles.ghost} ${styles.big}`}>
-                Done
-              </Link>
-            </div>
-          )}
+          <div className={styles.endActions}>
+            <button type="button" className={`${styles.primary} ${styles.big}`} onClick={rematch}>
+              Play again
+            </button>
+            <Link href="/games/play" className={`${styles.ghost} ${styles.big}`}>
+              Done
+            </Link>
+          </div>
         </div>
       </main>
     );
@@ -650,12 +637,20 @@ export default function YahtzeeGame({
   );
 }
 
-function TopBar({ backHref, children }) {
+// Give backHref for a link or onBack for a button.
+function TopBar({ backHref, onBack, children }) {
+  const icon = <ArrowLeftIcon size={20} />;
   return (
     <div className={styles.top}>
-      <Link href={backHref} className={styles.back} aria-label="Back" data-tip="Back" data-tip-pos="below">
-        <ArrowLeftIcon size={20} />
-      </Link>
+      {onBack ? (
+        <button type="button" className={styles.back} onClick={onBack} aria-label="Back" data-tip="Back" data-tip-pos="below">
+          {icon}
+        </button>
+      ) : (
+        <Link href={backHref} className={styles.back} aria-label="Back" data-tip="Back" data-tip-pos="below">
+          {icon}
+        </Link>
+      )}
       <span className={styles.title}>Yahtzee</span>
       {children ?? <span />}
     </div>

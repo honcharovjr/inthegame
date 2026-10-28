@@ -136,7 +136,9 @@ Games played inside the app. Stage 1 of the staged plan in section 9: no network
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
 | FR-43 | The Games tab opens on a choice: Play (games inside the app) or Track (the catalog and logging). Play has its own look | Should | P4 |
-| FR-44 | Yahtzee on one device for 2 to 6 players: dice with holds and three rolls, full score sheet with the upper bonus, Yahtzee bonus and joker rule. A game in progress survives a reload. The finished game is saved as a points session of the catalog game, so rating, stats and achievements update | Should | P4 |
+| FR-44 | Yahtzee in the app, solo or with friends on one device (2 to 6 players): dice with holds and three rolls, full score sheet with the upper bonus, Yahtzee bonus and joker rule. A game in progress survives a reload. Results are not saved to history or ratings yet | Should | P4 |
+| FR-45 | Play with friends by invite: a friend gets a notification, joins and plays from their own phone. Shown as "Coming soon" in the game | Could | Backlog |
+| FR-46 | Save in-app game results to history, ratings and achievements | Could | Backlog |
 
 ## 5. Phases
 

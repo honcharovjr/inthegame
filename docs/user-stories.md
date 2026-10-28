@@ -169,8 +169,12 @@ As a player, I want the Games tab to ask whether I play or track, so that playin
 Acceptance: two choices on the first screen; Track opens the catalog; Play opens a list of games that can be played in the app.
 
 **US-K2** (FR-44, P4, Should)
-As a player, I want to play Yahtzee on one phone with friends, so that we need no dice or paper and the result is saved by itself.
-Acceptance: choose 2 to 6 players (you, teammates, guests); roll up to three times and hold dice; the sheet shows the points every open box would give; standard bonuses and joker rule; the phone is passed with a clear "whose turn" screen; a reload keeps the game; the finished game appears in history with points, and ratings update.
+As a player, I want to play Yahtzee in the app alone or with friends on one phone, so that we need no dice or paper.
+Acceptance: choose Solo or With friends; with friends, choose On this phone (2 to 6 players: you, teammates, guests) or Invite friends (shown as coming soon); roll up to three times and hold dice; the sheet shows the points every open box would give; standard bonuses and joker rule; the phone is passed with a clear "whose turn" screen; a reload keeps the game; results are shown but not saved.
+
+**US-K3** (FR-45, Backlog, Could)
+As a player, I want to invite a friend to my game, so that we can play from our own phones.
+Acceptance: the friend gets a notification, joins the game and takes turns from their phone.
 
 ## Epic I: Platform and pilot
 
