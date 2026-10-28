@@ -44,8 +44,8 @@ export default function GamesWelcome() {
           <span className={styles.badge}>New</span>
           <span className={styles.choiceTitle}>Play</span>
           <span className={styles.choiceText}>
-            Play right here. Pass the phone around, the app keeps the score and
-            saves the result to everyone&apos;s history.
+            Play right here, solo or with friends on one phone. The app rolls
+            the dice and keeps the score.
           </span>
           <span className={styles.go}>Pick a game</span>
         </Link>

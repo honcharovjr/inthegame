@@ -31,10 +31,8 @@ export default function PlayPicker() {
               <span className={styles.name}>{game.name}</span>
               <span className={styles.blurb}>{game.blurb}</span>
               <span className={styles.meta}>
-                <span className={styles.pill}>
-                  {game.minPlayers} to {game.maxPlayers} players
-                </span>
-                <span className={styles.pill}>One phone</span>
+                <span className={styles.pill}>Solo</span>
+                <span className={styles.pill}>With friends, up to {game.maxPlayers}</span>
               </span>
               <span className={styles.cta}>Play</span>
             </Link>

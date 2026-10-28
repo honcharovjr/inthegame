@@ -17,19 +17,13 @@ export default function YahtzeePage() {
   );
 }
 
-// Loads the players to choose from and the catalog game the result is saved
-// to, in parallel, so the game itself never waits for the network.
+// Loads the players to choose from in parallel, so the game itself never
+// waits for the network.
 async function YahtzeeData() {
   const { profile } = await getProfile();
   const supabase = await createClient();
 
-  const [gameResult, guestsResult, teamsResult] = await Promise.all([
-    supabase
-      .from("games")
-      .select("id")
-      .eq("name", GAME.catalogName)
-      .is("created_by", null)
-      .limit(1),
+  const [guestsResult, teamsResult] = await Promise.all([
     supabase
       .from("guests")
       .select("id, name")
@@ -41,8 +35,7 @@ async function YahtzeeData() {
       .eq("profile_id", profile?.id),
   ]);
 
-  const gameId = gameResult.data?.[0]?.id;
-  if (!profile || !gameId) {
+  if (!profile) {
     return (
       <main className={styles.page}>
         <p role="alert" className={styles.problem}>
@@ -68,11 +61,9 @@ async function YahtzeeData() {
 
   return (
     <YahtzeeGame
-      gameId={gameId}
       profile={{ id: profile.id, nickname: profile.nickname, character: profile.character ?? null }}
       initialGuests={guestsResult.data ?? []}
       teams={teams}
-      minPlayers={GAME.minPlayers}
       maxPlayers={GAME.maxPlayers}
     />
   );
