@@ -1,190 +1,69 @@
-import BackButton from "@/components/BackButton/BackButton";
-import { Suspense } from "react";
-import Chip from "@/components/Chip/Chip";
-import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
-import GameRow from "@/components/GameRow/GameRow";
-import Skeleton from "@/components/Skeleton/Skeleton";
-import { requireUser } from "@/lib/auth/session";
-import { GAME_TYPES } from "@/lib/games/types";
-import { createClient } from "@/lib/supabase/server";
-import AddGameButton from "./AddGameButton";
-import GamesToolbar from "./GamesToolbar";
-import styles from "./games.module.css";
+import Link from "next/link";
+import Die from "@/components/Die/Die";
+import LoginGuard from "@/components/LoginGuard/LoginGuard";
+import styles from "./welcome.module.css";
 
 export const metadata = { title: "Games" };
 
-const PAGE_SIZE = 20;
-const PLAYER_COUNTS = [1, 2, 3, 4, 5, 6];
+const HEADLINE = "Play or track?";
 
-export default function GamesPage({ searchParams }) {
+// The Games tab starts here: play a game inside the app, or track one played
+// at the table.
+export default function GamesWelcome() {
+  const words = HEADLINE.split(" ");
+
   return (
     <main className={styles.page}>
-      <BackButton fallback="/" />
-      <h1 className={styles.title}>Games</h1>
-      <Suspense fallback={<CatalogSkeleton />}>
-        <Catalog searchParams={searchParams} />
-      </Suspense>
-    </main>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className={styles.skeletonList}>
-      <Skeleton height={64} radius={22} />
-      <Skeleton height={64} radius={22} delay={80} />
-      <Skeleton height={64} radius={22} delay={160} />
-      <Skeleton height={64} radius={22} delay={240} />
-      <Skeleton height={64} radius={22} delay={320} />
-    </div>
-  );
-}
-
-function CatalogSkeleton() {
-  return (
-    <>
-      <Skeleton height={150} radius={22} />
-      <div className={styles.skeletonList}>
-        <Skeleton height={64} radius={22} delay={240} />
-        <Skeleton height={64} radius={22} delay={320} />
-        <Skeleton height={64} radius={22} delay={400} />
-        <Skeleton height={64} radius={22} delay={480} />
-        <Skeleton height={64} radius={22} delay={560} />
-      </div>
-    </>
-  );
-}
-
-function readFilters(params) {
-  const q = String(params.q ?? "").trim().slice(0, 60);
-  const type = GAME_TYPES.some((t) => t.value === params.type)
-    ? params.type
-    : null;
-  const players = Number.parseInt(params.players, 10);
-  const page = Number.parseInt(params.page, 10);
-  return {
-    q,
-    type,
-    players: players >= 1 && players <= 12 ? players : null,
-    page: page >= 1 ? page : 1,
-  };
-}
-
-function buildHref(filters, changes) {
-  const next = { ...filters, ...changes };
-  const query = new URLSearchParams();
-  if (next.q) query.set("q", next.q);
-  if (next.type) query.set("type", next.type);
-  if (next.players) query.set("players", String(next.players));
-  if (next.page > 1) query.set("page", String(next.page));
-  const text = query.toString();
-  return text ? `/games?${text}` : "/games";
-}
-
-// Reads the URL query and the database, so it streams in behind Suspense.
-async function Catalog({ searchParams }) {
-  await requireUser();
-  const filters = readFilters(await searchParams);
-  const from = (filters.page - 1) * PAGE_SIZE;
-
-  const supabase = await createClient();
-  let query = supabase
-    .from("games")
-    .select(
-      "id, name, type, emoji, is_classic, min_players, max_players, typical_duration_min, created_by",
-      { count: "exact" },
-    )
-    .order("name")
-    .range(from, from + PAGE_SIZE - 1);
-
-  if (filters.q) {
-    // Escape the characters that act as wildcards in a LIKE pattern.
-    query = query.ilike("name", `%${filters.q.replace(/[\\%_]/g, "\\$&")}%`);
-  }
-  if (filters.type) {
-    query = query.eq("type", filters.type);
-  }
-  if (filters.players) {
-    query = query
-      .lte("min_players", filters.players)
-      .gte("max_players", filters.players);
-  }
-
-  const [{ data: games, count, error }, namesResult] = await Promise.all([
-    query,
-    supabase.from("games").select("name"),
-  ]);
-  const existingNames = (namesResult.data ?? []).map((row) =>
-    row.name.toLowerCase(),
-  );
-  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
-
-  return (
-    <FilterLoading>
-    <div className={`${styles.body} stagger`}>
-      <GamesToolbar
-        filters={filters}
-        playerHrefs={[0, ...PLAYER_COUNTS].map((count) =>
-          buildHref(filters, { players: count || null, page: 1 }),
-        )}
-      >
-        <div className={styles.types} aria-label="Type">
-          <FilterChip
-            href={buildHref(filters, { type: null, page: 1 })}
-            tone={filters.type ? "default" : "active"}
-          >
-            All
-          </FilterChip>
-          {GAME_TYPES.map((type) => (
-            <FilterChip
-              key={type.value}
-              href={buildHref(filters, { type: type.value, page: 1 })}
-              tone={filters.type === type.value ? "active" : "default"}
-            >
-              {type.label}
-            </FilterChip>
-          ))}
+      <LoginGuard />
+      <section className={styles.poster}>
+        <div className={styles.shapes} aria-hidden="true">
+          <span className={styles.circle} />
+          <span className={styles.square} />
+          <Die face={5} size={78} className={styles.floatDie} />
         </div>
-      </GamesToolbar>
+        <p className={styles.kicker}>Games</p>
+        <h1 className={styles.headline} aria-label={HEADLINE}>
+          {words.map((word, index) => (
+            <span key={index}>
+              <span className={styles.word} style={{ "--w": index }} aria-hidden="true">
+                {word}
+              </span>
+              {index < words.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </h1>
+      </section>
 
-      <AddGameButton existingNames={existingNames} />
+      <div className={`${styles.choices} stagger`}>
+        <Link href="/games/play" className={`${styles.choice} ${styles.play}`}>
+          <span className={styles.art} aria-hidden="true">
+            <Die face={6} size={54} className={styles.artDieA} />
+            <Die face={3} size={46} className={styles.artDieB} />
+            <Die face={1} size={38} className={styles.artDieC} />
+          </span>
+          <span className={styles.badge}>New</span>
+          <span className={styles.choiceTitle}>Play</span>
+          <span className={styles.choiceText}>
+            Play right here. Pass the phone around, the app keeps the score and
+            saves the result to everyone&apos;s history.
+          </span>
+          <span className={styles.go}>Pick a game</span>
+        </Link>
 
-      <FilterBody skeleton={<ListSkeleton />}>
-      {error && (
-        <p role="alert" className={styles.problem}>
-          Could not load games: {error.message}
-        </p>
-      )}
-
-      {games && games.length === 0 && (
-        <p className={styles.empty}>No games match these filters.</p>
-      )}
-
-      <ul className={`${styles.list} stagger`}>
-        {games?.map((game) => (
-          <GameRow key={game.id} game={game} />
-        ))}
-      </ul>
-
-      {totalPages > 1 && (
-        <nav className={styles.pager} aria-label="Pages">
-          {filters.page > 1 && (
-            <FilterChip href={buildHref(filters, { page: filters.page - 1 })}>
-              Previous
-            </FilterChip>
-          )}
-          <Chip tone="pink">
-            Page {filters.page} of {totalPages}
-          </Chip>
-          {filters.page < totalPages && (
-            <FilterChip href={buildHref(filters, { page: filters.page + 1 })}>
-              Next
-            </FilterChip>
-          )}
-        </nav>
-      )}
-      </FilterBody>
-    </div>
-    </FilterLoading>
+        <Link href="/games/track" className={`${styles.choice} ${styles.track}`}>
+          <span className={styles.art} aria-hidden="true">
+            <span className={styles.sheetLine} style={{ "--l": 0 }} />
+            <span className={styles.sheetLine} style={{ "--l": 1 }} />
+            <span className={styles.sheetLine} style={{ "--l": 2 }} />
+          </span>
+          <span className={styles.choiceTitle}>Track</span>
+          <span className={styles.choiceText}>
+            Played at the table? Find the game in the catalog and log the result
+            in under a minute.
+          </span>
+          <span className={styles.go}>Open the catalog</span>
+        </Link>
+      </div>
+    </main>
   );
 }

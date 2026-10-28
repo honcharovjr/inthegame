@@ -162,6 +162,16 @@ Acceptance: standard d6 and custom dice; several dice at once.
 As a player, I want a random team generator, so that splitting players is fast and fair.
 Acceptance: select players and number of teams; reshuffle option.
 
+## Epic K: Own games
+
+**US-K1** (FR-43, P4, Should)
+As a player, I want the Games tab to ask whether I play or track, so that playing in the app feels separate from logging.
+Acceptance: two choices on the first screen; Track opens the catalog; Play opens a list of games that can be played in the app.
+
+**US-K2** (FR-44, P4, Should)
+As a player, I want to play Yahtzee on one phone with friends, so that we need no dice or paper and the result is saved by itself.
+Acceptance: choose 2 to 6 players (you, teammates, guests); roll up to three times and hold dice; the sheet shows the points every open box would give; standard bonuses and joker rule; the phone is passed with a clear "whose turn" screen; a reload keeps the game; the finished game appears in history with points, and ratings update.
+
 ## Epic I: Platform and pilot
 
 **US-I1** (FR-34, P1, Must)

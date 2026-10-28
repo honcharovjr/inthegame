@@ -55,7 +55,7 @@ Profile, guest profile, game (catalog), session (a played match), session partic
 - Logging a session takes under 1 minute. This is the core UX target
 - Catalog of at least 30 games, including classic games that need no box
 - At least 30 achievements
-- Own online games are phased: no multiplayer first, then simple multiplayer, then ranked. Not in MVP scope
+- Own games are phased: no multiplayer first, then simple multiplayer, then ranked. Stage 1 (one device) is in scope since change C13, starting with Yahtzee in `src/lib/games/yahtzee/`. Network multiplayer is not
 
 ## Planned phases
 

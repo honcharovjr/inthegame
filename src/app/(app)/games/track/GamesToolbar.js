@@ -42,7 +42,7 @@ export default function GamesToolbar({ filters, playerHrefs, children }) {
             if (String(text).trim()) query.set(key, String(text).trim());
           }
           const text = query.toString();
-          go(text ? `/games?${text}` : "/games");
+          go(text ? `/games/track?${text}` : "/games/track");
         }}
       >
         <SearchIcon size={20} />
@@ -102,7 +102,7 @@ export default function GamesToolbar({ filters, playerHrefs, children }) {
         label="Reset filters"
         icon={<ResetIcon size={20} />}
         disabled={!active}
-        onClick={() => go("/games")}
+        onClick={() => go("/games/track")}
       />
 
       {children}

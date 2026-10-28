@@ -61,6 +61,6 @@ export async function createGame(input) {
     return { error: "Could not add the game. Try again." };
   }
 
-  revalidatePath("/games");
+  revalidatePath("/games/track");
   return { game: data };
 }
