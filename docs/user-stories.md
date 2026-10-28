@@ -176,6 +176,20 @@ Acceptance: choose Solo or With friends; with friends, choose On this phone (2 t
 As a player, I want to invite a friend to my game, so that we can play from our own phones.
 Acceptance: the friend gets a notification, joins the game and takes turns from their phone.
 
+## Epic L: Administration
+
+**US-L1** (FR-47, P4, Should)
+As a super admin, I want an overview of the app, so that I can follow the pilot without opening the database.
+Acceptance: totals of players, sessions, catalog games and teams; active players in 7 and 30 days; returning players over 8 weeks; sessions and sign-ups per week; top games; recent admin actions. Other users get a "not found" page.
+
+**US-L2** (FR-47, P4, Should)
+As a super admin, I want to manage the catalog, so that the game list grows without migrations.
+Acceptance: add and edit catalog games; delete a game only when no session uses it; move a player's custom game into the catalog; every change is logged.
+
+**US-L3** (FR-47, P4, Should)
+As a super admin, I want to see players and block abusive ones, so that the pilot stays safe.
+Acceptance: search by nickname or email; a player page with sessions, teams, ratings and achievements; block and unblock with confirmation; admins and yourself cannot be blocked; every block is logged.
+
 ## Epic I: Platform and pilot
 
 **US-I1** (FR-34, P1, Must)

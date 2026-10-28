@@ -105,6 +105,16 @@
     background: rgba(18, 10, 26, 0.06);
   }
 
+  /* The admin panel sits right above "Log a session" at the bottom */
+  .admin {
+    order: 98;
+    margin-top: auto;
+  }
+
+  .bar:has(.admin) .log {
+    margin-top: 6px;
+  }
+
   /* Pinned to the bottom of the menu and set apart from the places above it */
   .log {
     order: 99;

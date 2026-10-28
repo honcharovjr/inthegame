@@ -40,6 +40,7 @@ One row per registered user. Created by a trigger on sign-up (Assumption: trigge
 | nickname | text, not null | 2 to 30 characters |
 | avatar_url | text | Optional, points to Storage |
 | character | jsonb | Optional. The chosen item codes of the character, see docs/character.md. Null means no character yet. Must be a JSON object |
+| is_super_admin | boolean, not null | Default false. Opens the admin panel (FR-47). Set by the maintainer in the database, never by the player: players may update only `nickname`, `avatar_url` and `character` (column grants) |
 | created_at | timestamptz, not null | Default `now()` |
 
 Account deletion (FR-05, Pilot): the auth user is deleted, `user_id` becomes null, and the row is anonymized (placeholder nickname, no avatar) instead of removed, so sessions of other players stay consistent.
@@ -75,7 +76,7 @@ The catalog (FR-06) and custom games (FR-09).
 | created_by | uuid | Null for catalog games, otherwise the author. References `profiles(id)` |
 | created_at | timestamptz, not null | Default `now()` |
 
-Catalog games are managed by the maintainer directly in the database. Duplicate names are warned about in the UI (US-B3), so there is no unique constraint on name.
+Catalog games are managed by super admins in the admin panel (FR-47). Duplicate names are warned about in the UI (US-B3), so there is no unique constraint on name.
 
 ### 3.4 teams
 
@@ -197,13 +198,31 @@ Who earned what. Written server-side only. Never deleted when a session is delet
 
 Primary key (`profile_id`, `achievement_id`).
 
+### 3.12 admin_audit
+
+One row per admin action (FR-47). Written server-side only.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid, PK | |
+| admin_id | uuid, not null | References `profiles(id)` |
+| action | text, not null | For example `game.add`, `game.edit`, `game.delete`, `game.promote`, `player.block`, `player.unblock` |
+| target_type | text, not null | `game` or `profile` |
+| target_id | uuid | The game or profile acted on |
+| details | jsonb | For example the name at the time of the action |
+| created_at | timestamptz, not null | Default `now()`. Indexed descending |
+
+Blocking a player uses the login ban of Supabase Auth, so no column stores it.
+
 ## 4. Statistics
 
 No stored statistics tables in the MVP. Games played, wins and win rate (docs/rating.md section 6) are computed by queries or SQL views over `session_participants`. The overall team leaderboard is ranked by wins and games played (docs/rating.md section 9, proposal). Revisit if queries become slow.
 
 ## 5. Access rules (Row Level Security)
 
-Helper functions are `security definer` with a fixed `search_path`, so policies do not recurse: `is_team_member(team_id)` and `can_see_session(session_id)`.
+Helper functions are `security definer` with a fixed `search_path`, so policies do not recurse: `is_team_member(team_id)`, `can_see_session(session_id)` and `is_super_admin()`.
+
+Admin pages check `is_super_admin()` on the server and then read and write with the service role, so no table gets extra client policies for admins.
 
 | Table | Read | Insert | Update | Delete |
 |---|---|---|---|---|
@@ -218,6 +237,7 @@ Helper functions are `security definer` with a fixed `search_path`, so policies 
 | rating_history | Same as `ratings` | Server-side only | Server-side only | Server-side only |
 | achievements | Any logged-in user | Migration only | Migration only | Migration only |
 | user_achievements | Same visibility as the player's profile | Server-side only | Server-side only | Server-side only |
+| admin_audit | Super admins (`is_super_admin()`) | Server-side only | None | None |
 
 Notes:
 

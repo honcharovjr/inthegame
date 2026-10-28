@@ -140,6 +140,14 @@ Games played inside the app. Stage 1 of the staged plan in section 9: no network
 | FR-45 | Play with friends by invite: a friend gets a notification, joins and plays from their own phone. Shown as "Coming soon" in the game | Could | Backlog |
 | FR-46 | Save in-app game results to history, ratings and achievements | Could | Backlog |
 
+### 4.11 Administration
+
+Added by change C15 in [project/changes.md](project/changes.md).
+
+| ID | Requirement | Priority | Phase |
+|---|---|---|---|
+| FR-47 | Admin panel for super admins, shown as a menu tab above "Log a session": overview dashboard (totals, active and returning players, sessions and sign-ups per week, top games, admin activity), catalog management (add, edit, delete unused games, move a custom game into the catalog), and players (search, details, block and unblock). Every action is logged | Should | P4 |
+
 ## 5. Phases
 
 | Phase | Duration | Result |
@@ -199,7 +207,7 @@ Decisions made:
 
 - MVP is P1 and P2: accounts, catalog, sessions, history, statistics, rating, minimal teams
 - In the MVP the session creator records the result alone. Confirmation by squad leaders is in the backlog (section 4.9). The session `status` field is kept in the data model for it
-- The catalog is managed by the maintainer directly in the database. Custom games are visible to their author and the author's teams
+- The catalog is managed by super admins in the admin panel (FR-47). Custom games are visible to their author and the author's teams
 - Profiles are visible to team members only
 - Rating is Elo-style, details in docs/rating.md
 
