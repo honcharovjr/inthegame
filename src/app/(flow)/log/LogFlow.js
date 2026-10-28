@@ -13,7 +13,7 @@ import { PlusIcon } from "@/components/icons";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { playerColor } from "@/lib/sessions/colors";
-import { createGuest, saveSession } from "@/lib/sessions/actions";
+import { createGuest, saveSession, updateSession } from "@/lib/sessions/actions";
 import { placesFromOrder } from "@/lib/sessions/places";
 import RankingList from "./RankingList";
 import styles from "./flow.module.css";
@@ -38,15 +38,19 @@ function Trophy() {
 
 const TONES = { 1: "turquoise", 2: "yellow", 3: "pink" };
 const HEADLINES = { 1: "Which\ngame?", 2: "Who\nplayed?", 3: "Who\nwon?" };
+const EDIT_HEADLINES = { 1: "Which\ngame?", 2: "Who\nplayed?", 3: "Fix the\nresult" };
 
 // The whole log flow on one page: game, players, result. Moving between the
 // steps never reloads the page. Everything it needs is passed in once.
+// editing: a saved session turned into flow inputs (prefillFromSession). The
+// flow then opens on the result and saves changes to that session.
 export default function LogFlow({
   profile,
   games: initialGames,
   initialGuests,
   teams = [],
   lastSession,
+  editing = null,
 }) {
   const router = useRouter();
   const [, startSaving] = useTransition();
@@ -59,48 +63,52 @@ export default function LogFlow({
 
   const [games, setGames] = useState(initialGames);
   const [addingGame, setAddingGame] = useState(false);
-  const [step, setStep] = useState(1);
-  const [gameId, setGameId] = useState(null);
+  const [step, setStep] = useState(editing ? 3 : 1);
+  const [gameId, setGameId] = useState(editing?.gameId ?? null);
   const [query, setQuery] = useState("");
   const [guests, setGuests] = useState(initialGuests);
-  const [selected, setSelected] = useState([]);
-  const [teamId, setTeamId] = useState(null);
-  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [selected, setSelected] = useState(editing?.guestIds ?? []);
+  const [teamId, setTeamId] = useState(editing?.teamId ?? null);
+  const [selectedMembers, setSelectedMembers] = useState(editing?.memberIds ?? []);
   const [guestName, setGuestName] = useState("");
   const [guestError, setGuestError] = useState(null);
 
-  const [resultType, setResultType] = useState("ranking");
-  const [winner, setWinner] = useState("me");
-  const [order, setOrder] = useState([]);
-  const [tied, setTied] = useState({});
-  const [scores, setScores] = useState({});
-  const [tiebreak, setTiebreak] = useState(null);
+  const [resultType, setResultType] = useState(editing?.resultType ?? "ranking");
+  const [winner, setWinner] = useState(editing?.winner ?? "me");
+  const [order, setOrder] = useState(editing?.order ?? []);
+  const [tied, setTied] = useState(editing?.tied ?? {});
+  const [scores, setScores] = useState(editing?.scores ?? {});
+  const [tiebreak, setTiebreak] = useState(editing?.tiebreak ?? null);
   const [choosing, setChoosing] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
-  // Back to a clean first step. The guest list is kept, new guests stay.
+  // Back to the start: a clean first step, or the saved session when
+  // editing. The guest list is kept, new guests stay.
   function resetFlow() {
-    setStep(1);
-    setGameId(null);
+    setStep(editing ? 3 : 1);
+    setGameId(editing?.gameId ?? null);
     setQuery("");
-    setSelected([]);
-    setTeamId(null);
-    setSelectedMembers([]);
+    setSelected(editing?.guestIds ?? []);
+    setTeamId(editing?.teamId ?? null);
+    setSelectedMembers(editing?.memberIds ?? []);
     setGuestName("");
     setGuestError(null);
-    setResultType("ranking");
-    setWinner("me");
-    setOrder([]);
-    setTied({});
-    setScores({});
-    setTiebreak(null);
+    setResultType(editing?.resultType ?? "ranking");
+    setWinner(editing?.winner ?? "me");
+    setOrder(editing?.order ?? []);
+    setTied(editing?.tied ?? {});
+    setScores(editing?.scores ?? {});
+    setTiebreak(editing?.tiebreak ?? null);
     setChoosing(false);
     setSaveError(null);
     setPhase("idle");
   }
 
   // The app keeps pages it left alive in the background. When this page goes
-  // away, start over, so the next visit begins at the first step.
+  // away, start over, so the next visit begins at the first step. editing
+  // never changes for one instance (the page keys the flow by session), so
+  // the reset only needs to run on leaving.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => resetFlow(), []);
 
   const game = games.find((item) => item.id === gameId) ?? null;
@@ -225,14 +233,21 @@ export default function LogFlow({
     });
   }
 
-  // Fresh result inputs every time the players are confirmed.
+  // Moves on to the result. What was already entered for players who are
+  // still in stays, so going back to add someone does not wipe the result.
   function enterResult() {
-    setOrder(participants.map((p) => p.key));
-    setTied({});
-    setScores({});
-    setTiebreak(null);
+    const keys = participants.map((p) => p.key);
+    const keep = (object) =>
+      Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key)));
+    setOrder((current) => [
+      ...current.filter((key) => keys.includes(key)),
+      ...keys.filter((key) => !current.includes(key)),
+    ]);
+    setTied(keep);
+    setScores(keep);
+    setTiebreak((current) => (keys.includes(current) ? current : null));
     setChoosing(false);
-    setWinner("me");
+    setWinner((current) => (keys.includes(current) ? current : "me"));
     setSaveError(null);
     setStep(3);
   }
@@ -257,7 +272,7 @@ export default function LogFlow({
     setSaveError(null);
     setPhase("saving");
     startSaving(async () => {
-      const result = await saveSession({
+      const payload = {
         gameId,
         resultType,
         keys: participants.map((p) => p.key),
@@ -268,7 +283,10 @@ export default function LogFlow({
         ),
         tiebreak: activeTiebreak,
         teamId,
-      });
+      };
+      const result = editing
+        ? await updateSession(editing.sessionId, payload)
+        : await saveSession(payload);
       if (result.error) {
         setSaveError(result.error);
         setPhase("idle");
@@ -281,7 +299,7 @@ export default function LogFlow({
         guestIds: chosenGuests.map((g) => g.id),
       });
       setPhase("done");
-      router.push("/?saved=1");
+      router.push(editing ? "/history" : "/?saved=1");
       // Fallback if the page stays alive: start over once Home has opened.
       setTimeout(resetFlow, 1500);
     });
@@ -317,7 +335,7 @@ export default function LogFlow({
 
   function goBack() {
     if (step === 1) {
-      router.push("/");
+      router.push(editing ? "/history" : "/");
     } else {
       setStep(step - 1);
     }
@@ -328,7 +346,7 @@ export default function LogFlow({
       step={step}
       tone={TONES[step]}
       onBack={goBack}
-      headline={HEADLINES[step]}
+      headline={(editing ? EDIT_HEADLINES : HEADLINES)[step]}
     >
       {step === 1 && (
         <>
@@ -343,7 +361,7 @@ export default function LogFlow({
             />
           </div>
 
-          {!query && previousGame && (
+          {!query && !editing && previousGame && (
             <button
               type="button"
               className={`${styles.again} btn-primary`}
@@ -590,6 +608,13 @@ export default function LogFlow({
 
       {step === 3 && game && (
         <>
+          {editing?.droppedCount > 0 && (
+            <p className={styles.message}>
+              {editing.droppedCount === 1
+                ? "1 player is no longer in your team and was taken out of this session."
+                : `${editing.droppedCount} players are no longer in your team and were taken out of this session.`}
+            </p>
+          )}
           <div className={styles.chips}>
             <Chip tone="white">
               <GameName game={game} />
@@ -784,11 +809,11 @@ export default function LogFlow({
             onClick={save}
           >
             {phase === "idle" ? (
-              "Save session"
+              editing ? "Save changes" : "Save session"
             ) : (
               <>
                 <span className={styles.spinner} aria-hidden="true" />
-                {phase === "saving" ? "Saving your session" : "Saved"}
+                {phase === "saving" ? (editing ? "Saving your changes" : "Saving your session") : "Saved"}
               </>
             )}
           </button>
@@ -798,7 +823,13 @@ export default function LogFlow({
         <div className={styles.overlay} role="status" aria-live="polite">
           <div className={styles.overlayCard}>
             <span className={styles.spinner} aria-hidden="true" />
-            {phase === "saving" ? "Saving your session" : "Saved. Opening Home"}
+            {phase === "saving"
+              ? editing
+                ? "Saving your changes"
+                : "Saving your session"
+              : editing
+                ? "Saved. Opening history"
+                : "Saved. Opening Home"}
           </div>
         </div>
       )}

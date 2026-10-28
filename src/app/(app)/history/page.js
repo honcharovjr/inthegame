@@ -1,9 +1,11 @@
+import Link from "next/link";
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
+import { PenIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -166,6 +168,17 @@ async function HistoryList({ searchParams }) {
             </span>
             <span className={styles.side}>
               <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
+              {session.mine && (
+                <Link
+                  href={`/log?edit=${session.id}`}
+                  className={styles.edit}
+                  aria-label={`Edit the ${session.gameText} session`}
+                  data-tip="Edit"
+                  data-tip-align="end"
+                >
+                  <PenIcon size={17} />
+                </Link>
+              )}
               {session.mine && (
                 <ConfirmButton
                   title="Delete this session?"

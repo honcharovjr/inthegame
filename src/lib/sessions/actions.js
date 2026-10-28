@@ -43,16 +43,15 @@ export async function createGuest(name) {
   return { guest: data };
 }
 
-// Saves a session. Input from the log flow:
-//   { gameId, resultType, keys, winner, places, scores, tiebreak }
-// keys are "me" or guest ids. Turns the input into places, checks them, then
-// calls the create_session database function, which saves everything at once.
-export async function saveSession(input) {
+// Turns log flow input into the rows the database functions take. Input:
+//   { gameId, resultType, keys, winner, places, scores, tiebreak, teamId }
+// keys are "me", guest ids, or p: and a teammate's profile id.
+// Returns { error } or { gameId, resultType, teamId, participants }.
+async function buildSession(input) {
   const { gameId, resultType, winner, places: givenPlaces, scores: givenScores } =
     input ?? {};
   const keys = Array.isArray(input?.keys) ? input.keys.map(String) : [];
 
-  // A key is "me", a guest id, or p: and a teammate's profile id.
   const keysValid = keys.every(
     (key) => key === ME || UUID.test(key) || PROFILE_KEY.test(key),
   );
@@ -109,28 +108,21 @@ export async function saveSession(input) {
     score: resultType === "points" ? scores[key] : null,
   }));
 
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("create_session", {
-    p_game_id: gameId,
-    p_result_type: resultType,
-    p_participants: participants,
-    p_team_id: teamId,
-  });
-  if (error) {
-    console.error("saveSession failed", error);
-    return { error: "Could not save the session. Try again." };
-  }
+  return { gameId, resultType, teamId, participants };
+}
 
-  // The session is saved. A failed rating update must not undo it: ratings
-  // are derived data and can always be rebuilt from the sessions.
-  try {
-    await rebuildGameRatings(gameId);
-  } catch (ratingError) {
-    console.error("rebuildGameRatings failed", ratingError);
+// After a session is saved or edited. A failed rating update must not undo
+// it: ratings are derived data and can always be rebuilt from the sessions.
+// Achievements come after ratings, because some depend on them, under the
+// same rule.
+async function afterSave(gameIds, participants) {
+  for (const gameId of new Set(gameIds)) {
+    try {
+      await rebuildGameRatings(gameId);
+    } catch (ratingError) {
+      console.error("rebuildGameRatings failed", ratingError);
+    }
   }
-
-  // Achievements come after ratings, because some depend on them. The same
-  // rule applies: a failure here never undoes the saved session.
   try {
     await awardAchievements(
       participants.map((p) => p.profile_id).filter(Boolean),
@@ -138,7 +130,68 @@ export async function saveSession(input) {
   } catch (achievementError) {
     console.error("awardAchievements failed", achievementError);
   }
+}
 
+// Saves a session from the log flow. The create_session database function
+// saves everything at once.
+export async function saveSession(input) {
+  const built = await buildSession(input);
+  if (built.error) return { error: built.error };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("create_session", {
+    p_game_id: built.gameId,
+    p_result_type: built.resultType,
+    p_participants: built.participants,
+    p_team_id: built.teamId,
+  });
+  if (error) {
+    console.error("saveSession failed", error);
+    return { error: "Could not save the session. Try again." };
+  }
+
+  await afterSave([built.gameId], built.participants);
+  return { ok: true };
+}
+
+// Saves an edit of a session the player logged. Same input as saveSession.
+// The ratings of the old game are rebuilt too when the game changed.
+export async function updateSession(sessionId, input) {
+  if (!UUID.test(String(sessionId))) {
+    return { error: "Unknown session." };
+  }
+  const built = await buildSession(input);
+  if (built.error) return { error: built.error };
+
+  const supabase = await createClient();
+  const { data: before } = await supabase
+    .from("sessions")
+    .select("game_id")
+    .eq("id", sessionId)
+    .maybeSingle();
+  if (!before) {
+    return { error: "Unknown session." };
+  }
+
+  const { error } = await supabase.rpc("update_session", {
+    p_session_id: sessionId,
+    p_game_id: built.gameId,
+    p_result_type: built.resultType,
+    p_participants: built.participants,
+    p_team_id: built.teamId,
+  });
+  if (error) {
+    console.error("updateSession failed", error);
+    return {
+      error: error.message?.includes("Only the player")
+        ? "Only the player who logged a session can edit it."
+        : "Could not save your changes. Try again.",
+    };
+  }
+
+  await afterSave([before.game_id, built.gameId], built.participants);
+  revalidatePath("/history");
+  revalidatePath("/");
   return { ok: true };
 }
 

@@ -1,27 +1,33 @@
 import { Suspense } from "react";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
+import { prefillFromSession } from "@/lib/sessions/prefill";
 import { createClient } from "@/lib/supabase/server";
 import LogFlow from "./LogFlow";
 import styles from "./flow.module.css";
 
 export const metadata = { title: "log a session" };
 
-export default function LogPage() {
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// /log logs a new session; /log?edit=<id> edits one the player logged.
+export default function LogPage({ searchParams }) {
   return (
     <Suspense fallback={<LogSkeleton />}>
-      <LogData />
+      <LogData searchParams={searchParams} />
     </Suspense>
   );
 }
 
 // Loads everything the three steps need in one go, in parallel, so the steps
 // themselves never wait for the network.
-async function LogData() {
+async function LogData({ searchParams }) {
+  const { edit } = await searchParams;
+  const editId = UUID.test(String(edit ?? "")) ? edit : null;
   const { profile } = await getProfile();
   const supabase = await createClient();
 
-  const [gamesResult, guestsResult, recentResult, teamsResult] = await Promise.all([
+  const [gamesResult, guestsResult, recentResult, teamsResult, editResult] = await Promise.all([
     supabase
       .from("games")
       .select(
@@ -42,6 +48,15 @@ async function LogData() {
       .from("team_members")
       .select("teams(id, name, team_members(profile_id, profiles(nickname, character)))")
       .eq("profile_id", profile?.id),
+    editId
+      ? supabase
+          .from("sessions")
+          .select(
+            "id, game_id, team_id, result_type, created_by, updated_at, session_participants(profile_id, guest_id, place, score)",
+          )
+          .eq("id", editId)
+          .maybeSingle()
+      : { data: null },
   ]);
 
   // The teams of the player, each with its members.
@@ -67,6 +82,26 @@ async function LogData() {
     );
   }
 
+  // Only the player who logged a session can edit it.
+  const editSession =
+    editResult.data && editResult.data.created_by === profile.id ? editResult.data : null;
+  if (editId && !editSession) {
+    return (
+      <main className={styles.fallback}>
+        <p role="alert" className={styles.message}>
+          This session cannot be edited. Only the player who logged it can change it.
+        </p>
+      </main>
+    );
+  }
+  const editing = editSession
+    ? prefillFromSession(
+        editSession,
+        profile.id,
+        teams.find((team) => team.id === editSession.team_id) ?? null,
+      )
+    : null;
+
   // The latest session, so the flow can offer to play it again.
   const latest = recentResult.data?.[0];
   const lastSession = latest
@@ -84,11 +119,15 @@ async function LogData() {
 
   return (
     <LogFlow
+      // A new instance per edited session and per saved version, so a page
+      // the app kept alive never shows an old result.
+      key={editSession ? `${editSession.id}-${editSession.updated_at}` : "new"}
       profile={{ id: profile.id, nickname: profile.nickname, character: profile.character ?? null }}
       games={gamesResult.data}
       initialGuests={guestsResult.data ?? []}
       teams={teams}
       lastSession={lastSession}
+      editing={editing}
     />
   );
 }
