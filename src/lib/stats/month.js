@@ -13,6 +13,18 @@ export function monthStats(rows) {
   return { played, wins, winRate };
 }
 
+// The big line at the top of Home, from monthStats. Lowercase, as all UI text.
+export function monthHeadline({ played, wins, winRate }) {
+  if (played === 0) return "no games yet this month. deal the cards.";
+  if (wins === 0) {
+    return `${played} ${played === 1 ? "game" : "games"} this month. the first win is close.`;
+  }
+  if (winRate !== null && winRate >= 50 && played >= 3) {
+    return `${wins} wins this month. the table is yours.`;
+  }
+  return `${wins} ${wins === 1 ? "win" : "wins"} this month. keep it rolling.`;
+}
+
 export function ordinal(place) {
   const mod100 = place % 100;
   if (mod100 >= 11 && mod100 <= 13) return `${place}th`;

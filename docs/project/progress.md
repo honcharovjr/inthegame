@@ -29,7 +29,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #38 | Admin panel: overview, catalog management, players with blocking |
 | Oct 28 | #39 | All UI text in lowercase; player-typed text keeps its case |
 | Oct 28 | #40 | Edit a session (FR-14); team management modes designed (FR-48 to FR-50) |
-| Oct 28 | (this branch) | Team and personal panels with session history; read-only profile history |
+| Oct 28 | #41 | Team and personal panels with session history; read-only profile history |
+| Oct 28 | (this branch) | UI blocks, part 1: shared poster block, tilt buttons, Home hero with a monthly headline |
 
 ## 3. Requirements status
 

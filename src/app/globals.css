@@ -337,6 +337,14 @@ button {
   box-shadow: var(--shadow-card);
 }
 
+/* .btn-tilt: adds a playful turn on hover, like the dice on customize.
+   Use it on the big, fun actions of a screen, not on every button. */
+@media (hover: hover) {
+  .btn-tilt:hover:not(:disabled) {
+    transform: rotate(-4deg) translateY(-2px) scale(1.03);
+  }
+}
+
 .btn-text {
   cursor: pointer;
   transition: color 0.18s ease;
@@ -358,7 +366,8 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
   .btn-primary:hover:not(:disabled),
-  .btn-secondary:hover:not(:disabled) {
+  .btn-secondary:hover:not(:disabled),
+  .btn-tilt:hover:not(:disabled) {
     transform: none;
   }
 }

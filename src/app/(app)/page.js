@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
+import Poster from "@/components/Poster/Poster";
 import ResultBadge from "@/components/ResultBadge/ResultBadge";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Toast from "@/components/Toast/Toast";
@@ -11,7 +12,7 @@ import { getProfile } from "@/lib/auth/session";
 import { nameStyle } from "@/lib/character/items";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
-import { monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
+import { monthHeadline, monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./page.module.css";
 
@@ -38,20 +39,8 @@ const shortDate = new Intl.DateTimeFormat("en-GB", {
 function HomeSkeleton() {
   return (
     <>
-      <div className={styles.header}>
-        <Skeleton width={150} height={14} />
-        <Skeleton width={220} height={36} delay={80} style={{ marginTop: 8 }} />
-      </div>
-      <div className={styles.panel}>
-        <div className={styles.panelTop}>
-          <Skeleton width={64} height={64} radius={32} delay={160} />
-          <div className={styles.identity}>
-            <Skeleton width={140} height={26} delay={220} />
-            </div>
-          <Skeleton width={96} height={48} radius={24} delay={340} />
-        </div>
-        <Skeleton height={64} radius={16} delay={400} />
-      </div>
+      <Skeleton height={320} radius={36} />
+      <Skeleton height={180} radius={28} delay={120} />
     </>
   );
 }
@@ -127,20 +116,19 @@ async function HomeContent({ searchParams }) {
     <>
       {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
       <div className={`${styles.content} stagger`}>
-      <header className={styles.header}>
-        <div className={styles.date}>{dateFormat.format(new Date())}</div>
-        <h1 className={styles.title}>
-          Hey, {profile?.nickname ? <UserText>{profile.nickname}</UserText> : "player"}
-        </h1>
-      </header>
-
       {error && (
         <p role="alert" className={styles.problem}>
           Could not load your profile: {error.message}
         </p>
       )}
 
-      <section className={styles.panel} aria-label="You">
+      <Poster
+        tone="ink"
+        kicker={dateFormat.format(new Date())}
+        headline={monthHeadline(stats)}
+        face={stats.wins > 0 ? 6 : 3}
+        className={styles.hero}
+      >
         <div className={styles.panelTop}>
           <Avatar
             name={profile?.nickname}
@@ -155,7 +143,11 @@ async function HomeContent({ searchParams }) {
               <UserText>{profile?.nickname}</UserText>
             </div>
           </div>
-          <Link href="/log" className={`${styles.logButton} btn-primary`} aria-label="Log a session">
+          <Link
+            href="/log"
+            className={`${styles.logButton} btn-primary btn-tilt`}
+            aria-label="Log a session"
+          >
             <span>Log</span>
             <span className={styles.logPlus} aria-hidden="true">
               +
@@ -165,9 +157,7 @@ async function HomeContent({ searchParams }) {
 
         <div className={styles.meta}>
           {profile?.created_at && <PlayingSince date={profile.created_at} />}
-          {stats.played === 0 ? (
-            <Chip>No sessions yet this month</Chip>
-          ) : (
+          {stats.played > 0 && (
             <>
               <span className={styles.metaLabel}>This month</span>
               <Chip tone="yellow">
@@ -182,7 +172,7 @@ async function HomeContent({ searchParams }) {
             </>
           )}
         </div>
-      </section>
+      </Poster>
 
       {ratings.length > 0 && (
         <section className={styles.card} aria-label="Your ratings">
