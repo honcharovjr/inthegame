@@ -23,7 +23,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 25 | #29 | 30 achievements with progress, first character with a customizer |
 | Oct 25 to 27 | #30 to #32 | Layered character art: 5 races, hair, beards, eye colour, 10 free outfits |
 | Oct 27 | #33, #34 | Game-style customizer, profile avatar that expands to the full figure |
-| Oct 28 | (this branch) | Project management documentation |
+| Oct 28 | #35 | Project management documentation |
+| Oct 28 | (this branch) | Games tab split into Play and Track; Yahtzee playable on one device |
 
 ## 3. Requirements status
 
@@ -63,6 +64,8 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-28 | Social feed | Must | P4 | Open | |
 | FR-29 | Reactions | Could | P4 | Open | |
 | FR-30 to FR-33 | Table tools | Should | P4 | Open | |
+| FR-43 | Games tab: Play or Track | Should | P4 | Done | Change C13 |
+| FR-44 | Yahtzee on one device, saved as a session | Should | P4 | Done | Change C13; 22 rule tests |
 | FR-05 | Account deletion | Should | Pilot | Open | |
 | FR-36 | Feedback link | Could | Pilot | Open | |
 | FR-37 | Pilot with seed data and a tournament | Must | Pilot | Open | |

@@ -129,6 +129,15 @@ Not scheduled. These depend on open questions in section 9.
 | FR-41 | Optional team setting: one squad leader proposes the result, and the other squads confirm it in their own UI | Could | Backlog |
 | FR-42 | Rules for unconfirmed sessions: timeout, dispute handling, and how guests are covered | Could | Backlog |
 
+### 4.10 Own games
+
+Games played inside the app. Stage 1 of the staged plan in section 9: no network play, one device passed between players. Added by change C13 in [project/changes.md](project/changes.md).
+
+| ID | Requirement | Priority | Phase |
+|---|---|---|---|
+| FR-43 | The Games tab opens on a choice: Play (games inside the app) or Track (the catalog and logging). Play has its own look | Should | P4 |
+| FR-44 | Yahtzee on one device for 2 to 6 players: dice with holds and three rolls, full score sheet with the upper bonus, Yahtzee bonus and joker rule. A game in progress survives a reload. The finished game is saved as a points session of the catalog game, so rating, stats and achievements update | Should | P4 |
+
 ## 5. Phases
 
 | Phase | Duration | Result |
@@ -181,7 +190,7 @@ Out of scope for this project:
 
 - Monetization and payments
 - Native mobile apps
-- Own online games with multiplayer or ranked mode (planned in stages after the MVP: no multiplayer, then simple multiplayer, then ranked). Needs confirmation of whether any stage falls inside the 5 months
+- Own online games with network multiplayer or ranked mode. Stage 1, games on one device, is in scope (section 4.10); simple multiplayer and ranked stay after the project
 - Integrations with external catalogs such as BoardGameGeek
 
 Decisions made:
