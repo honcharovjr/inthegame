@@ -12,6 +12,7 @@ const ICONS = {
   teams:
     "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3.5 19a5.5 5.5 0 0 1 11 0M16 5.2a3 3 0 0 1 0 5.6M17 14a5.5 5.5 0 0 1 3.5 5",
   profile: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0",
+  admin: "M12 3l7 3v6c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6zM9 12l2 2 4-4",
 };
 
 // href is null for screens that are not built yet.
@@ -23,9 +24,12 @@ const TABS = [
   { id: "profile", label: "Profile", href: "/profile" },
 ];
 
+const ADMIN_TAB = { id: "admin", label: "Admin panel", href: "/admin" };
+
 // Floating capsule menu with icon tabs. The active tab is a pink circle.
 // A tab lights up the moment it is pressed, not when the next page arrives.
-export default function TabBar() {
+// Super admins also get the admin panel, just above "Log a session".
+export default function TabBar({ isAdmin = false }) {
   const pathname = usePathname();
   const [pressed, setPressed] = useState({ href: null, from: null });
   const shown = pressed.from === pathname && pressed.href ? pressed.href : pathname;
@@ -33,7 +37,7 @@ export default function TabBar() {
   return (
     <nav className={styles.bar} aria-label="Main">
       <div className={styles.brand}>In the Game</div>
-      {TABS.map((tab) => {
+      {(isAdmin ? [...TABS, ADMIN_TAB] : TABS).map((tab) => {
         const isLog = tab.id === "log";
         const active =
           !isLog &&
@@ -44,6 +48,7 @@ export default function TabBar() {
           styles.tab,
           active && styles.active,
           isLog && `${styles.log} btn-primary`,
+          tab.id === "admin" && styles.admin,
           !tab.href && styles.soon,
         ]
           .filter(Boolean)

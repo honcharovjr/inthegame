@@ -25,7 +25,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 27 | #33, #34 | Game-style customizer, profile avatar that expands to the full figure |
 | Oct 28 | #35 | Project management documentation |
 | Oct 28 | #36 | Games tab split into Play and Track; Yahtzee playable on one device |
-| Oct 28 | (this branch) | Yahtzee modes: solo, one phone, invite placeholder; results not saved |
+| Oct 28 | #37 | Yahtzee modes: solo, one phone, invite placeholder; results not saved |
+| Oct 28 | (this branch) | Admin panel: overview, catalog management, players with blocking |
 
 ## 3. Requirements status
 
@@ -36,7 +37,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-01 | Email registration, login, logout, password reset | Must | P1 | Done | |
 | FR-02 | Profile with nickname and avatar | Must | P1 | Done | Avatar is the character |
 | FR-03 | Guest profiles | Must | P1 | Done | |
-| FR-06 | Catalog of 30+ games incl. classic games | Must | P1 | **Partial** | 3 games left after change C8; refill needed |
+| FR-06 | Catalog of 30+ games incl. classic games | Must | P1 | **Partial** | 3 games left after change C8; refill through the admin panel |
 | FR-07 | Search and filter by name, player count, type | Must | P1 | Done | |
 | FR-09 | Custom game | Should | P1 | Partial | No warning for duplicate names |
 | FR-10 | Create a session | Must | P1 | Done | |
@@ -69,6 +70,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-44 | Yahtzee solo and on one device | Should | P4 | Done | Changes C13, C14; 22 rule tests |
 | FR-45 | Play with friends by invite | Could | Backlog | Open | Placeholder in the game |
 | FR-46 | In-app results saved to history and ratings | Could | Backlog | Open | |
+| FR-47 | Admin panel: overview, catalog, players | Should | P4 | Done | Change C15 |
 | FR-05 | Account deletion | Should | Pilot | Open | |
 | FR-36 | Feedback link | Could | Pilot | Open | |
 | FR-37 | Pilot with seed data and a tournament | Must | Pilot | Open | |
