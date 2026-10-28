@@ -107,7 +107,7 @@ gantt
   Pilot                    :b7, after b6, 14d
   Final                    :b8, after b7, 7d
   section Actual
-  Initiation and requirements (concept, spec, stories)  :a1, 2026-09-15, 2026-10-24
+  Initiation and requirements  :a1, 2026-09-15, 2026-10-24
   P1 Core and sessions     :a3, 2026-10-24, 2026-10-26
   P2 Rating and teams (partial) :a4, 2026-10-25, 2026-10-29
   P3 Achievements and character (ahead of plan) :a5, 2026-10-25, 2026-10-28
