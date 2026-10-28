@@ -2,6 +2,7 @@ import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import Poster from "@/components/Poster/Poster";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -14,7 +15,7 @@ export default function TeamsPage() {
   return (
     <main className={styles.page}>
       <BackButton fallback="/" />
-      <h1 className={styles.title}>Teams</h1>
+      <Poster tone="turquoise" kicker="Teams" headline="your table, your people." face={4} />
       <Suspense fallback={<TeamsSkeleton />}>
         <TeamList />
       </Suspense>
@@ -51,57 +52,56 @@ async function TeamList() {
     }));
 
   return (
-    <div className={`${styles.body} stagger`}>
+    <div className={`${styles.body} ${styles.wide} stagger`}>
       {error && (
         <p role="alert" className={styles.error}>
           Could not load your teams: {error.message}
         </p>
       )}
 
-      <Link href="/teams/personal" className={styles.teamRow}>
-        <span className={`${styles.tile} ${styles.personalTile}`} aria-hidden="true">
-          ★
-        </span>
-        <span className={styles.teamText}>
-          <span className={styles.teamName}>Personal</span>
-          <span className={styles.chips}>
-            <Chip size="s">Sessions without a team</Chip>
-          </span>
-        </span>
-        <span className={styles.arrow} aria-hidden="true">
-          &#8250;
-        </span>
-      </Link>
-
-      {teams.length > 0 && (
-        <ul className={styles.list}>
-          {teams.map((team) => (
-            <li key={team.id}>
-              <Link href={`/teams/${team.id}`} className={styles.teamRow}>
-                <span className={`${styles.tile} keep-case`} aria-hidden="true">
-                  {team.name.charAt(0)}
-                </span>
-                <span className={styles.teamText}>
-                  <span className={`${styles.teamName} keep-case`}>{team.name}</span>
-                  <span className={styles.chips}>
-                    <Chip size="s">
-                      {team.members} {team.members === 1 ? "member" : "members"}
+      <ul className={styles.teamGrid}>
+        <li>
+          <Link href="/teams/personal" className={styles.teamRow}>
+            <span className={`${styles.tile} ${styles.personalTile}`} aria-hidden="true">
+              ★
+            </span>
+            <span className={styles.teamText}>
+              <span className={styles.teamName}>Personal</span>
+              <span className={styles.chips}>
+                <Chip size="s">Sessions without a team</Chip>
+              </span>
+            </span>
+            <span className={styles.arrow} aria-hidden="true">
+              &#8250;
+            </span>
+          </Link>
+        </li>
+        {teams.map((team) => (
+          <li key={team.id}>
+            <Link href={`/teams/${team.id}`} className={styles.teamRow}>
+              <span className={`${styles.tile} keep-case`} aria-hidden="true">
+                {team.name.charAt(0)}
+              </span>
+              <span className={styles.teamText}>
+                <span className={`${styles.teamName} keep-case`}>{team.name}</span>
+                <span className={styles.chips}>
+                  <Chip size="s">
+                    {team.members} {team.members === 1 ? "member" : "members"}
+                  </Chip>
+                  {team.role === "owner" && (
+                    <Chip size="s" tone="pink">
+                      Owner
                     </Chip>
-                    {team.role === "owner" && (
-                      <Chip size="s" tone="pink">
-                        Owner
-                      </Chip>
-                    )}
-                  </span>
+                  )}
                 </span>
-                <span className={styles.arrow} aria-hidden="true">
-                  &#8250;
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+              </span>
+              <span className={styles.arrow} aria-hidden="true">
+                &#8250;
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
 
       {!error && teams.length === 0 && (
         <p className={styles.empty}>

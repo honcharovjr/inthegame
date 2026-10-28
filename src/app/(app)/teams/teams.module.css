@@ -68,6 +68,27 @@
   box-shadow: var(--shadow-float);
 }
 
+.tile {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .teamRow:hover .tile {
+    transform: rotate(-10deg) scale(1.06);
+  }
+}
+
+/* Personal first, then each team: a list on a phone, cards on desktop */
+.teamGrid {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.teamGrid > li {
+  min-width: 0;
+}
+
 .teamRow:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
@@ -456,5 +477,31 @@
   .gameChips {
     flex-wrap: wrap;
     overflow: visible;
+  }
+}
+
+@media (min-width: 900px) {
+  .wide {
+    max-width: none;
+  }
+
+  .teamGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .wide > .card {
+    max-width: 640px;
+  }
+
+  .teamGrid .teamRow {
+    height: 100%;
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teamRow:hover .tile {
+    transform: none;
   }
 }

@@ -23,7 +23,7 @@ export default function CreateTeamForm() {
           defaultValue={state?.values?.name}
           required
         />
-        <button type="submit" className={`${styles.primary} btn-primary`} disabled={pending}>
+        <button type="submit" className={`${styles.primary} btn-primary btn-tilt`} disabled={pending}>
           {pending ? "Creating" : "Create"}
         </button>
       </div>
