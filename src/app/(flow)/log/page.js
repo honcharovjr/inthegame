@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
+import { panelHref } from "@/lib/sessions/panel";
 import { prefillFromSession } from "@/lib/sessions/prefill";
 import { createClient } from "@/lib/supabase/server";
 import LogFlow from "./LogFlow";
@@ -85,21 +86,22 @@ async function LogData({ searchParams }) {
   // Only the player who logged a session can edit it.
   const editSession =
     editResult.data && editResult.data.created_by === profile.id ? editResult.data : null;
-  if (editId && !editSession) {
+  // A team session is edited by a member of that team only.
+  const editTeam = editSession?.team_id
+    ? teams.find((team) => team.id === editSession.team_id) ?? null
+    : null;
+  if (editId && (!editSession || (editSession.team_id && !editTeam))) {
     return (
       <main className={styles.fallback}>
         <p role="alert" className={styles.message}>
-          This session cannot be edited. Only the player who logged it can change it.
+          This session cannot be edited. Only the player who logged it can change it, from
+          its team.
         </p>
       </main>
     );
   }
   const editing = editSession
-    ? prefillFromSession(
-        editSession,
-        profile.id,
-        teams.find((team) => team.id === editSession.team_id) ?? null,
-      )
+    ? { ...prefillFromSession(editSession, profile.id, editTeam), returnTo: panelHref(editSession.team_id) }
     : null;
 
   // The latest session, so the flow can offer to play it again.

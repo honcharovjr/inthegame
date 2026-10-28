@@ -166,11 +166,15 @@ export async function updateSession(sessionId, input) {
   const supabase = await createClient();
   const { data: before } = await supabase
     .from("sessions")
-    .select("game_id")
+    .select("game_id, team_id")
     .eq("id", sessionId)
     .maybeSingle();
   if (!before) {
     return { error: "Unknown session." };
+  }
+  // A session stays in the team it was logged in (or stays personal).
+  if ((built.teamId ?? null) !== (before.team_id ?? null)) {
+    return { error: "A session cannot move to another team." };
   }
 
   const { error } = await supabase.rpc("update_session", {
@@ -190,8 +194,7 @@ export async function updateSession(sessionId, input) {
   }
 
   await afterSave([before.game_id, built.gameId], built.participants);
-  revalidatePath("/history");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 
@@ -228,7 +231,6 @@ export async function deleteSession(sessionId) {
     console.error("rebuildGameRatings failed", ratingError);
   }
 
-  revalidatePath("/history");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { ok: true };
 }

@@ -299,7 +299,7 @@ export default function LogFlow({
         guestIds: chosenGuests.map((g) => g.id),
       });
       setPhase("done");
-      router.push(editing ? "/history" : "/?saved=1");
+      router.push(editing ? editing.returnTo : "/?saved=1");
       // Fallback if the page stays alive: start over once Home has opened.
       setTimeout(resetFlow, 1500);
     });
@@ -335,7 +335,7 @@ export default function LogFlow({
 
   function goBack() {
     if (step === 1) {
-      router.push(editing ? "/history" : "/");
+      router.push(editing ? editing.returnTo : "/");
     } else {
       setStep(step - 1);
     }
@@ -460,7 +460,9 @@ export default function LogFlow({
             </Chip>
           </div>
 
-          {teams.length > 0 && (
+          {/* A session stays in the team it was logged in, so editing
+              never changes the team. */}
+          {!editing && teams.length > 0 && (
             <div className={styles.chips} role="group" aria-label="Team">
               <button
                 type="button"
@@ -828,7 +830,7 @@ export default function LogFlow({
                 ? "Saving your changes"
                 : "Saving your session"
               : editing
-                ? "Saved. Opening history"
+                ? "Saved"
                 : "Saved. Opening Home"}
           </div>
         </div>

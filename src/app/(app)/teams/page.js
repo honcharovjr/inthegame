@@ -58,6 +58,21 @@ async function TeamList() {
         </p>
       )}
 
+      <Link href="/teams/personal" className={styles.teamRow}>
+        <span className={`${styles.tile} ${styles.personalTile}`} aria-hidden="true">
+          ★
+        </span>
+        <span className={styles.teamText}>
+          <span className={styles.teamName}>Personal</span>
+          <span className={styles.chips}>
+            <Chip size="s">Sessions without a team</Chip>
+          </span>
+        </span>
+        <span className={styles.arrow} aria-hidden="true">
+          &#8250;
+        </span>
+      </Link>
+
       {teams.length > 0 && (
         <ul className={styles.list}>
           {teams.map((team) => (
