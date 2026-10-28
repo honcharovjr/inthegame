@@ -1,16 +1,12 @@
-import Link from "next/link";
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
-import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
-import { PenIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
-import { deleteSession } from "@/lib/sessions/actions";
 import { resultLabel } from "@/lib/stats/month";
 import { createClient } from "@/lib/supabase/server";
 import HistoryFilters from "./HistoryFilters";
@@ -87,7 +83,7 @@ async function HistoryList({ searchParams }) {
   let query = supabase
     .from("sessions")
     .select(
-      `id, played_at, created_by, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))${
+      `id, played_at, team_id, teams(id, name), games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))${
         byResult ? ", mine:session_participants!inner(place)" : ""
       }`,
       { count: "exact" },
@@ -116,9 +112,10 @@ async function HistoryList({ searchParams }) {
     return {
       id: session.id,
       playedAt: session.played_at,
-      mine: session.created_by === profile?.id,
       game: <GameName game={session.games} />,
-      gameText: session.games?.name ?? "Game",
+      teamId: session.team_id,
+      // Null when the player has left the session's team.
+      team: session.teams,
       emoji: gameEmoji(session.games),
       tone: findGameType(session.games?.type).tone,
       others: people
@@ -149,6 +146,12 @@ async function HistoryList({ searchParams }) {
         </p>
       )}
 
+      {sessions.length > 0 && (
+        <p className={styles.note}>
+          To fix or delete a session, open its team or personal sessions.
+        </p>
+      )}
+
       <ul className={`${styles.list} stagger`}>
         {sessions.map((session) => (
           <li key={session.id} className={styles.row}>
@@ -158,6 +161,17 @@ async function HistoryList({ searchParams }) {
             <span className={styles.text}>
               <span className={styles.name}>{session.game}</span>
               <span className={styles.chips}>
+                {!session.teamId ? (
+                  <Chip size="s" tone="yellow" href="/teams/personal">
+                    Personal
+                  </Chip>
+                ) : session.team ? (
+                  <Chip size="s" tone="turquoise" href={`/teams/${session.team.id}`}>
+                    <UserText>{session.team.name}</UserText>
+                  </Chip>
+                ) : (
+                  <Chip size="s">Former team</Chip>
+                )}
                 <Chip size="s">{dateFormat.format(new Date(session.playedAt))}</Chip>
                 {session.others.filter(Boolean).map((name) => (
                   <Chip key={name} size="s">
@@ -168,31 +182,6 @@ async function HistoryList({ searchParams }) {
             </span>
             <span className={styles.side}>
               <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
-              {session.mine && (
-                <Link
-                  href={`/log?edit=${session.id}`}
-                  className={styles.edit}
-                  aria-label={`Edit the ${session.gameText} session`}
-                  data-tip="Edit"
-                  data-tip-align="end"
-                >
-                  <PenIcon size={17} />
-                </Link>
-              )}
-              {session.mine && (
-                <ConfirmButton
-                  title="Delete this session?"
-                  message={
-                    <>
-                      {session.game} on {dateFormat.format(new Date(session.playedAt))} will be
-                      removed and your ratings will be recalculated.
-                    </>
-                  }
-                  confirmLabel="Delete session"
-                  ariaLabel={`Delete the ${session.gameText} session`}
-                  action={deleteSession.bind(null, session.id)}
-                />
-              )}
             </span>
           </li>
         ))}

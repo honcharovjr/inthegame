@@ -28,7 +28,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #37 | Yahtzee modes: solo, one phone, invite placeholder; results not saved |
 | Oct 28 | #38 | Admin panel: overview, catalog management, players with blocking |
 | Oct 28 | #39 | All UI text in lowercase; player-typed text keeps its case |
-| Oct 28 | (this branch) | Edit a session (FR-14); team management modes designed (FR-48 to FR-50) |
+| Oct 28 | #40 | Edit a session (FR-14); team management modes designed (FR-48 to FR-50) |
+| Oct 28 | (this branch) | Team and personal panels with session history; read-only profile history |
 
 ## 3. Requirements status
 
@@ -45,7 +46,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-10 | Create a session | Must | P1 | Done | |
 | FR-11 | Winner, places, points | Must | P1 | Done | |
 | FR-13 | Fast entry, recent games and players suggested | Must | P1 | **Partial** | "Same again" for the last session only; under-1-minute not measured yet |
-| FR-14 | History; creator edits and deletes | Must | P1 | Done | Edit reuses the log flow; the date is not editable |
+| FR-14 | History; creator edits and deletes | Must | P1 | Done | History is read-only; edit and delete in the team or personal panel; the date is not editable |
 | FR-34 | PostHog analytics | Must | P1 | **Open** | Needs a dependency and an account |
 | FR-35 | Sentry | Should | P1 | Open | |
 | FR-08 | Game page with own stats | Should | P2 | Open | |

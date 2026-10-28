@@ -58,11 +58,11 @@ Acceptance: participants can be split into sides; the winning side is recorded; 
 
 **US-C4** (FR-14, P1, Must)
 As a player, I want to see my session history, so that I can look back at what I played and with whom.
-Acceptance: list sorted by date; shows game, participants and result; supports pagination.
+Acceptance: list sorted by date; shows game, participants, result and the session's team ("personal" when logged without a team); supports pagination; read-only, each team chip opens the panel where the session is managed.
 
 **US-C5** (FR-14, P1, Must)
 As a player, I want to edit or delete a session I created, so that I can fix mistakes.
-Acceptance: only the creator can edit or delete; ratings and stats are recalculated after a change.
+Acceptance: edit and delete are in the session's panel (its team page, or personal on the Teams tab); only the creator can edit or delete; an edit cannot change the team; ratings and stats are recalculated after a change.
 
 **US-C6** (FR-15, P2, Could)
 As a player, I want to add a short note to a session, so that I can remember a memorable moment.

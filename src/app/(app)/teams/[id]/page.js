@@ -5,15 +5,16 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
-import UserText, { GameName } from "@/components/UserText/UserText";
+import UserText from "@/components/UserText/UserText";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
-import { gameEmoji } from "@/lib/games/emoji";
 import { playerColor } from "@/lib/sessions/colors";
+import { loadPanelSessions, readPage } from "@/lib/sessions/panel";
 import { teamLeaderboard } from "@/lib/stats/leaderboard";
 import { leaveTeam } from "@/lib/teams/actions";
 import { createClient } from "@/lib/supabase/server";
+import SessionHistory from "../SessionHistory";
 import CopyLink from "./CopyLink";
 import InviteToggle from "./InviteToggle";
 import styles from "../teams.module.css";
@@ -22,7 +23,7 @@ export const metadata = { title: "team" };
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
-export default function TeamPage({ params }) {
+export default function TeamPage({ params, searchParams }) {
   return (
     <main className={styles.page}>
       <BackButton fallback="/teams" />
@@ -30,7 +31,7 @@ export default function TeamPage({ params }) {
         All teams
       </Link>
       <Suspense fallback={<TeamSkeleton />}>
-        <TeamContent params={params} />
+        <TeamContent params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );
@@ -46,20 +47,16 @@ function TeamSkeleton() {
   );
 }
 
-const dateFormat = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-});
-
 // Reads the session, the address and the database, so it streams in.
-async function TeamContent({ params }) {
+async function TeamContent({ params, searchParams }) {
   const { id } = await params;
   if (!UUID.test(id)) notFound();
+  const page = readPage((await searchParams).page);
 
   const { profile } = await getProfile();
   const supabase = await createClient();
 
-  const [teamResult, membersResult, sessionsResult] = await Promise.all([
+  const [teamResult, membersResult, sessionsResult, history] = await Promise.all([
     supabase
       .from("teams")
       .select("id, name, owner_id, invite_code, invite_enabled")
@@ -71,12 +68,11 @@ async function TeamContent({ params }) {
       .eq("team_id", id),
     supabase
       .from("sessions")
-      .select(
-        "id, played_at, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
-      )
+      .select("id, session_participants(place, profile_id)")
       .eq("team_id", id)
       .order("played_at", { ascending: false })
       .limit(500),
+    loadPanelSessions(supabase, { teamId: id, page }),
   ]);
 
   const team = teamResult.data;
@@ -100,7 +96,6 @@ async function TeamContent({ params }) {
     })),
     members,
   );
-  const recent = sessions.slice(0, 5);
 
   const requestHeaders = await headers();
   const host = requestHeaders.get("host");
@@ -194,50 +189,15 @@ async function TeamContent({ params }) {
         </ol>
       </section>
 
-      {recent.length > 0 && (
-        <section className={styles.card} aria-label="Team history">
-          <div className={styles.cardTitle}>Team history</div>
-          <ul className={styles.sessions}>
-            {recent.map((session) => {
-              const names = session.session_participants
-                .map((p) => p.profiles?.nickname ?? p.guests?.name)
-                .filter(Boolean);
-              const winner = session.session_participants.find(
-                (p) => p.place === 1,
-              );
-              return (
-                <li key={session.id} className={styles.sessionRow}>
-                  <span className={styles.tile} aria-hidden="true">
-                    {gameEmoji(session.games)}
-                  </span>
-                  <span className={styles.sessionText}>
-                    <span className={styles.sessionName}>
-                      <GameName game={session.games} />
-                    </span>
-                    <span className={styles.chips}>
-                      <Chip size="s">
-                        {dateFormat.format(new Date(session.played_at))}
-                      </Chip>
-                      {names.slice(0, 3).map((name) => (
-                        <Chip key={name} size="s">
-                          <UserText>{name}</UserText>
-                        </Chip>
-                      ))}
-                    </span>
-                  </span>
-                  {winner && (
-                    <Chip tone="pink">
-                      <span>
-                        <UserText>{winner.profiles?.nickname ?? winner.guests?.name}</UserText> won
-                      </span>
-                    </Chip>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
+      <SessionHistory
+        title="Team history"
+        sessions={history.sessions}
+        profileId={profile?.id}
+        page={page}
+        totalPages={history.totalPages}
+        pageHref={(next) => `/teams/${team.id}${next > 1 ? `?page=${next}` : ""}`}
+        empty="No sessions in this team yet. Log one and pick this team."
+      />
 
       <div className={styles.leave}>
         <ConfirmButton

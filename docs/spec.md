@@ -67,7 +67,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-11 | Result types: winner only, ranking by place, points per participant | Must | P1 |
 | FR-12 | Sides result type (team games) | Should | P2 |
 | FR-13 | Fast entry: recent games and recent participants are suggested. Target is under 1 minute from start to saved session | Must | P1 |
-| FR-14 | Session history for a player. A creator can edit and delete own sessions | Must | P1 |
+| FR-14 | Session history for a player, read-only, with the team of each session. Sessions are managed in their panel: a team's page for team sessions, the personal panel for sessions logged without a team. There the creator can edit and delete own sessions. A session never moves between teams or into a team | Must | P1 |
 | FR-15 | Optional note on a session | Could | P2 |
 
 ### 4.4 Statistics and rating
