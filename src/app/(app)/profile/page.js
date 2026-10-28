@@ -5,6 +5,7 @@ import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
+import Poster from "@/components/Poster/Poster";
 import { LogoutIcon, PenIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { nameStyle } from "@/lib/character/items";
@@ -23,7 +24,7 @@ export default function ProfilePage() {
   return (
     <main className={styles.page}>
       <BackButton fallback="/" />
-      <h1 className={styles.title}>Profile</h1>
+      <Poster tone="ink" kicker="Profile" headline="your player card." face={1} />
       <Suspense fallback={<ProfileSkeleton />}>
         <ProfileContent />
       </Suspense>
@@ -54,7 +55,7 @@ async function ProfileContent() {
     <>
       <NicknameForm nickname={profile?.nickname ?? ""} nameClass={nameStyle(profile?.character)} />
       {profile?.created_at && <PlayingSince date={profile.created_at} />}
-      <Link href="/profile/customize" className={`${styles.customize} btn-secondary`}>
+      <Link href="/profile/customize" className={`${styles.customize} btn-secondary btn-tilt`}>
         <PenIcon size={16} />
         Customize character
       </Link>

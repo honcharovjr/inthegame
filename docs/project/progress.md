@@ -30,7 +30,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #39 | All UI text in lowercase; player-typed text keeps its case |
 | Oct 28 | #40 | Edit a session (FR-14); team management modes designed (FR-48 to FR-50) |
 | Oct 28 | #41 | Team and personal panels with session history; read-only profile history |
-| Oct 28 | (this branch) | UI blocks, part 1: shared poster block, tilt buttons, Home hero with a monthly headline |
+| Oct 28 | #42 | UI blocks, part 1: shared poster block, tilt buttons, Home hero with a monthly headline |
+| Oct 28 | (this branch) | UI blocks, part 2: poster headers and desktop grids on Teams, History, Profile |
 
 ## 3. Requirements status
 

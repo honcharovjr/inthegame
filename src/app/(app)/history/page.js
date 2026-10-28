@@ -1,6 +1,7 @@
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import Poster from "@/components/Poster/Poster";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -42,7 +43,7 @@ export default function HistoryPage({ searchParams }) {
   return (
     <main className={styles.page}>
       <BackButton fallback="/" />
-      <h1 className={styles.title}>History</h1>
+      <Poster tone="yellow" kicker="History" headline="every game you played." face={2} />
       <Suspense fallback={<HistorySkeleton />}>
         <HistoryList searchParams={searchParams} />
       </Suspense>

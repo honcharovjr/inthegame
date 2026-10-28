@@ -5,14 +5,6 @@
   gap: var(--space-3);
 }
 
-.title {
-  padding: 0 4px;
-  font-size: clamp(36px, 11vw, 44px);
-  line-height: 0.92;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-}
-
 .body,
 .skeletons {
   display: flex;
@@ -227,11 +219,10 @@
     gap: 16px;
   }
 
-  .title {
-    font-size: clamp(48px, 6vw, 76px);
-  }
-
-  .body {
-    max-width: 1040px;
+  /* Two columns of sessions under the filters */
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 }
