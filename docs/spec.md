@@ -99,6 +99,9 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-28 | Social feed with team sessions and earned achievements | Must | P4 |
 | FR-29 | Reactions on feed items | Could | P4 |
 | FR-38 | Session history of a team | Must | P2 |
+| FR-48 | Team management mode, set by the owner. Owner-managed: the owner can edit and delete every session of the team, with no approvals. Team-managed: every new session and every edit of a team session needs approval (FR-50) | Should | P4 |
+| FR-49 | Team logging setting, set by the owner: only the owner can log team sessions, or any member can | Should | P4 |
+| FR-50 | Approvals in team-managed teams. Every registered team member who took part approves; the logger counts as approved; members who did not play are not asked. A pending session or edit does not count in ratings, stats or achievements, and an edit keeps the old version counting until approved. A rejection, with an optional reason, goes back to the logger, who edits and resends or deletes it | Should | P4 |
 
 ### 4.7 Table tools
 
@@ -125,9 +128,9 @@ Not scheduled. These depend on open questions in section 9.
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
 | FR-39 | Squads inside a team. The team owner creates squads and manages roles such as squad leader | Could | Backlog |
-| FR-40 | Default confirmation mode: a session result counts only after the squad leader confirms it. Ratings and stats use confirmed sessions only | Could | Backlog |
-| FR-41 | Optional team setting: one squad leader proposes the result, and the other squads confirm it in their own UI | Could | Backlog |
-| FR-42 | Rules for unconfirmed sessions: timeout, dispute handling, and how guests are covered | Could | Backlog |
+| FR-40 | Replaced by FR-48 to FR-50 (team management modes, change C17) | | |
+| FR-41 | Replaced by FR-48 to FR-50 (team management modes, change C17) | | |
+| FR-42 | Rules for sessions that wait for approval too long: timeout and reminders | Could | Backlog |
 
 ### 4.10 Own games
 

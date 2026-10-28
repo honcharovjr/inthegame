@@ -242,7 +242,7 @@ Admin pages check `is_super_admin()` on the server and then read and write with 
 Notes:
 
 - "Server-side only" means no client policy for that command. The service role key bypasses RLS and is never exposed to the browser
-- Teams go through server functions: `create_team`, `join_team`, `leave_team`, and `team_by_invite` for the preview before joining. A session saved to a team may include teammates as registered participants, checked inside `create_session`
+- Teams go through server functions: `create_team`, `join_team`, `leave_team`, and `team_by_invite` for the preview before joining. A session saved to a team may include teammates as registered participants, checked inside `create_session`. Edits go through `update_session`, which only the creator may call and which replaces the participants in one step (FR-14). Team management modes (FR-48 to FR-50) will need team settings, a pending status and an approvals table; they are designed in the spec but not modelled yet
 - Avatar files in Storage need their own bucket policies: anyone logged in can read, only the owner can write their own file
 - After a session is edited or deleted, ratings of that game are rebuilt (docs/rating.md section 5)
 

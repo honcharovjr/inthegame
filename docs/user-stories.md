@@ -144,6 +144,18 @@ Acceptance: list sorted by date; shows game, participants and result; visible on
 As a team owner, I want to remove a member, so that I keep the team under control.
 Acceptance: only the owner can remove; the removed member's past sessions stay in the history.
 
+**US-G7** (FR-48, P4, Should)
+As a team owner, I want to choose whether I manage the team's results or the team does, so that the team works the way we play.
+Acceptance: the owner switches between owner-managed and team-managed in the team settings; in owner-managed mode the owner can edit and delete any team session without approvals.
+
+**US-G8** (FR-49, P4, Should)
+As a team owner, I want to choose who can log team sessions, so that results come from the right people.
+Acceptance: the owner chooses "only me" or "any member"; members who may not log do not see the team in the log flow.
+
+**US-G9** (FR-50, P4, Should)
+As a player in a team-managed team, I want to approve sessions I played before they count, so that nobody records a wrong result for me.
+Acceptance: a new or edited team session waits for every registered teammate who played; the logger counts as approved; pending sessions show in history but do not count in ratings, stats or achievements; an edit keeps the old version counting until approved; a rejection with an optional reason goes back to the logger, who edits and resends or deletes it.
+
 ## Epic H: Table tools
 
 **US-H1** (FR-30, P4, Should)
@@ -216,17 +228,11 @@ Not scheduled. These stories depend on open questions about timeouts, disputes a
 As a team owner, I want to create squads in my team and assign roles such as squad leader, so that responsibility for results is clear.
 Acceptance: the owner creates squads and assigns or changes roles; every squad has at least one leader.
 
-**US-J2** (FR-40, Backlog, Could)
-As a squad leader, I want to confirm a session result, so that only verified results affect ratings and stats.
-Acceptance: a new session is pending until the leader confirms; ratings and stats update only for confirmed sessions; only a leader can confirm.
-
-**US-J3** (FR-41, Backlog, Could)
-As a team owner, I want a setting where one squad leader proposes the result and the other squads confirm it, so that all sides agree.
-Acceptance: the setting is per team; the proposal appears in the other leaders' UI; the session is confirmed when all other sides confirm; a rejection marks it disputed.
+US-J2 and US-J3 (FR-40, FR-41) are replaced by US-G7 to US-G9 (change C17).
 
 **US-J4** (FR-42, Backlog, Could)
-As a player, I want clear rules for sessions that nobody confirms, so that results do not hang forever.
-Acceptance: timeout, dispute handling and handling of guests are defined and implemented. The rules are an open question.
+As a player, I want sessions that wait for approval too long to be handled, so that results do not hang forever.
+Acceptance: a timeout and reminders are defined and implemented. The rules are an open question.
 
 ## Definition of done (draft)
 
