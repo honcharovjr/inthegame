@@ -27,6 +27,9 @@ export default function CreateTeamForm() {
           {pending ? "Creating" : "Create"}
         </button>
       </div>
+      <p className={styles.createHint}>
+        Name it, then send the invite link to your friends.
+      </p>
       {state?.error && (
         <p role="alert" className={styles.error}>
           {state.error}

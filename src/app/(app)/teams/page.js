@@ -1,7 +1,7 @@
-import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import Poster from "@/components/Poster/Poster";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
@@ -13,13 +13,16 @@ export const metadata = { title: "teams" };
 
 export default function TeamsPage() {
   return (
-    <main className={styles.page}>
-      <BackButton fallback="/" />
-      <Poster tone="turquoise" kicker="Teams" headline="your table, your people." face={4} />
+    <PageFrame>
+      <PageTop
+        label="Start a team"
+        poster={<Poster tone="turquoise" kicker="Teams" headline="your table, your people." face={4} />}
+        aside={<CreateTeamForm />}
+      />
       <Suspense fallback={<TeamsSkeleton />}>
         <TeamList />
       </Suspense>
-    </main>
+    </PageFrame>
   );
 }
 
@@ -109,10 +112,6 @@ async function TeamList() {
           your friends.
         </p>
       )}
-
-      <section className={styles.card}>
-        <CreateTeamForm />
-      </section>
     </div>
   );
 }

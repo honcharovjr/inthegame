@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Die from "@/components/Die/Die";
 import LoginGuard from "@/components/LoginGuard/LoginGuard";
+import PageFrame, { AsideTitle, PageTop } from "@/components/PageFrame/PageFrame";
 import Poster from "@/components/Poster/Poster";
 import styles from "./welcome.module.css";
 
@@ -12,9 +13,27 @@ const HEADLINE = "Play or track?";
 // at the table.
 export default function GamesWelcome() {
   return (
-    <main className={styles.page}>
+    <PageFrame>
       <LoginGuard />
-      <Poster kicker="Games" headline={HEADLINE} />
+      <PageTop
+        label="Quick start"
+        poster={<Poster kicker="Games" headline={HEADLINE} />}
+        aside={
+          <>
+            <AsideTitle>Quick start</AsideTitle>
+            <Link href="/play/yahtzee" className={`${styles.quick} ${styles.quickPlay} btn-primary btn-tilt`}>
+              <Die face={6} size={34} className={styles.quickDie} />
+              <span>Play yahtzee</span>
+            </Link>
+            <Link href="/log" className={`${styles.quick} btn-secondary btn-tilt`}>
+              <span className={styles.quickPlus} aria-hidden="true">
+                +
+              </span>
+              <span>Log a session</span>
+            </Link>
+          </>
+        }
+      />
 
       <div className={`${styles.choices} stagger`}>
         <Link href="/games/play" className={`${styles.choice} ${styles.play}`}>
@@ -46,6 +65,6 @@ export default function GamesWelcome() {
           <span className={styles.go}>Open the catalog</span>
         </Link>
       </div>
-    </main>
+    </PageFrame>
   );
 }

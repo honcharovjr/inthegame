@@ -1,10 +1,11 @@
-import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
+import AllTimeStats from "@/components/AllTimeStats/AllTimeStats";
+import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import Poster from "@/components/Poster/Poster";
 import { LogoutIcon, PenIcon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -22,13 +23,27 @@ export const metadata = { title: "profile" };
 
 export default function ProfilePage() {
   return (
-    <main className={styles.page}>
-      <BackButton fallback="/" />
-      <Poster tone="ink" kicker="Profile" headline="your player card." face={1} />
+    <PageFrame>
+      <PageTop
+        label="All time"
+        poster={<Poster tone="ink" kicker="Profile" headline="your player card." face={1} />}
+        aside={(
+          <AllTimeStats>
+            <div className={styles.asideFoot}>
+              <Chip size="s" href="/profile/achievements">
+                Achievements
+              </Chip>
+              <Chip size="s" href="/history">
+                All sessions
+              </Chip>
+            </div>
+          </AllTimeStats>
+        )}
+      />
       <Suspense fallback={<ProfileSkeleton />}>
         <ProfileContent />
       </Suspense>
-    </main>
+    </PageFrame>
   );
 }
 

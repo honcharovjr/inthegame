@@ -1,0 +1,49 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.value {
+  font-size: clamp(32px, 9vw, 44px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+/* A highlighter stroke behind the number */
+.mark {
+  padding: 0 4px;
+  background: linear-gradient(transparent 58%, var(--mark) 58%, var(--mark) 92%, transparent 92%);
+}
+
+.yellow {
+  --mark: var(--color-yellow);
+}
+
+.pink {
+  --mark: var(--color-pink-soft);
+}
+
+.turquoise {
+  --mark: var(--color-turquoise-soft);
+}
+
+@media (min-width: 900px) {
+  .value {
+    font-size: clamp(40px, 3vw, 60px);
+  }
+}

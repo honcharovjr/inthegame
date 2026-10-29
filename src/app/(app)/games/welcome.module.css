@@ -1,8 +1,36 @@
-.page {
-  padding: var(--space-6) var(--space-4);
+/* The quick start beside the poster */
+.quick {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 18px;
+  border-radius: 22px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.quickPlay {
+  --btn-bg: var(--color-ink);
+  --btn-ink: #fff;
+}
+
+.quickDie {
+  --die-bg: var(--color-yellow);
+  transform: rotate(-8deg);
+}
+
+.quickPlus {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-pink-deep);
+  color: #fff;
+  font-size: 20px;
 }
 
 .choices {
@@ -177,6 +205,7 @@
 @media (min-width: 900px) {
   .choices {
     grid-template-columns: 1fr 1fr;
+    gap: 20px;
   }
 
   .choice {
