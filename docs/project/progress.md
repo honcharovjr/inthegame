@@ -31,7 +31,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #40 | Edit a session (FR-14); team management modes designed (FR-48 to FR-50) |
 | Oct 28 | #41 | Team and personal panels with session history; read-only profile history |
 | Oct 28 | #42 | UI blocks, part 1: shared poster block, tilt buttons, Home hero with a monthly headline |
-| Oct 28 | (this branch) | UI blocks, part 2: poster headers and desktop grids on Teams, History, Profile |
+| Oct 28 | #43 | UI blocks, part 2: poster headers and desktop grids on Teams, History, Profile |
+| Oct 29 | (this branch) | UI blocks, part 3: tilt on main actions, hover motion on game rows and medals |
 
 ## 3. Requirements status
 

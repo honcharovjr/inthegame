@@ -161,7 +161,7 @@ export default function AddGameForm({ existingNames, onAdded, onCancel }) {
         <button type="button" className={`${styles.cancel} btn-secondary`} onClick={onCancel}>
           Cancel
         </button>
-        <button type="submit" className={`${styles.add} btn-primary`} disabled={pending}>
+        <button type="submit" className={`${styles.add} btn-primary btn-tilt`} disabled={pending}>
           {pending ? "Adding" : warned ? "Add anyway" : "Add game"}
         </button>
       </div>

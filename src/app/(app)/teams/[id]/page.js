@@ -154,7 +154,7 @@ async function TeamContent({ params, searchParams }) {
           <span className={styles.cardTitle}>Leaderboard</span>
           <Link
             href={`/teams/${team.id}/stats`}
-            className={`${styles.statsLink} btn-secondary`}
+            className={`${styles.statsLink} btn-secondary btn-tilt`}
           >
             Full stats
           </Link>

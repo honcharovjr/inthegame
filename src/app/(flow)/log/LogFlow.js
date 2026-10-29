@@ -364,7 +364,7 @@ export default function LogFlow({
           {!query && !editing && previousGame && (
             <button
               type="button"
-              className={`${styles.again} btn-primary`}
+              className={`${styles.again} btn-primary btn-tilt`}
               onClick={sameAgain}
             >
               <span className={styles.againIcon} aria-hidden="true">
@@ -599,7 +599,7 @@ export default function LogFlow({
 
           <button
             type="button"
-            className={`${styles.cta} btn-secondary`}
+            className={`${styles.cta} btn-secondary btn-tilt`}
             disabled={participants.length < 2}
             onClick={enterResult}
           >
@@ -806,7 +806,7 @@ export default function LogFlow({
 
           <button
             type="button"
-            className={`${styles.cta} btn-secondary`}
+            className={`${styles.cta} btn-secondary btn-tilt`}
             disabled={phase !== "idle"}
             onClick={save}
           >

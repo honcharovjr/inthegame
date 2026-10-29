@@ -72,7 +72,7 @@ export default function AuthForm({
         );
       })}
 
-      <button className={`${styles.button} btn-primary`} type="submit" disabled={pending}>
+      <button className={`${styles.button} btn-primary btn-tilt`} type="submit" disabled={pending}>
         {pending ? "Please wait" : submitLabel}
       </button>
 

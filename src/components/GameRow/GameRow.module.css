@@ -81,3 +81,20 @@
     box-shadow: var(--shadow-float);
   }
 }
+
+/* The tile turns a little on hover, like the dice on customize */
+.tile {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .row:hover .tile {
+    transform: rotate(-10deg) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row:hover .tile {
+    transform: none;
+  }
+}
