@@ -10,6 +10,15 @@ export const PLAYABLE_GAMES = [
     maxPlayers: 6,
     blurb: "Roll five dice up to three times and fill 13 boxes. Highest total wins.",
   },
+  {
+    slug: "blackjack",
+    name: "Blackjack",
+    catalogName: "Blackjack",
+    href: "/play/blackjack",
+    minPlayers: 1,
+    maxPlayers: 5,
+    blurb: "Beat the dealer to 21 without going over. Bet chips, double down, split pairs.",
+  },
 ];
 
 export function findPlayable(slug) {

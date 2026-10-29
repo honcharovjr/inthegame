@@ -2,6 +2,7 @@ import Link from "next/link";
 import BackButton from "@/components/BackButton/BackButton";
 import Die from "@/components/Die/Die";
 import LoginGuard from "@/components/LoginGuard/LoginGuard";
+import PlayingCard from "@/components/PlayingCard/PlayingCard";
 import { PLAYABLE_GAMES } from "@/lib/games/playable";
 import styles from "./play.module.css";
 
@@ -25,8 +26,21 @@ export default function PlayPicker() {
           <li key={game.slug}>
             <Link href={game.href} className={styles.card}>
               <span className={styles.dice} aria-hidden="true">
-                <Die face={5} size={50} className={styles.dieA} />
-                <Die face={2} size={42} className={styles.dieB} />
+                {game.slug === "blackjack" ? (
+                  <>
+                    <span className={styles.dieA}>
+                      <PlayingCard card="AS" width={44} />
+                    </span>
+                    <span className={styles.dieB}>
+                      <PlayingCard card="KH" width={40} />
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Die face={5} size={50} className={styles.dieA} />
+                    <Die face={2} size={42} className={styles.dieB} />
+                  </>
+                )}
               </span>
               <span className={styles.name}>{game.name}</span>
               <span className={styles.blurb}>{game.blurb}</span>

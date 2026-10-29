@@ -33,8 +33,9 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #42 | UI blocks, part 1: shared poster block, tilt buttons, Home hero with a monthly headline |
 | Oct 28 | #43 | UI blocks, part 2: poster headers and desktop grids on Teams, History, Profile |
 | Oct 29 | #44 | UI blocks, part 3: tilt on main actions, hover motion on game rows and medals |
-| Oct 29 | (next PR) | One page frame: same poster size and place on every top page, side block beside it, wider pages |
-| Oct 29 | (this branch) | Personal stats per game (FR-16) |
+| Oct 29 | #45 | One page frame: same poster size and place on every top page, side block beside it, wider pages |
+| Oct 29 | #46 | Personal stats per game (FR-16) |
+| Oct 29 | (this branch) | Blackjack in the app (FR-51); setup screens shared between games |
 
 ## 3. Requirements status
 
@@ -77,6 +78,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-30 to FR-33 | Table tools | Should | P4 | Open | |
 | FR-43 | Games tab: Play or Track | Should | P4 | Done | Change C13 |
 | FR-44 | Yahtzee solo and on one device | Should | P4 | Done | Changes C13, C14; 22 rule tests |
+| FR-51 | Blackjack solo and on one device | Should | P4 | Done | Change C19; 19 rule tests |
 | FR-45 | Play with friends by invite | Could | Backlog | Open | Placeholder in the game |
 | FR-46 | In-app results saved to history and ratings | Could | Backlog | Open | |
 | FR-47 | Admin panel: overview, catalog, players | Should | P4 | Done | Change C15 |
