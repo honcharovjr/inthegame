@@ -1,13 +1,10 @@
 import Link from "next/link";
 import Die from "@/components/Die/Die";
 import LoginGuard from "@/components/LoginGuard/LoginGuard";
-import PageFrame, { AsideTitle, PageTop } from "@/components/PageFrame/PageFrame";
-import Poster from "@/components/Poster/Poster";
+import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import styles from "./welcome.module.css";
 
 export const metadata = { title: "games" };
-
-const HEADLINE = "Play or track?";
 
 // The Games tab starts here: play a game inside the app, or track one played
 // at the table.
@@ -15,25 +12,18 @@ export default function GamesWelcome() {
   return (
     <PageFrame>
       <LoginGuard />
-      <PageTop
-        label="Quick start"
-        poster={<Poster kicker="Games" headline={HEADLINE} />}
-        aside={
-          <>
-            <AsideTitle>Quick start</AsideTitle>
-            <Link href="/play/yahtzee" className={`${styles.quick} ${styles.quickPlay} btn-primary btn-tilt`}>
-              <Die face={6} size={34} className={styles.quickDie} />
-              <span>Play yahtzee</span>
-            </Link>
-            <Link href="/log" className={`${styles.quick} btn-secondary btn-tilt`}>
-              <span className={styles.quickPlus} aria-hidden="true">
-                +
-              </span>
-              <span>Log a session</span>
-            </Link>
-          </>
-        }
-      />
+      <PageTop title="Games">
+        <Link href="/play/yahtzee" className={`${styles.quick} ${styles.quickPlay} btn-primary btn-tilt`}>
+          <Die face={6} size={34} className={styles.quickDie} />
+          <span>Play yahtzee</span>
+        </Link>
+        <Link href="/log" className={`${styles.quick} btn-secondary btn-tilt`}>
+          <span className={styles.quickPlus} aria-hidden="true">
+            +
+          </span>
+          <span>Log a session</span>
+        </Link>
+      </PageTop>
 
       <div className={`${styles.choices} stagger`}>
         <Link href="/games/play" className={`${styles.choice} ${styles.play}`}>

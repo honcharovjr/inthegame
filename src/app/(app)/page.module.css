@@ -1,50 +1,3 @@
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.content > * {
-  min-width: 0;
-}
-
-.card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-}
-
-
-
-
-.identity {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.name {
-  font-size: clamp(24px, 6.5vw, 30px);
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
-
-
-
-
-
-
 .problem {
   padding: 10px 16px;
   border-radius: var(--radius-chip);
@@ -54,192 +7,28 @@
   font-weight: 700;
 }
 
-/* This month */
-.cardTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-
-.card:has(.cardTitle) {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.cardHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-
-.number {
-  font-size: clamp(28px, 8vw, 34px);
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 1;
-}
-
-
-/* A highlighter stroke behind the number */
-.mark {
-  padding: 0 4px;
-  background: linear-gradient(
-    transparent 58%,
-    var(--mark) 58%,
-    var(--mark) 92%,
-    transparent 92%
-  );
-}
-
-.markYellow {
-  --mark: var(--color-yellow);
-}
-
-
-
-/* Recent sessions */
-.recent {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.recentRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-}
-
-.tile {
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  line-height: 1;
-  font-weight: 800;
-}
-
-.tile_yellow {
-  background: var(--color-yellow);
-}
-
-.tile_pink {
-  background: var(--color-pink-soft);
-}
-
-.tile_turquoise {
-  background: var(--color-turquoise-soft);
-}
-
-.tile_violet {
-  background: var(--color-violet-tint);
-}
-
-.tile_default {
-  background: var(--color-chip);
-}
-
-.recentText {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.resultChip {
-  flex: none;
-}
-
-.recentName {
-  overflow-wrap: anywhere;
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.recentChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-/* Desktop: a two column dashboard. */
-@media (min-width: 900px) {
-  .content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 20px;
-    align-items: start;
-  }
-
-  .card {
-    padding: 24px;
-    border-radius: 28px;
-  }
-
-
-
-  .name {
-    font-size: clamp(28px, 3vw, 40px);
-  }
-
-
-
-
-  .number {
-    font-size: 48px;
-  }
-}
-
-/* Under the numbers beside the poster */
-.asideFoot {
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-/* The poster at the top: this month in big words, who you are, a quick Log. */
-.hero {
-  --die-top: 26px;
-  --die-bottom: auto;
-  --die-right: 24px;
-}
-
-.hero h1 {
-  max-width: calc(100% - 84px);
-  font-size: clamp(30px, 9vw, 44px);
-}
-
-.panelTop {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
+/* The two buttons beside the page title */
+.playButton,
 .logButton {
-  --btn-bg: var(--color-yellow);
-  --btn-ink: var(--color-ink);
   flex: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 52px;
-  padding: 0 6px 0 20px;
   border-radius: var(--radius-pill);
   font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.03em;
+}
+
+.playButton {
+  padding: 0 22px;
+}
+
+.logButton {
+  --btn-bg: var(--color-yellow);
+  --btn-ink: var(--color-ink);
+  padding: 0 6px 0 20px;
 }
 
 .logPlus {
@@ -261,35 +50,378 @@
   }
 }
 
+/* Sections sit right on the page: a heading, then the content */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+}
+
+.grid > * {
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 0;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.note {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.more {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-pink-ink);
+}
+
+/* A big number with a highlighter stroke instead of a frame */
+.big {
+  font-size: 64px;
+  line-height: 0.9;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.marker {
+  background: linear-gradient(transparent 58%, var(--color-yellow) 58%, var(--color-yellow) 92%, transparent 92%);
+}
+
+.spark {
+  width: 100%;
+  height: 44px;
+  overflow: visible;
+}
+
+.spark path {
+  fill: none;
+  stroke: var(--color-turquoise-ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Last sessions: a line through time */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+.step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 22px;
+  bottom: 0;
+  width: 2px;
+  background: #e7dfe6;
+}
+
+.dot {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--color-bg);
+}
+
+.dot_won {
+  background: var(--color-pink-deep);
+}
+
+.dot_other {
+  background: var(--color-violet-ink);
+}
+
+.dot_solo {
+  background: var(--color-muted);
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stepGame {
+  font-size: 18px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.place {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.place_won {
+  color: var(--color-pink-deep);
+}
+
+.place_other {
+  color: var(--color-violet-ink);
+}
+
+.place_solo {
+  color: var(--color-muted);
+}
+
+/* Rivals: people as tilted cards that straighten on hover */
+.cards {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 8px 6px;
+}
+
+.rival {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 170px;
+  min-height: 190px;
+  margin-left: -6%;
+  padding: 16px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 12px 30px rgba(18, 10, 26, 0.14);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.rival:first-child {
+  margin-left: 0;
+}
+
+.rival:nth-child(1) {
+  transform: rotate(-7deg);
+}
+
+.rival:nth-child(2) {
+  transform: rotate(3deg) translateY(-10px);
+}
+
+.rival:nth-child(3) {
+  transform: rotate(8deg);
+}
+
+@media (hover: hover) {
+  .rival:hover {
+    z-index: 2;
+    transform: rotate(0) translateY(-12px);
+  }
+}
+
+.rival_turquoise {
+  background: var(--color-turquoise);
+}
+
+.rival_pink {
+  background: var(--color-pink);
+}
+
+.rival_white {
+  background: var(--color-surface);
+}
+
+.rivalText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rivalName {
+  font-size: 18px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Play now: the one dark block, an action */
+.play {
+  position: relative;
+  overflow: hidden;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 32px;
+  background: var(--color-ink);
+  color: #fff;
+  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+}
+
+.play::after {
+  content: "";
+  position: absolute;
+  right: -16px;
+  top: -12px;
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  background: var(--color-yellow);
+  transform: rotate(18deg);
+}
+
+.playTitle {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.playRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 800;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .playRow:hover {
+    background: rgba(255, 255, 255, 0.14);
+    transform: rotate(-2deg) translateY(-2px);
+  }
+}
+
+.playArt {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
 @media (min-width: 900px) {
-  .hero {
-    --die-top: 40px;
-    --die-right: 9%;
+  .playButton,
+  .logButton {
+    height: 60px;
+    font-size: 21px;
   }
 
-  .hero h1 {
-    max-width: min(720px, calc(100% - 130px));
-    font-size: clamp(40px, 3.8vw, 72px);
-  }
-
-  .panelTop {
-    gap: 18px;
+  .playButton {
+    padding: 0 28px;
   }
 
   .logButton {
-    height: 60px;
     padding: 0 8px 0 26px;
-    font-size: 21px;
   }
 
   .logPlus {
     width: 44px;
     height: 44px;
   }
+
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 48px 40px;
+  }
+
+  .grid > section:first-child,
+  .side {
+    grid-column: span 12;
+  }
+
+  .lastBlock,
+  .rivalsBlock {
+    grid-column: span 6;
+  }
+
+  .play {
+    grid-column: span 12;
+  }
+
+  .big {
+    font-size: 88px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid > section:first-child {
+    grid-column: span 5;
+  }
+
+  .side {
+    grid-column: span 7;
+  }
+
+  .lastBlock {
+    grid-column: span 5;
+  }
+
+  .rivalsBlock {
+    grid-column: span 4;
+  }
+
+  .play {
+    grid-column: span 3;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logButton:hover .logPlus {
+  .logButton:hover .logPlus,
+  .rival,
+  .rival:hover {
     transform: none;
   }
 }

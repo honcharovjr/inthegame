@@ -1,0 +1,70 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  gap: 3px;
+}
+
+.day {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  transition: transform 0.15s ease;
+}
+
+@media (hover: hover) {
+  .day:hover {
+    transform: scale(1.35);
+  }
+}
+
+.level0 {
+  background: var(--color-chip);
+}
+
+.level1 {
+  background: var(--color-pink-soft);
+}
+
+.level2 {
+  background: #ff8fc4;
+}
+
+.level3 {
+  background: var(--color-pink);
+}
+
+.level4 {
+  background: var(--color-pink-ink);
+}
+
+.future {
+  background: transparent;
+}
+
+.months {
+  display: grid;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.months span {
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    gap: 5px;
+  }
+
+  .day {
+    border-radius: 4px;
+  }
+}

@@ -1,27 +1,32 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import Avatar from "@/components/Avatar/Avatar";
-import BigStats from "@/components/BigStats/BigStats";
-import Chip from "@/components/Chip/Chip";
-import PlayingSince from "@/components/PlayingSince/PlayingSince";
-import PageFrame, { AsideTitle, PageTop } from "@/components/PageFrame/PageFrame";
-import Poster from "@/components/Poster/Poster";
-import ResultBadge from "@/components/ResultBadge/ResultBadge";
+import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import Skeleton from "@/components/Skeleton/Skeleton";
-import Toast from "@/components/Toast/Toast";
-import UserText, { GameName } from "@/components/UserText/UserText";
+import { checkPlayer } from "@/lib/achievements/award";
 import { getProfile } from "@/lib/auth/session";
-import { nameStyle } from "@/lib/character/items";
-import { gameEmoji } from "@/lib/games/emoji";
-import { findGameType } from "@/lib/games/types";
-import { monthHeadline, monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
+import { activityCalendar } from "@/lib/stats/activity";
+import { monthStats, resultLabel } from "@/lib/stats/month";
 import { loadResults } from "@/lib/stats/results";
+import { headToHead } from "@/lib/stats/rivals";
+import { winStreaks } from "@/lib/stats/streak";
 import { createClient } from "@/lib/supabase/server";
+import HomeView from "./HomeView";
 import styles from "./page.module.css";
 
 export default function Home({ searchParams }) {
   return (
     <PageFrame>
+      <PageTop title="Home">
+        <Link href="/games/play" className={`${styles.playButton} btn-secondary btn-tilt`}>
+          Play
+        </Link>
+        <Link href="/log" className={`${styles.logButton} btn-primary btn-tilt`} aria-label="Log a session">
+          <span>Log</span>
+          <span className={styles.logPlus} aria-hidden="true">
+            +
+          </span>
+        </Link>
+      </PageTop>
       <Suspense fallback={<HomeSkeleton />}>
         <HomeContent searchParams={searchParams} />
       </Suspense>
@@ -29,225 +34,114 @@ export default function Home({ searchParams }) {
   );
 }
 
-const dateFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-});
-const shortDate = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-});
+const shortDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+
+// How many sessions the rivals are counted from.
+const RIVAL_SESSIONS = 200;
 
 function HomeSkeleton() {
   return (
-    <>
-      <PageTop
-        poster={<Skeleton height={320} radius={36} />}
-        aside={<Skeleton height={120} radius={20} delay={120} />}
-        label="This month"
-      />
-      <Skeleton height={180} radius={28} delay={200} />
-    </>
+    <div className={styles.grid}>
+      <Skeleton height={560} radius={36} />
+      <Skeleton height={560} radius={28} delay={120} />
+    </div>
   );
 }
+
+const personKey = (p) => (p.profile_id ? `p:${p.profile_id}` : `g:${p.guest_id}`);
 
 // Reads the session, so it streams in behind the Suspense boundary.
 async function HomeContent({ searchParams }) {
   const { saved } = await searchParams;
   const { profile, error } = await getProfile();
+  if (!profile) {
+    return error ? (
+      <p role="alert" className={styles.problem}>
+        Could not load your profile: {error.message}
+      </p>
+    ) : null;
+  }
 
-  // This month's sessions of the player, and the three latest sessions.
   const supabase = await createClient();
-  const now = new Date();
-  const [monthResult, recentResult, ratingResult] = profile
-    ? await Promise.all([
-        loadResults(supabase, profile.id, { since: monthStartIso(now) }),
-        supabase
-          .from("sessions")
-          .select(
-            "id, played_at, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))",
-          )
-          .order("played_at", { ascending: false })
-          .limit(3),
-        supabase
-          .from("ratings")
-          .select("rating, games_count, games(name, created_by, type, emoji)")
-          .eq("profile_id", profile.id)
-          .order("rating", { ascending: false })
-          .limit(4),
-      ])
-    : [{ rows: [] }, { data: [] }, { data: [] }];
+  const [results, sessionsResult, ratingResult] = await Promise.all([
+    loadResults(supabase, profile.id),
+    supabase
+      .from("sessions")
+      .select(
+        "id, played_at, games(name, created_by, type, emoji), session_participants(place, profile_id, guest_id, profiles(nickname, character), guests(name)), mine:session_participants!inner(profile_id)",
+      )
+      .eq("mine.profile_id", profile.id)
+      .order("played_at", { ascending: false })
+      .limit(RIVAL_SESSIONS),
+    supabase
+      .from("ratings")
+      .select("game_id, rating, games(name, created_by, type, emoji)")
+      .eq("profile_id", profile.id)
+      .order("games_count", { ascending: false })
+      .limit(1),
+  ]);
 
-  const ratings = (ratingResult.data ?? []).map((row, index) => ({
-    id: `${row.games?.name}-${index}`,
-    game: <GameName game={row.games} />,
-    emoji: gameEmoji(row.games),
-    tone: findGameType(row.games?.type).tone,
-    rating: Math.round(Number(row.rating)),
-    games: row.games_count,
-  }));
+  // The rating of the game played most, with its last steps.
+  const top = ratingResult.data?.[0] ?? null;
+  const { data: history } = top
+    ? await supabase
+        .from("rating_history")
+        .select("rating_after, created_at")
+        .eq("profile_id", profile.id)
+        .eq("game_id", top.game_id)
+        .order("created_at", { ascending: false })
+        .limit(30)
+    : { data: [] };
+  const trend = (history ?? []).map((row) => Number(row.rating_after)).reverse();
 
-  const stats = monthStats(monthResult.rows);
-  const recent = (recentResult.data ?? []).map((session) => {
-    const mine = session.session_participants.find(
-      (p) => p.profile_id === profile.id,
-    );
-    const others = session.session_participants
-      .filter((p) => p.profile_id !== profile.id)
-      .map((p) => p.profiles?.nickname ?? p.guests?.name)
-      .filter(Boolean);
+  const totals = monthStats(results.rows);
+  const streak = winStreaks(results.rows);
+  const calendar = activityCalendar(
+    results.rows.map((row) => row.playedAt),
+    new Date(),
+  );
+
+  const me = `p:${profile.id}`;
+  const sessions = sessionsResult.data ?? [];
+  const rivals = headToHead(
+    sessions.map((session) => ({
+      participants: session.session_participants.map((p) => ({
+        key: personKey(p),
+        place: p.place,
+        name: p.profiles?.nickname ?? p.guests?.name ?? "Player",
+        registered: Boolean(p.profile_id),
+        character: p.profiles?.character ?? null,
+      })),
+    })),
+    me,
+  );
+  const timeline = sessions.slice(0, 4).map((session) => {
+    const mine = session.session_participants.find((p) => personKey(p) === me);
+    const players = session.session_participants.length;
     return {
       id: session.id,
-      playedAt: session.played_at,
-      game: <GameName game={session.games} />,
-      emoji: gameEmoji(session.games),
-      tone: findGameType(session.games?.type).tone,
-      others,
-      result: resultLabel(mine?.place ?? 0, session.session_participants.length),
-      place: mine?.place ?? 0,
-      players: session.session_participants.length,
+      game: session.games,
+      date: shortDate.format(new Date(session.played_at)),
+      label: resultLabel(mine?.place ?? 0, players),
+      tone: players < 2 ? "solo" : mine?.place === 1 ? "won" : "other",
     };
   });
 
   return (
-    <>
-      {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
-      {error && (
-        <p role="alert" className={styles.problem}>
-          Could not load your profile: {error.message}
-        </p>
+    <HomeView
+      saved={saved}
+      profile={profile}
+      totals={totals}
+      streak={streak.current}
+      calendar={calendar}
+      top={top}
+      trend={trend}
+      timeline={timeline}
+      rivals={rivals}
+      progress={checkPlayer(profile.id).then(
+        (check) => check.results,
+        () => null,
       )}
-
-      <PageTop
-        label="This month"
-        poster={
-          <Poster
-            tone="ink"
-            kicker={dateFormat.format(new Date())}
-            headline={monthHeadline(stats)}
-            face={stats.wins > 0 ? 6 : 3}
-            className={styles.hero}
-          >
-            <div className={styles.panelTop}>
-              <Avatar
-                name={profile?.nickname}
-                size={56}
-                color="#ff4fa3"
-                registered
-                character={profile?.character}
-                perks
-              />
-              <div className={styles.identity}>
-                <div className={`${styles.name} ${nameStyle(profile?.character)}`}>
-                  <UserText>{profile?.nickname}</UserText>
-                </div>
-              </div>
-              <Link
-                href="/log"
-                className={`${styles.logButton} btn-primary btn-tilt`}
-                aria-label="Log a session"
-              >
-                <span>Log</span>
-                <span className={styles.logPlus} aria-hidden="true">
-                  +
-                </span>
-              </Link>
-            </div>
-          </Poster>
-        }
-        aside={
-          <>
-            <AsideTitle>This month</AsideTitle>
-            <BigStats
-              items={[
-                { label: stats.wins === 1 ? "win" : "wins", value: stats.wins, tone: "yellow" },
-                { label: stats.played === 1 ? "session" : "sessions", value: stats.played, tone: "pink" },
-                { label: "win rate", value: stats.winRate === null ? "–" : `${stats.winRate}%`, tone: "turquoise" },
-              ]}
-            />
-            <div className={styles.asideFoot}>
-              {profile?.created_at && <PlayingSince date={profile.created_at} />}
-              <Chip size="s" href="/history">
-                All sessions
-              </Chip>
-            </div>
-          </>
-        }
-      />
-
-      <div className={`${styles.content} stagger`}>
-
-      {ratings.length > 0 && (
-        <section className={styles.card} aria-label="Your ratings">
-          <div className={styles.cardTitle}>Your ratings</div>
-          <ul className={styles.recent}>
-            {ratings.map((item) => (
-              <li key={item.id} className={styles.recentRow}>
-                <span className={`${styles.tile} ${styles[`tile_${item.tone}`]}`}>
-                  {item.emoji}
-                </span>
-                <span className={styles.recentText}>
-                  <span className={styles.recentName}>{item.game}</span>
-                  <span className={styles.recentChips}>
-                    <Chip size="s">
-                      {item.games} {item.games === 1 ? "game" : "games"}
-                    </Chip>
-                  </span>
-                </span>
-                <span className={styles.number}>
-                  <span className={`${styles.mark} ${styles.markYellow}`}>
-                    {item.rating}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {recent.length > 0 && (
-        <section className={styles.card} aria-label="Recent sessions">
-          <div className={styles.cardHead}>
-            <span className={styles.cardTitle}>Recent</span>
-            <Chip size="s" href="/history">
-              All sessions
-            </Chip>
-          </div>
-          <ul className={styles.recent}>
-            {recent.map((session) => (
-              <li key={session.id} className={styles.recentRow}>
-                <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
-                  {session.emoji}
-                </span>
-                <span className={styles.recentText}>
-                  <span className={styles.recentName}>{session.game}</span>
-                  <span className={styles.recentChips}>
-                    <Chip size="s">{shortDate.format(new Date(session.playedAt))}</Chip>
-                    {session.others.slice(0, 2).map((name) => (
-                      <Chip key={name} size="s">
-                        <UserText>{name}</UserText>
-                      </Chip>
-                    ))}
-                    {session.others.length > 2 && (
-                      <Chip size="s">+{session.others.length - 2}</Chip>
-                    )}
-                  </span>
-                </span>
-                <span className={styles.resultChip}>
-                  <ResultBadge
-                    place={session.place}
-                    players={session.players}
-                    label={session.result}
-                  />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      </div>
-    </>
+    />
   );
 }

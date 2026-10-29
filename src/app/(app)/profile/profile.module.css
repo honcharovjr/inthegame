@@ -1,167 +1,60 @@
-.asideFoot {
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.skeleton {
+  display: grid;
+  gap: var(--space-4);
 }
 
-.body {
+/* Sections sit right on the page: a heading, then the content */
+.section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-}
-
-.body > * {
+  gap: 16px;
   min-width: 0;
+  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both;
 }
 
-.card {
+.head {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-}
-
-.card:has(.cardHead) {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.identity {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.name {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  font-size: clamp(24px, 6.5vw, 32px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
-.cardHead {
-  display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
 }
 
-.cardTitle,
-.label {
-  font-size: 13px;
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.more {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-pink-ink);
+}
+
+.empty {
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-muted);
 }
 
-/* Your stats: one row per game, most played first (FR-16) */
-.statsList {
-  list-style: none;
-  display: grid;
-  gap: 4px;
-}
-
-.statRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.statTile {
-  width: 42px;
-  height: 42px;
-  flex: none;
-  border-radius: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  line-height: 1;
-  background: var(--color-chip);
-}
-
-.tile_yellow {
-  background: var(--color-yellow);
-}
-
-.tile_pink {
-  background: var(--color-pink-soft);
-}
-
-.tile_turquoise {
-  background: var(--color-turquoise-soft);
-}
-
-.tile_violet {
-  background: var(--color-violet-tint);
-}
-
-.statText {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.statName {
-  overflow-wrap: anywhere;
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.statChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.statRate {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.statRateValue {
-  padding: 0 4px;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 1;
-  background: linear-gradient(
-    transparent 58%,
-    var(--color-turquoise-soft) 58%,
-    var(--color-turquoise-soft) 92%,
-    transparent 92%
-  );
-}
-
-.statRateLabel {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-muted);
-}
-
-/* Nickname */
+/* Nickname, on the stage */
 .nameRow {
-  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 44px;
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
 }
 
 .nicknameForm {
-  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -174,7 +67,7 @@
   padding: 0 18px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-chip);
+  background: var(--color-surface);
   font: inherit;
   font-size: 16px;
   font-weight: 700;
@@ -199,16 +92,263 @@
   color: var(--color-pink-ink);
 }
 
-.notice {
-  background: var(--color-turquoise-tint);
-  color: var(--color-turquoise-ink);
+/* Achievements: one row of coins that scrolls sideways */
+.medals {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0 calc(var(--space-4) * -1);
+  padding: 8px var(--space-4) 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.medal {
+  width: 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  scroll-snap-align: start;
+}
+
+.coin {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid var(--color-surface);
+  background: #ebe3ea;
+  color: #d3c8d2;
+  box-shadow: 0 5px 0 rgba(18, 10, 26, 0.12), 0 10px 20px rgba(18, 10, 26, 0.08);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .medal:hover .coin {
+    transform: rotate(-14deg) scale(1.08);
+  }
+}
+
+.tier1 {
+  background: #c98b4a;
+  color: #fff;
+}
+
+.tier2 {
+  background: #c3ccd6;
+  color: #fff;
+}
+
+.tier3 {
+  background: #ffc928;
+  color: #fff;
+}
+
+.medalName {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.medalLocked .medalName {
+  color: var(--color-muted);
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 48px 40px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-weight: 700;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  width: 18px;
+  height: 5px;
+  border-radius: 3px;
+}
+
+.legendValue {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.lines {
+  width: 100%;
+  height: 240px;
+}
+
+.gridLine {
+  stroke: #ebe3ea;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.line {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 12px;
+}
+
+.barName {
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barTrack {
+  height: 26px;
+  display: flex;
+}
+
+.barFill {
+  height: 100%;
+  min-width: 8px;
+  border-radius: 8px;
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bar_yellow {
+  background: var(--color-yellow);
+}
+
+.bar_pink {
+  background: var(--color-pink);
+}
+
+.bar_turquoise {
+  background: var(--color-turquoise);
+}
+
+.bar_violet {
+  background: var(--color-violet-ink);
+}
+
+.bar_ink {
+  background: var(--color-ink);
+}
+
+.barValue {
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.table th {
+  padding: 0 12px 12px;
+  border-bottom: 2px solid var(--color-ink);
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #ebe3ea;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background: var(--color-surface);
+}
+
+.gameCell {
+  font-weight: 800;
+}
+
+.rateCol {
+  width: 30%;
+}
+
+.rate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rateTrack {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: #ebe3ea;
+  overflow: hidden;
+}
+
+.rateFill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--color-ink);
+}
+
+.rateValue {
+  width: 44px;
+  font-weight: 800;
 }
 
 /* Guests */
 .guests {
   list-style: none;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0 32px;
 }
 
 .guestRow {
@@ -216,10 +356,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 0;
-}
-
-.guestRow + .guestRow {
-  box-shadow: inset 0 1px 0 var(--color-chip);
+  border-bottom: 1px solid #ebe3ea;
 }
 
 .guestName {
@@ -230,41 +367,9 @@
   font-weight: 800;
 }
 
-.empty {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-
-/* Links and sign out */
-.links {
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-}
-
-.linkRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 18px;
-  font-size: 17px;
-  font-weight: 800;
-  border-radius: var(--radius-card);
-  transition: background-color 0.2s ease;
-}
-
-.linkRow:hover {
-  background: var(--color-chip);
-}
-
-.linkRow:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
 .signOut {
-  width: 100%;
+  align-self: center;
+  width: min(100%, 320px);
   height: 52px;
   border-radius: var(--radius-pill);
   font-size: 16px;
@@ -274,117 +379,50 @@
 }
 
 @media (min-width: 900px) {
-  /* You across the top; guests and links side by side */
-  .body {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    gap: 20px;
-    align-items: start;
+  .name {
+    font-size: 64px;
   }
 
-  .body > :first-child,
-  .statsCard {
-    grid-column: 1 / -1;
+  .medals {
+    margin: 0;
+    padding: 8px 0 14px;
   }
 
-  /* On a wide screen the games sit in columns */
-  .statsList {
+  .stats {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .chart {
+    grid-column: span 7;
+  }
+
+  .share {
+    grid-column: span 5;
+  }
+
+  .tableBlock {
+    grid-column: span 12;
+  }
+
+  .share:first-child {
+    grid-column: span 12;
+  }
+
+  .guests {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    column-gap: 32px;
-  }
-
-  .signOut {
-    grid-column: 1 / -1;
-    justify-self: start;
-    width: auto;
-    padding: 0 32px;
   }
 }
 
-/* The top of the profile. The avatar grows from a disc into the whole
-   figure and pushes the details to the right; on a narrow screen they move
-   below it. */
-.hero {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-}
-
-.hero .identity {
-  min-width: 170px;
-}
-
-.heroArt {
-  position: relative;
-  flex: none;
-}
-
-.heroBox {
-  position: relative;
-  overflow: hidden;
-  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
-    border-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.heroFigure {
-  position: absolute;
-  left: 0;
-  top: 0;
-  line-height: 0;
-  transform-origin: 0 0;
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.heroToggle {
-  position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-surface);
-  box-shadow: 0 4px 12px rgba(18, 10, 26, 0.18);
-  color: var(--color-ink);
-  cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.heroOpen .heroToggle {
-  right: 8px;
-  bottom: 8px;
-}
-
-@media (hover: hover) {
-  .heroToggle:hover {
-    transform: scale(1.1);
+@media (min-width: 1200px) {
+  .skeleton {
+    grid-template-columns: 5fr 6fr;
   }
-}
 
-.heroToggle:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-}
+  .chart {
+    grid-column: span 8;
+  }
 
-.customize {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: var(--radius-pill);
-  font-size: 14px;
-  font-weight: 800;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .heroBox,
-  .heroFigure {
-    transition: none;
+  .share {
+    grid-column: span 4;
   }
 }

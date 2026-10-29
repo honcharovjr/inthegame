@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import AllTimeStats from "@/components/AllTimeStats/AllTimeStats";
 import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
-import Poster from "@/components/Poster/Poster";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -43,11 +42,9 @@ function pageHref(filters, page) {
 export default function HistoryPage({ searchParams }) {
   return (
     <PageFrame>
-      <PageTop
-        label="All time"
-        poster={<Poster tone="yellow" kicker="History" headline="every game you played." face={2} />}
-        aside={<AllTimeStats />}
-      />
+      <PageTop title="History">
+        <AllTimeStats />
+      </PageTop>
       <Suspense fallback={<HistorySkeleton />}>
         <HistoryList searchParams={searchParams} />
       </Suspense>
