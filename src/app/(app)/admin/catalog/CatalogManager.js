@@ -56,7 +56,7 @@ export default function CatalogManager({ catalog, custom }) {
           placeholder={`Search ${catalog.length} games`}
           aria-label="Search catalog games"
         />
-        <button type="button" className={`${styles.addButton} btn-primary`} onClick={() => setEditing("new")}>
+        <button type="button" className={`${styles.addButton} btn-primary btn-tilt`} onClick={() => setEditing("new")}>
           <PlusIcon size={18} />
           Add game
         </button>

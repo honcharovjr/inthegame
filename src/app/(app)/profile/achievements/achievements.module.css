@@ -137,3 +137,20 @@
     max-width: 860px;
   }
 }
+
+/* An earned medal wobbles when you point at it */
+.medal {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .row:not(.locked):hover .medal {
+    transform: rotate(-14deg) scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row:not(.locked):hover .medal {
+    transform: none;
+  }
+}

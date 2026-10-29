@@ -188,7 +188,7 @@ export default function Customizer({ name, initial, earned }) {
           >
             Reset
           </button>
-          <button type="button" className={`${styles.save} btn-primary`} onClick={save} disabled={pending}>
+          <button type="button" className={`${styles.save} btn-primary btn-tilt`} onClick={save} disabled={pending}>
             {saved ? "Saved" : pending ? "Saving" : "Save character"}
           </button>
         </div>
