@@ -1,7 +1,8 @@
 .poster {
   position: relative;
   overflow: hidden;
-  min-height: 250px;
+  /* One height for every top page, so the posters line up */
+  min-height: 280px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -99,7 +100,7 @@
 
 @media (min-width: 900px) {
   .poster {
-    min-height: 300px;
+    min-height: 340px;
     padding: 36px 40px;
   }
 

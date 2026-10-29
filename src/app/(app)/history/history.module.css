@@ -1,10 +1,3 @@
-.page {
-  padding: var(--space-6) var(--space-4) var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
 .body,
 .skeletons {
   display: flex;
@@ -214,15 +207,10 @@
 }
 
 @media (min-width: 900px) {
-  .page {
-    padding: 56px 56px 48px;
-    gap: 16px;
-  }
-
   /* Two columns of sessions under the filters */
   .list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
     gap: 12px;
   }
 }

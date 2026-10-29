@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
+import BigStats from "@/components/BigStats/BigStats";
 import Chip from "@/components/Chip/Chip";
 import PlayingSince from "@/components/PlayingSince/PlayingSince";
+import PageFrame, { AsideTitle, PageTop } from "@/components/PageFrame/PageFrame";
 import Poster from "@/components/Poster/Poster";
 import ResultBadge from "@/components/ResultBadge/ResultBadge";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -13,16 +15,17 @@ import { nameStyle } from "@/lib/character/items";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { monthHeadline, monthStartIso, monthStats, resultLabel } from "@/lib/stats/month";
+import { loadResults } from "@/lib/stats/results";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./page.module.css";
 
 export default function Home({ searchParams }) {
   return (
-    <main className={styles.main}>
+    <PageFrame>
       <Suspense fallback={<HomeSkeleton />}>
         <HomeContent searchParams={searchParams} />
       </Suspense>
-    </main>
+    </PageFrame>
   );
 }
 
@@ -39,8 +42,12 @@ const shortDate = new Intl.DateTimeFormat("en-GB", {
 function HomeSkeleton() {
   return (
     <>
-      <Skeleton height={320} radius={36} />
-      <Skeleton height={180} radius={28} delay={120} />
+      <PageTop
+        poster={<Skeleton height={320} radius={36} />}
+        aside={<Skeleton height={120} radius={20} delay={120} />}
+        label="This month"
+      />
+      <Skeleton height={180} radius={28} delay={200} />
     </>
   );
 }
@@ -55,11 +62,7 @@ async function HomeContent({ searchParams }) {
   const now = new Date();
   const [monthResult, recentResult, ratingResult] = profile
     ? await Promise.all([
-        supabase
-          .from("session_participants")
-          .select("place, sessions!inner(played_at, session_participants(count))")
-          .eq("profile_id", profile.id)
-          .gte("sessions.played_at", monthStartIso(now)),
+        loadResults(supabase, profile.id, monthStartIso(now)),
         supabase
           .from("sessions")
           .select(
@@ -74,7 +77,7 @@ async function HomeContent({ searchParams }) {
           .order("rating", { ascending: false })
           .limit(4),
       ])
-    : [{ data: [] }, { data: [] }, { data: [] }];
+    : [{ rows: [] }, { data: [] }, { data: [] }];
 
   const ratings = (ratingResult.data ?? []).map((row, index) => ({
     id: `${row.games?.name}-${index}`,
@@ -85,12 +88,7 @@ async function HomeContent({ searchParams }) {
     games: row.games_count,
   }));
 
-  const stats = monthStats(
-    (monthResult.data ?? []).map((row) => ({
-      place: row.place,
-      participants: row.sessions.session_participants[0]?.count ?? 1,
-    })),
-  );
+  const stats = monthStats(monthResult.rows);
   const recent = (recentResult.data ?? []).map((session) => {
     const mine = session.session_participants.find(
       (p) => p.profile_id === profile.id,
@@ -115,64 +113,70 @@ async function HomeContent({ searchParams }) {
   return (
     <>
       {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
-      <div className={`${styles.content} stagger`}>
       {error && (
         <p role="alert" className={styles.problem}>
           Could not load your profile: {error.message}
         </p>
       )}
 
-      <Poster
-        tone="ink"
-        kicker={dateFormat.format(new Date())}
-        headline={monthHeadline(stats)}
-        face={stats.wins > 0 ? 6 : 3}
-        className={styles.hero}
-      >
-        <div className={styles.panelTop}>
-          <Avatar
-            name={profile?.nickname}
-            size={64}
-            color="#ff4fa3"
-            registered
-            character={profile?.character}
-            perks
-          />
-          <div className={styles.identity}>
-            <div className={`${styles.name} ${nameStyle(profile?.character)}`}>
-              <UserText>{profile?.nickname}</UserText>
-            </div>
-          </div>
-          <Link
-            href="/log"
-            className={`${styles.logButton} btn-primary btn-tilt`}
-            aria-label="Log a session"
+      <PageTop
+        label="This month"
+        poster={
+          <Poster
+            tone="ink"
+            kicker={dateFormat.format(new Date())}
+            headline={monthHeadline(stats)}
+            face={stats.wins > 0 ? 6 : 3}
+            className={styles.hero}
           >
-            <span>Log</span>
-            <span className={styles.logPlus} aria-hidden="true">
-              +
-            </span>
-          </Link>
-        </div>
+            <div className={styles.panelTop}>
+              <Avatar
+                name={profile?.nickname}
+                size={56}
+                color="#ff4fa3"
+                registered
+                character={profile?.character}
+                perks
+              />
+              <div className={styles.identity}>
+                <div className={`${styles.name} ${nameStyle(profile?.character)}`}>
+                  <UserText>{profile?.nickname}</UserText>
+                </div>
+              </div>
+              <Link
+                href="/log"
+                className={`${styles.logButton} btn-primary btn-tilt`}
+                aria-label="Log a session"
+              >
+                <span>Log</span>
+                <span className={styles.logPlus} aria-hidden="true">
+                  +
+                </span>
+              </Link>
+            </div>
+          </Poster>
+        }
+        aside={
+          <>
+            <AsideTitle>This month</AsideTitle>
+            <BigStats
+              items={[
+                { label: stats.wins === 1 ? "win" : "wins", value: stats.wins, tone: "yellow" },
+                { label: stats.played === 1 ? "session" : "sessions", value: stats.played, tone: "pink" },
+                { label: "win rate", value: stats.winRate === null ? "–" : `${stats.winRate}%`, tone: "turquoise" },
+              ]}
+            />
+            <div className={styles.asideFoot}>
+              {profile?.created_at && <PlayingSince date={profile.created_at} />}
+              <Chip size="s" href="/history">
+                All sessions
+              </Chip>
+            </div>
+          </>
+        }
+      />
 
-        <div className={styles.meta}>
-          {profile?.created_at && <PlayingSince date={profile.created_at} />}
-          {stats.played > 0 && (
-            <>
-              <span className={styles.metaLabel}>This month</span>
-              <Chip tone="yellow">
-                {stats.wins} {stats.wins === 1 ? "win" : "wins"}
-              </Chip>
-              <Chip tone="pink">
-                {stats.played} {stats.played === 1 ? "session" : "sessions"}
-              </Chip>
-              {stats.winRate !== null && (
-                <Chip tone="turquoise">{stats.winRate}% win rate</Chip>
-              )}
-            </>
-          )}
-        </div>
-      </Poster>
+      <div className={`${styles.content} stagger`}>
 
       {ratings.length > 0 && (
         <section className={styles.card} aria-label="Your ratings">

@@ -1,0 +1,55 @@
+.frame {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+}
+
+.frame > * {
+  min-width: 0;
+}
+
+.top {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.aside {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 36px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.08s both;
+}
+
+.asideTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+@media (min-width: 900px) {
+  .frame {
+    gap: 20px;
+    padding: 40px 40px 48px;
+  }
+
+  .top {
+    gap: 20px;
+  }
+
+  .aside {
+    padding: 28px;
+  }
+}
+
+/* Wide screens: the poster and the side block share the top row */
+@media (min-width: 1200px) {
+  .top {
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  }
+}
