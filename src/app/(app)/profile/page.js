@@ -13,8 +13,12 @@ import { nameStyle } from "@/lib/character/items";
 import { signOut } from "@/lib/auth/actions";
 import { getProfile } from "@/lib/auth/session";
 import { deleteGuest } from "@/lib/profile/actions";
+import { gameEmoji } from "@/lib/games/emoji";
+import { findGameType } from "@/lib/games/types";
+import { playerStats } from "@/lib/stats/player";
+import { loadResults } from "@/lib/stats/results";
 import { createClient } from "@/lib/supabase/server";
-import UserText from "@/components/UserText/UserText";
+import UserText, { GameName } from "@/components/UserText/UserText";
 import NicknameForm from "./NicknameForm";
 import ProfileHero from "./ProfileHero";
 import styles from "./profile.module.css";
@@ -60,11 +64,11 @@ function ProfileSkeleton() {
 async function ProfileContent() {
   const { profile } = await getProfile();
   const supabase = await createClient();
-  const { data: guests } = await supabase
-    .from("guests")
-    .select("id, name")
-    .eq("owner_id", profile?.id)
-    .order("created_at");
+  const [{ data: guests }, results] = await Promise.all([
+    supabase.from("guests").select("id, name").eq("owner_id", profile?.id).order("created_at"),
+    profile ? loadResults(supabase, profile.id, { withGames: true }) : { rows: [] },
+  ]);
+  const { games: gameStats } = playerStats(results.rows);
 
   const identity = (
     <>
@@ -89,6 +93,57 @@ async function ProfileContent() {
             <Avatar name={profile?.nickname} size={104} color="#ff4fa3" registered character={null} />
             <div className={styles.identity}>{identity}</div>
           </>
+        )}
+      </section>
+
+      <section className={`${styles.card} ${styles.statsCard}`} aria-label="Your stats">
+        <div className={styles.cardHead}>
+          <span className={styles.cardTitle}>Your stats</span>
+          <Chip size="s">
+            {gameStats.length} {gameStats.length === 1 ? "game" : "games"}
+          </Chip>
+        </div>
+        {results.error && (
+          <p role="alert" className={styles.empty}>
+            Could not load your stats: {results.error.message}
+          </p>
+        )}
+        {gameStats.length ? (
+          <ul className={styles.statsList}>
+            {gameStats.map((item) => (
+              <li key={item.game.id} className={styles.statRow}>
+                <span
+                  className={`${styles.statTile} ${styles[`tile_${findGameType(item.game.type).tone}`]}`}
+                  aria-hidden="true"
+                >
+                  {gameEmoji(item.game)}
+                </span>
+                <span className={styles.statText}>
+                  <span className={styles.statName}>
+                    <GameName game={item.game} />
+                  </span>
+                  <span className={styles.statChips}>
+                    <Chip size="s">
+                      {item.played} {item.played === 1 ? "session" : "sessions"}
+                    </Chip>
+                    <Chip size="s" tone="yellow">
+                      {item.wins} {item.wins === 1 ? "win" : "wins"}
+                    </Chip>
+                  </span>
+                </span>
+                <span className={styles.statRate}>
+                  <span className={styles.statRateValue}>
+                    {item.winRate === null ? "–" : `${item.winRate}%`}
+                  </span>
+                  <span className={styles.statRateLabel}>win rate</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          !results.error && (
+            <p className={styles.empty}>Log a session and your stats for each game appear here.</p>
+          )
         )}
       </section>
 

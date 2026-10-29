@@ -33,7 +33,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 28 | #42 | UI blocks, part 1: shared poster block, tilt buttons, Home hero with a monthly headline |
 | Oct 28 | #43 | UI blocks, part 2: poster headers and desktop grids on Teams, History, Profile |
 | Oct 29 | #44 | UI blocks, part 3: tilt on main actions, hover motion on game rows and medals |
-| Oct 29 | (this branch) | One page frame: same poster size and place on every top page, side block beside it, wider pages |
+| Oct 29 | (next PR) | One page frame: same poster size and place on every top page, side block beside it, wider pages |
+| Oct 29 | (this branch) | Personal stats per game (FR-16) |
 
 ## 3. Requirements status
 
@@ -56,7 +57,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-08 | Game page with own stats | Should | P2 | Open | |
 | FR-12 | Sides result type | Should | P2 | Open | |
 | FR-15 | Session note | Could | P2 | Open | Database field exists |
-| FR-16 | Personal stats overall and per game | Must | P2 | **Partial** | Monthly stats and rating per game; wins and win rate per game missing |
+| FR-16 | Personal stats overall and per game | Must | P2 | Done | All-time numbers on Profile and History, a "your stats" card per game on Profile, this month on Home |
 | FR-17 | Rating per player per game | Must | P2 | Done | Elo-style, tests on synthetic data |
 | FR-18 | Team leaderboard per game and overall | Must | P2 | Done | Team stats page |
 | FR-19 | Head to head | Should | P2 | Open | |
@@ -88,12 +89,10 @@ Non-functional gaps: NFR-07 asks for CI in GitHub Actions (not set up); NFR-01 t
 ## 4. Next steps (corrective actions)
 
 1. Refill the catalog to 30+ games (FR-06)
-2. Edit a session with rating recalculation (FR-14)
-3. Personal stats per game (FR-16)
-4. PostHog analytics (FR-34), then Sentry (FR-35)
-5. Recent games and players in the log flow (FR-13)
-6. CI in GitHub Actions (NFR-07)
-7. Then the Should items of P2, then P4
+2. PostHog analytics (FR-34), then Sentry (FR-35)
+3. Recent games and players in the log flow (FR-13)
+4. CI in GitHub Actions (NFR-07)
+5. Then the Should items of P2, then P4
 
 ## 20. Closure phase
 
