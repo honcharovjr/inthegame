@@ -2,7 +2,7 @@ import BackButton from "@/components/BackButton/BackButton";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import Chip from "@/components/Chip/Chip";
+import MetaLine from "@/components/MetaLine/MetaLine";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -55,11 +55,7 @@ async function Invite({ params }) {
     <section className={`${styles.card} stagger`} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <span className={styles.cardTitle}>You are invited to</span>
       <h1 className={`${styles.title} keep-case`}>{team.name}</h1>
-      <div className={styles.chips}>
-        <Chip>
-          {team.member_count} {Number(team.member_count) === 1 ? "member" : "members"}
-        </Chip>
-      </div>
+      <MetaLine items={[`${team.member_count} ${Number(team.member_count) === 1 ? "member" : "members"}`]} />
       <JoinButton code={code} />
     </section>
   );

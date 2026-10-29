@@ -1,23 +1,22 @@
 import Link from "next/link";
 import ActivityCalendar from "@/components/ActivityCalendar/ActivityCalendar";
 import Avatar from "@/components/Avatar/Avatar";
-import Die from "@/components/Die/Die";
 import Flames from "@/components/Flames/Flames";
-import PlayingCard from "@/components/PlayingCard/PlayingCard";
+import { InfoIcon } from "@/components/icons";
 import Toast from "@/components/Toast/Toast";
 import UserText, { GameName } from "@/components/UserText/UserText";
-import { PLAYABLE_GAMES } from "@/lib/games/playable";
-import { linePath } from "@/lib/stats/chart";
 import { STREAK_STEPS, milestone } from "@/lib/stats/milestones";
 import CharacterCard from "./CharacterCard";
 import styles from "./page.module.css";
 
 const RIVAL_COLORS = ["turquoise", "pink", "white"];
+// Games listed under the average rating
+const RATING_GAMES = 3;
 
-// Home below its title, from data read by the page. top: the rating row of
-// the game played most, trend: its last ratings. progress: a promise of the
-// achievement progress, which streams in on its own.
-export default function HomeView({ saved, profile, totals, streak, calendar, top, trend, timeline, rivals, progress }) {
+// Home below its title, from data read by the page. rating: the average over
+// all rated games and the rows behind it, played most first. progress: a
+// promise of the achievement progress, which streams in on its own.
+export default function HomeView({ saved, profile, totals, streak, calendar, rating, timeline, rivals, progress }) {
   return (
     <>
       {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
@@ -30,25 +29,44 @@ export default function HomeView({ saved, profile, totals, streak, calendar, top
             <section className={styles.section} aria-label="Rating">
               <div className={styles.head}>
                 <h2 className={styles.title}>Rating</h2>
-                {top && (
+                {rating.games.length > 0 && (
                   <span className={styles.note}>
-                    <GameName game={top.games} />
+                    average of {rating.games.length} {rating.games.length === 1 ? "game" : "games"}
                   </span>
                 )}
               </div>
               <span className={styles.big}>
-                <span className={styles.marker}>{top ? Math.round(Number(top.rating)) : "–"}</span>
+                <span className={styles.marker}>{rating.average ?? "–"}</span>
               </span>
-              {trend.length > 1 && (
-                <svg className={styles.spark} viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true">
-                  <path d={linePath(trend, 240, 48)} vectorEffect="non-scaling-stroke" />
-                </svg>
+              {rating.games.length > 1 && (
+                <ul className={styles.ratings}>
+                  {rating.games.slice(0, RATING_GAMES).map((row) => (
+                    <li key={row.game_id}>
+                      <span className={styles.ratingGame}>
+                        <GameName game={row.games} />
+                      </span>
+                      <span className={styles.ratingValue}>{Math.round(Number(row.rating))}</span>
+                    </li>
+                  ))}
+                </ul>
               )}
             </section>
 
             <section className={styles.section} aria-label="Win streak">
               <div className={styles.head}>
-                <h2 className={styles.title}>On a roll</h2>
+                <h2 className={styles.title}>
+                  On a roll
+                  <span
+                    className={styles.info}
+                    tabIndex={0}
+                    role="img"
+                    aria-label="Wins in a row in sessions with other players. Solo sessions don't break it."
+                    data-tip="Wins in a row in sessions with other players. Solo sessions don't break it."
+                    data-tip-pos="below"
+                  >
+                    <InfoIcon size={18} />
+                  </span>
+                </h2>
               </div>
               <span className={styles.big}>{streak}</span>
               <Flames value={streak} goal={milestone(streak, STREAK_STEPS).target} />
@@ -66,27 +84,31 @@ export default function HomeView({ saved, profile, totals, streak, calendar, top
         <section className={`${styles.section} ${styles.lastBlock}`} aria-label="Last sessions">
           <div className={styles.head}>
             <h2 className={styles.title}>Last sessions</h2>
-            <Link href="/history" className={styles.more}>
-              History
-            </Link>
+            {timeline.length > 0 && (
+              <Link href="/history" className={`${styles.moreButton} btn-secondary`}>
+                Show all sessions
+              </Link>
+            )}
           </div>
           {timeline.length ? (
             <ol className={styles.timeline}>
               {timeline.map((item) => (
-                <li key={item.id} className={styles.step}>
-                  <span className={`${styles.dot} ${styles[`dot_${item.tone}`]}`} aria-hidden="true" />
-                  <span className={styles.stepText}>
-                    <span className={styles.stepGame}>
-                      <GameName game={item.game} />
+                <li key={item.id}>
+                  <Link href={`/history?session=${item.id}`} className={styles.step}>
+                    <span className={`${styles.dot} ${styles[`dot_${item.tone}`]}`} aria-hidden="true" />
+                    <span className={styles.stepText}>
+                      <span className={styles.stepGame}>
+                        <GameName game={item.game} />
+                      </span>
+                      <span className={styles.note}>{item.date}</span>
                     </span>
-                    <span className={styles.note}>{item.date}</span>
-                  </span>
-                  <span className={`${styles.place} ${styles[`place_${item.tone}`]}`}>{item.label}</span>
+                    <span className={`${styles.place} ${styles[`place_${item.tone}`]}`}>{item.label}</span>
+                  </Link>
                 </li>
               ))}
             </ol>
           ) : (
-            <Link href="/log" className={styles.more}>
+            <Link href="/log" className={`${styles.moreButton} btn-secondary`}>
               Log your first session
             </Link>
           )}
@@ -120,18 +142,6 @@ export default function HomeView({ saved, profile, totals, streak, calendar, top
             </ul>
           </section>
         )}
-
-        <section className={styles.play} aria-label="Play now">
-          <h2 className={styles.playTitle}>Play now</h2>
-          {PLAYABLE_GAMES.map((game) => (
-            <Link key={game.slug} href={game.href} className={styles.playRow}>
-              <span className={styles.playArt} aria-hidden="true">
-                {game.slug === "blackjack" ? <PlayingCard card="AS" width={30} /> : <Die face={5} size={30} />}
-              </span>
-              <span className="keep-case">{game.name}</span>
-            </Link>
-          ))}
-        </section>
       </div>
     </>
   );

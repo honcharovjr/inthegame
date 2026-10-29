@@ -1,6 +1,7 @@
-.skeleton {
+.skeleton,
+.skeletonSide {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-6);
 }
 
 /* Sections sit right on the page: a heading, then the content */
@@ -26,10 +27,16 @@
   letter-spacing: -0.02em;
 }
 
-.more {
+/* A small button beside a heading that opens the full list */
+.moreButton {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
   font-size: 14px;
-  font-weight: 700;
-  color: var(--color-pink-ink);
+  font-weight: 800;
 }
 
 .empty {
@@ -47,7 +54,7 @@
 }
 
 .name {
-  font-size: 44px;
+  font-size: 40px;
   line-height: 0.95;
   font-weight: 800;
   letter-spacing: -0.045em;
@@ -92,26 +99,77 @@
   color: var(--color-pink-ink);
 }
 
-/* Achievements: one row of coins that scrolls sideways */
-.medals {
+/* Your numbers, under the wardrobe panel */
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.number {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.numberIcon {
+  flex: none;
+  line-height: 0;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .number:hover .numberIcon {
+    transform: rotate(-10deg) scale(1.1);
+  }
+}
+
+.numberText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.numberValue {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.numberLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+/* Achievements: one row of coins, as many as fit the width */
+.medals {
+  --medals: 3;
+  display: grid;
+  grid-template-columns: repeat(var(--medals), minmax(0, 1fr));
   gap: 8px;
   list-style: none;
-  margin: 0 calc(var(--space-4) * -1);
-  padding: 8px var(--space-4) 14px;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  scrollbar-width: thin;
+  margin: 0;
+  padding: 8px 0 4px;
+}
+
+.medals > li:nth-child(n + 4) {
+  display: none;
 }
 
 .medal {
-  width: 104px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   text-align: center;
-  scroll-snap-align: start;
 }
 
 .coin {
@@ -150,8 +208,8 @@
 }
 
 .medalName {
+  font-family: var(--font-fancy), serif;
   font-size: 14px;
-  font-weight: 800;
   line-height: 1.15;
 }
 
@@ -169,31 +227,110 @@
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  gap: 12px 28px;
   list-style: none;
   margin: 0;
   padding: 0;
-  font-weight: 700;
 }
 
-.legend li {
+.legendItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .swatch {
-  width: 18px;
-  height: 5px;
+  width: 22px;
+  height: 6px;
+  flex: none;
   border-radius: 3px;
 }
 
+.legendText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.legendGame {
+  font-weight: 800;
+}
+
+.legendNote {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
 .legendValue {
+  margin-left: 4px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.up,
+.down {
+  font-size: 14px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
+.up {
+  color: var(--color-success);
+}
+
+.down {
+  color: var(--color-pink-deep);
+}
+
+/* The plot: values on the left, the lines, and the start and end below */
+.plot {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px 10px;
+}
+
+.axis {
+  position: relative;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.canvas {
+  position: relative;
+}
+
+.endDot {
+  position: absolute;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--color-bg);
+  transform: translate(50%, -50%);
+}
+
+.xAxis {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
 .lines {
+  display: block;
   width: 100%;
   height: 240px;
 }
@@ -378,14 +515,31 @@
   --btn-bg: var(--color-pink-tint);
 }
 
-@media (min-width: 900px) {
-  .name {
-    font-size: 64px;
+@media (min-width: 640px) {
+  .numbers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .medals {
-    margin: 0;
-    padding: 8px 0 14px;
+    --medals: 6;
+  }
+
+  .medals > li:nth-child(-n + 6) {
+    display: list-item;
+  }
+}
+
+@media (min-width: 900px) {
+  .name {
+    font-size: 48px;
+  }
+
+  .medals {
+    --medals: 8;
+  }
+
+  .medals > li:nth-child(-n + 8) {
+    display: list-item;
   }
 
   .stats {
@@ -415,7 +569,16 @@
 
 @media (min-width: 1200px) {
   .skeleton {
-    grid-template-columns: 5fr 6fr;
+    grid-template-columns: minmax(380px, 4fr) minmax(0, 7fr);
+    gap: 40px;
+  }
+
+  .medals {
+    --medals: 10;
+  }
+
+  .medals > li:nth-child(-n + 10) {
+    display: list-item;
   }
 
   .chart {
@@ -424,5 +587,15 @@
 
   .share {
     grid-column: span 4;
+  }
+}
+
+@media (min-width: 1440px) {
+  .medals {
+    --medals: 12;
+  }
+
+  .medals > li {
+    display: list-item;
   }
 }

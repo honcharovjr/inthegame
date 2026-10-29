@@ -1,7 +1,8 @@
 import Link from "next/link";
-import Chip from "@/components/Chip/Chip";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import { PenIcon } from "@/components/icons";
+import MetaLine from "@/components/MetaLine/MetaLine";
+import Pager from "@/components/Pager/Pager";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { gameEmoji } from "@/lib/games/emoji";
 import { deleteSession } from "@/lib/sessions/actions";
@@ -39,21 +40,17 @@ export default function SessionHistory({ title, sessions, profileId, page, total
                   <span className={styles.sessionName}>
                     <GameName game={session.games} />
                   </span>
-                  <span className={styles.chips}>
-                    <Chip size="s">{dateFormat.format(new Date(session.played_at))}</Chip>
-                    {names.slice(0, 3).map((name) => (
-                      <Chip key={name} size="s">
-                        <UserText>{name}</UserText>
-                      </Chip>
-                    ))}
-                    {winner && session.session_participants.length > 1 && (
-                      <Chip size="s" tone="pink">
-                        <span>
+                  <MetaLine
+                    items={[
+                      dateFormat.format(new Date(session.played_at)),
+                      names.length > 0 && <UserText>{names.slice(0, 3).join(", ")}</UserText>,
+                      winner && session.session_participants.length > 1 && (
+                        <span className={styles.winner}>
                           <UserText>{winner.profiles?.nickname ?? winner.guests?.name}</UserText> won
                         </span>
-                      </Chip>
-                    )}
-                  </span>
+                      ),
+                    ]}
+                  />
                 </span>
                 {mine && (
                   <span className={styles.sessionActions}>
@@ -87,21 +84,7 @@ export default function SessionHistory({ title, sessions, profileId, page, total
         </ul>
       )}
       {totalPages > 1 && (
-        <nav className={styles.pager} aria-label="Pages">
-          {page > 1 && (
-            <Chip href={pageHref(page - 1)} tone="white" scroll={false}>
-              Previous
-            </Chip>
-          )}
-          <Chip tone="pink">
-            Page {page} of {totalPages}
-          </Chip>
-          {page < totalPages && (
-            <Chip href={pageHref(page + 1)} tone="white" scroll={false}>
-              Next
-            </Chip>
-          )}
-        </nav>
+        <Pager page={page} total={totalPages} prevHref={pageHref(page - 1)} nextHref={pageHref(page + 1)} />
       )}
     </section>
   );

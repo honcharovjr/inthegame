@@ -210,65 +210,8 @@ button {
   }
 }
 
-/* Tooltips. Any element with data-tip shows it on hover and keyboard focus.
-   data-tip-align="end" keeps it inside the screen at the right edge.
-   data-tip-pos="below" puts it under the element. */
-[data-tip] {
-  position: relative;
-}
-
-[data-tip]::after {
-  content: attr(data-tip);
-  position: absolute;
-  z-index: 60;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-float);
-  color: var(--color-ink);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.25;
-  /* As wide as the text, wrapping only long tips */
-  width: max-content;
-  max-width: 220px;
-  white-space: normal;
-  text-align: center;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, 4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-[data-tip][data-tip-align="end"]::after {
-  left: auto;
-  right: 0;
-  transform: translate(0, 4px);
-}
-
-[data-tip][data-tip-pos="below"]::after {
-  bottom: auto;
-  top: calc(100% + 8px);
-}
-
-/* Lifted over the elements around it, which may come later in the page */
-[data-tip]:hover,
-[data-tip]:focus-visible {
-  z-index: 60;
-}
-
-[data-tip]:hover::after,
-[data-tip]:focus-visible::after {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-[data-tip][data-tip-align="end"]:hover::after,
-[data-tip][data-tip-align="end"]:focus-visible::after {
-  transform: translate(0, 0);
-}
+/* Tooltips: any element with data-tip shows it on hover and keyboard focus.
+   TipLayer draws them over the page; data-tip-pos="below" prefers below. */
 
 /* Buttons. Three kinds share one structure:
    .btn-primary   filled block, the one main action of a screen

@@ -3,7 +3,10 @@ import Chip from "@/components/Chip/Chip";
 import AllTimeStats from "@/components/AllTimeStats/AllTimeStats";
 import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import UserText, { GameName } from "@/components/UserText/UserText";
-import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
+import { FilterBody, FilterLoading } from "@/components/FilterLoading/FilterLoading";
+import MetaLine from "@/components/MetaLine/MetaLine";
+import Pager from "@/components/Pager/Pager";
+import ScrollIntoView from "@/components/ScrollIntoView/ScrollIntoView";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -76,6 +79,8 @@ async function HistoryList({ searchParams }) {
   const from = (page - 1) * PAGE_SIZE;
 
   const filters = readFilters(params);
+  // A session opened from Home, shown highlighted
+  const picked = UUID.test(String(params.session ?? "")) ? params.session : null;
   const { profile } = await getProfile();
   const supabase = await createClient();
 
@@ -156,7 +161,11 @@ async function HistoryList({ searchParams }) {
 
       <ul className={`${styles.list} stagger`}>
         {sessions.map((session) => (
-          <li key={session.id} className={styles.row}>
+          <li
+            key={session.id}
+            id={`session-${session.id}`}
+            className={`${styles.row} ${session.id === picked ? styles.picked : ""}`}
+          >
             <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
               {session.emoji}
             </span>
@@ -174,34 +183,33 @@ async function HistoryList({ searchParams }) {
                 ) : (
                   <Chip size="s">Former team</Chip>
                 )}
-                <Chip size="s">{dateFormat.format(new Date(session.playedAt))}</Chip>
-                {session.others.filter(Boolean).map((name) => (
-                  <Chip key={name} size="s">
-                    <UserText>{name}</UserText>
-                  </Chip>
-                ))}
               </span>
+              <MetaLine
+                items={[
+                  dateFormat.format(new Date(session.playedAt)),
+                  session.others.filter(Boolean).length > 0 && (
+                    <>
+                      with <UserText>{session.others.filter(Boolean).join(", ")}</UserText>
+                    </>
+                  ),
+                ]}
+              />
             </span>
-            <span className={styles.side}>
-              <Chip tone={session.won ? "pink" : "default"}>{session.result}</Chip>
-            </span>
+            <span className={`${styles.result} ${session.won ? styles.resultWon : ""}`}>{session.result}</span>
           </li>
         ))}
       </ul>
 
       {totalPages > 1 && (
-        <nav className={styles.pager} aria-label="Pages">
-          {page > 1 && (
-            <FilterChip href={pageHref(filters, page - 1)}>Previous</FilterChip>
-          )}
-          <Chip tone="pink">
-            Page {page} of {totalPages}
-          </Chip>
-          {page < totalPages && (
-            <FilterChip href={pageHref(filters, page + 1)}>Next</FilterChip>
-          )}
-        </nav>
+        <Pager
+          filter
+          page={page}
+          total={totalPages}
+          prevHref={pageHref(filters, page - 1)}
+          nextHref={pageHref(filters, page + 1)}
+        />
       )}
+      {picked && <ScrollIntoView id={`session-${picked}`} />}
       </FilterBody>
     </div>
     </FilterLoading>

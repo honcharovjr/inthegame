@@ -1,4 +1,3 @@
-import Chip from "@/components/Chip/Chip";
 import { TrophyIcon } from "@/components/icons";
 import styles from "./ResultBadge.module.css";
 
@@ -6,7 +5,7 @@ import styles from "./ResultBadge.module.css";
 // a trophy for a win, the place number for anything else.
 // label is the words, such as "Won" or "2nd". They show as a tooltip.
 export default function ResultBadge({ place, players, label }) {
-  if (players < 2) return <Chip>{label}</Chip>;
+  if (players < 2) return <span className={styles.solo}>{label}</span>;
 
   const won = place === 1;
   const tone = won ? "win" : place === 2 ? "second" : place === 3 ? "third" : "rest";

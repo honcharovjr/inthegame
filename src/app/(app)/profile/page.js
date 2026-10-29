@@ -6,6 +6,7 @@ import { getProfile } from "@/lib/auth/session";
 import { monthStats } from "@/lib/stats/month";
 import { playerStats } from "@/lib/stats/player";
 import { loadResults } from "@/lib/stats/results";
+import { winStreaks } from "@/lib/stats/streak";
 import { createClient } from "@/lib/supabase/server";
 import ProfileView from "./ProfileView";
 import styles from "./profile.module.css";
@@ -26,11 +27,15 @@ export default function ProfilePage({ searchParams }) {
   );
 }
 
+// The shape of the card, the wardrobe panel and the numbers under it.
 function ProfileSkeleton() {
   return (
     <div className={styles.skeleton}>
-      <Skeleton height={640} radius={36} />
-      <Skeleton height={640} radius={36} delay={120} />
+      <Skeleton height={620} radius={36} />
+      <div className={styles.skeletonSide}>
+        <Skeleton height={420} radius={36} delay={120} />
+        <Skeleton height={160} radius={24} delay={200} />
+      </div>
     </div>
   );
 }
@@ -83,6 +88,7 @@ async function ProfileContent({ searchParams }) {
       profile={profile}
       startOnLook={mode === "look"}
       totals={totals}
+      bestStreak={winStreaks(results.rows).best}
       gameStats={gameStats}
       statsError={results.error}
       ratingOf={ratingOf}

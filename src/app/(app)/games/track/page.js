@@ -1,6 +1,6 @@
 import BackButton from "@/components/BackButton/BackButton";
 import { Suspense } from "react";
-import Chip from "@/components/Chip/Chip";
+import Pager from "@/components/Pager/Pager";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
 import GameRow from "@/components/GameRow/GameRow";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -11,7 +11,7 @@ import AddGameButton from "./AddGameButton";
 import GamesToolbar from "./GamesToolbar";
 import styles from "./games.module.css";
 
-export const metadata = { title: "track" };
+export const metadata = { title: "catalog" };
 
 const PAGE_SIZE = 20;
 const PLAYER_COUNTS = [1, 2, 3, 4, 5, 6];
@@ -20,7 +20,7 @@ export default function GamesPage({ searchParams }) {
   return (
     <main className={styles.page}>
       <BackButton to="/games" />
-      <h1 className={styles.title}>Track</h1>
+      <h1 className={styles.title}>Catalog</h1>
       <Suspense fallback={<CatalogSkeleton />}>
         <Catalog searchParams={searchParams} />
       </Suspense>
@@ -167,21 +167,13 @@ async function Catalog({ searchParams }) {
       </ul>
 
       {totalPages > 1 && (
-        <nav className={styles.pager} aria-label="Pages">
-          {filters.page > 1 && (
-            <FilterChip href={buildHref(filters, { page: filters.page - 1 })}>
-              Previous
-            </FilterChip>
-          )}
-          <Chip tone="pink">
-            Page {filters.page} of {totalPages}
-          </Chip>
-          {filters.page < totalPages && (
-            <FilterChip href={buildHref(filters, { page: filters.page + 1 })}>
-              Next
-            </FilterChip>
-          )}
-        </nav>
+        <Pager
+          filter
+          page={filters.page}
+          total={totalPages}
+          prevHref={buildHref(filters, { page: filters.page - 1 })}
+          nextHref={buildHref(filters, { page: filters.page + 1 })}
+        />
       )}
       </FilterBody>
     </div>
