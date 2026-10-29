@@ -62,7 +62,7 @@ async function HomeContent({ searchParams }) {
   const now = new Date();
   const [monthResult, recentResult, ratingResult] = profile
     ? await Promise.all([
-        loadResults(supabase, profile.id, monthStartIso(now)),
+        loadResults(supabase, profile.id, { since: monthStartIso(now) }),
         supabase
           .from("sessions")
           .select(
