@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
 import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
-import Poster from "@/components/Poster/Poster";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -14,11 +13,9 @@ export const metadata = { title: "teams" };
 export default function TeamsPage() {
   return (
     <PageFrame>
-      <PageTop
-        label="Start a team"
-        poster={<Poster tone="turquoise" kicker="Teams" headline="your table, your people." face={4} />}
-        aside={<CreateTeamForm />}
-      />
+      <PageTop title="Teams">
+        <CreateTeamForm />
+      </PageTop>
       <Suspense fallback={<TeamsSkeleton />}>
         <TeamList />
       </Suspense>
