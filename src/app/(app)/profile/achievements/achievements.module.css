@@ -94,8 +94,33 @@
 }
 
 .name {
-  font-size: 16px;
+  font-family: var(--font-fancy), serif;
+  font-size: 17px;
+}
+
+.summary {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.summary strong {
+  font-size: 28px;
   font-weight: 800;
+  color: var(--color-ink);
+}
+
+/* When it was earned, or how far along it is */
+.state {
+  flex: none;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.stateDone {
+  color: var(--color-turquoise-ink);
 }
 
 .description {

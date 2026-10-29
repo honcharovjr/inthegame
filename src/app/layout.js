@@ -1,4 +1,5 @@
-import { Bricolage_Grotesque, Cinzel } from "next/font/google";
+import { Bricolage_Grotesque, Uncial_Antiqua } from "next/font/google";
+import TipLayer from "@/components/TipLayer/TipLayer";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -6,11 +7,11 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
 });
 
-// The fantasy display font of character names
-const cinzel = Cinzel({
-  variable: "--font-display",
+// The fantasy font: the kind of a character, perks and achievement names
+const uncial = Uncial_Antiqua({
+  variable: "--font-fancy",
   subsets: ["latin"],
-  weight: ["700", "900"],
+  weight: "400",
 });
 
 export const metadata = {
@@ -20,9 +21,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${cinzel.variable}`}>
+    <html lang="en" className={`${bricolage.variable} ${uncial.variable}`}>
       {/* Browser extensions add attributes to body before React loads */}
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <TipLayer />
+      </body>
     </html>
   );
 }

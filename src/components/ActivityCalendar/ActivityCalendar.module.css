@@ -1,4 +1,5 @@
 .wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -18,10 +19,38 @@
   transition: transform 0.15s ease;
 }
 
-@media (hover: hover) {
-  .day:hover {
-    transform: scale(1.35);
-  }
+.dayOn {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 2px var(--color-ink);
+}
+
+/* The flag over the day pointed at: the date, then the sessions. It slides
+   along its day so it never leaves the calendar at the edges. */
+.flag {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  background: var(--color-ink);
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(var(--shift), calc(-100% - 10px));
+  box-shadow: 0 8px 20px rgba(18, 10, 26, 0.2);
+}
+
+.flagDate {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.flagCount {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-yellow);
 }
 
 .level0 {

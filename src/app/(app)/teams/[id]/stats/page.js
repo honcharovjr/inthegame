@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import BackButton from "@/components/BackButton/BackButton";
 import { FilterBody, FilterChip, FilterLoading } from "@/components/FilterLoading/FilterLoading";
-import Chip from "@/components/Chip/Chip";
+import MetaLine from "@/components/MetaLine/MetaLine";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
@@ -137,13 +137,13 @@ async function StatsContent({ params, searchParams }) {
       )}
 
       <FilterBody skeleton={<Skeleton height={260} radius={22} />}>
-      <div className={styles.chips} aria-label="Totals">
-        <Chip tone="pink">
-          {shown.length} {shown.length === 1 ? "session" : "sessions"}
-        </Chip>
-        <Chip tone="turquoise">
-          {games.length} {games.length === 1 ? "game" : "games"}
-        </Chip>
+      <div className={styles.totals} aria-label="Totals">
+        <span>
+          <strong>{shown.length}</strong> {shown.length === 1 ? "session" : "sessions"}
+        </span>
+        <span>
+          <strong>{games.length}</strong> {games.length === 1 ? "game" : "games"}
+        </span>
       </div>
 
       <section className={styles.card} aria-label="Leaderboard">
@@ -175,24 +175,17 @@ async function StatsContent({ params, searchParams }) {
                   character={members.find((m) => m.id === row.id)?.character}
                 />
                 <span className={`${styles.boardName} keep-case`}>{row.name}</span>
-                <span className={styles.boardChips}>
-                  <Chip size="s">
-                    {row.games} {row.games === 1 ? "game" : "games"}
-                  </Chip>
-                  <Chip size="s" tone="pink">
-                    {row.wins} {row.wins === 1 ? "win" : "wins"}
-                  </Chip>
-                  {row.winRate !== null && (
-                    <Chip size="s" tone="turquoise">
-                      {row.winRate}%
-                    </Chip>
-                  )}
-                  {ratings.has(row.id) && (
-                    <Chip size="s" tone="yellow">
-                      {ratings.get(row.id)}
-                    </Chip>
-                  )}
-                </span>
+                <MetaLine
+                  className={styles.boardMeta}
+                  items={[
+                    `${row.games} ${row.games === 1 ? "game" : "games"}`,
+                    <span key="wins" className={styles.winner}>
+                      {row.wins} {row.wins === 1 ? "win" : "wins"}
+                    </span>,
+                    row.winRate !== null && `${row.winRate}%`,
+                    ratings.has(row.id) && `rating ${ratings.get(row.id)}`,
+                  ]}
+                />
               </li>
             ))}
           </ol>

@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import Character from "@/components/Character/Character";
 import GearIcon from "@/components/GearIcon/GearIcon";
 import { DiceIcon, LockIcon } from "@/components/icons";
+import TradingCard, { ArtWindow } from "@/components/TradingCard/TradingCard";
 import { findAchievement } from "@/lib/achievements/catalog";
 import { saveCharacter } from "@/lib/character/actions";
 import { GEAR_SLOTS, MOCK_GEAR } from "@/lib/character/gear";
@@ -76,7 +77,7 @@ function Figure({ frames, name, focus, rolling, onRoll, saved }) {
     transform: `scale(${shot.scale}) translate(${-(shot.x - 0.5 / shot.scale) * 100}%, ${-(shot.y - 0.5 / shot.scale) * 100}%)`,
   };
   return (
-    <div className={styles.frame}>
+    <ArtWindow className={styles.frame}>
       <div className={styles.lens} style={lens}>
         <div className={styles.alive}>
           {frames.map((frame, i) => (
@@ -110,7 +111,7 @@ function Figure({ frames, name, focus, rolling, onRoll, saved }) {
           <span className={styles.cheerText}>Looking sharp!</span>
         </div>
       )}
-    </div>
+    </ArtWindow>
   );
 }
 
@@ -236,11 +237,11 @@ function LookPanel({ tab, setTab, choice, owned, set, preview }) {
   );
 }
 
-// The top of the profile, like the gear screen of a game: the character on a
-// bright stage with the gear slots around it, and a panel beside it that
-// switches between the gear and the look. identity: the name and its editor.
-// stats: [{ label, value, icon }].
-export default function Wardrobe({ name, initial, earned, startOnLook, identity, kind, stats }) {
+// The top of the profile, like the gear screen of a game: the character's
+// card with the gear slots around it, and a panel beside it that switches
+// between the gear and the look. identity: the name and its editor. aside:
+// what goes under the panel.
+export default function Wardrobe({ name, initial, earned, startOnLook, identity, kind, aside }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [mode, setMode] = useState(startOnLook ? "look" : "gear");
@@ -267,18 +268,11 @@ export default function Wardrobe({ name, initial, earned, startOnLook, identity,
   // A small preview of one option, worn on the current choice
   const preview = (part, value) => ({ ...choice, [part]: value });
 
-  // The dice: a few quick random looks, settling on the last one.
+  // The dice: a random look at once, while the dice spins.
   function roll() {
-    if (rolling) return;
+    show(randomCharacter(choice, owned));
     setRolling(true);
-    let left = 5;
-    const step = () => {
-      show(randomCharacter(choice, owned));
-      left -= 1;
-      if (left > 0) setTimeout(step, 110);
-      else setRolling(false);
-    };
-    step();
+    setTimeout(() => setRolling(false), 550);
   }
 
   function save() {
@@ -309,14 +303,7 @@ export default function Wardrobe({ name, initial, earned, startOnLook, identity,
 
   return (
     <div className={styles.wardrobe}>
-      <section className={styles.stage} aria-label="Your character">
-        <div className={styles.stageTop}>
-          <div className={styles.identity}>
-            {identity}
-            <span className={styles.kind}>{kind}</span>
-          </div>
-        </div>
-
+      <TradingCard label="Your character" name={identity} kind={kind} className={styles.stage}>
         <div className={styles.rig}>
           <div className={styles.slots}>
             {GEAR_SLOTS.slice(0, 3).map((slot) => (
@@ -350,20 +337,6 @@ export default function Wardrobe({ name, initial, earned, startOnLook, identity,
           </div>
         )}
 
-        <ul className={styles.stats}>
-          {stats.map((item) => (
-            <li key={item.label} className={styles.stat}>
-              <span className={styles.statIcon} aria-hidden="true">
-                {item.icon}
-              </span>
-              <span className={styles.statText}>
-                <span className={styles.statLabel}>{item.label}</span>
-                <span className={styles.statValue}>{item.value}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-
         {error && (
           <p role="alert" className={styles.error}>
             {error}
@@ -389,34 +362,37 @@ export default function Wardrobe({ name, initial, earned, startOnLook, identity,
             </button>
           )}
         </div>
-      </section>
+      </TradingCard>
 
-      <section className={styles.bag} aria-label={looking ? "Look" : "Gear"}>
-        <div className={styles.switcher} role="tablist" aria-label="Wardrobe">
-          {[
-            ["gear", "Gear"],
-            ["look", "Look"],
-          ].map(([code, label]) => (
-            <button
-              key={code}
-              type="button"
-              role="tab"
-              aria-selected={mode === code}
-              className={`${styles.switch} ${mode === code ? styles.switchOn : ""}`}
-              onClick={() => switchTo(code)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <div className={styles.bagBody}>
-          {looking ? (
-            <LookPanel tab={tab} setTab={setTab} choice={choice} owned={owned} set={set} preview={preview} />
-          ) : (
-            <GearPanel />
-          )}
-        </div>
-      </section>
+      <div className={styles.side}>
+        <section className={styles.bag} aria-label={looking ? "Look" : "Gear"}>
+          <div className={styles.switcher} role="tablist" aria-label="Wardrobe">
+            {[
+              ["gear", "Gear"],
+              ["look", "Look"],
+            ].map(([code, label]) => (
+              <button
+                key={code}
+                type="button"
+                role="tab"
+                aria-selected={mode === code}
+                className={`${styles.switch} ${mode === code ? styles.switchOn : ""}`}
+                onClick={() => switchTo(code)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className={styles.bagBody}>
+            {looking ? (
+              <LookPanel tab={tab} setTab={setTab} choice={choice} owned={owned} set={set} preview={preview} />
+            ) : (
+              <GearPanel />
+            )}
+          </div>
+        </section>
+        {aside}
+      </div>
     </div>
   );
 }

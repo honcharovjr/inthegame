@@ -125,7 +125,12 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  align-items: center;
+  gap: 5px 10px;
+}
+
+.winner {
+  color: var(--color-pink-ink);
 }
 
 .arrow {
@@ -153,6 +158,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 560px;
+  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.05s both;
 }
 
 .createRow {
@@ -289,10 +296,33 @@
   font-weight: 800;
 }
 
-.boardChips {
+.boardMeta {
   flex: none;
+  flex-wrap: nowrap;
+}
+
+/* Totals of the team stats, as plain words with bold numbers */
+.totals {
   display: flex;
-  gap: 5px;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.totals strong {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+/* How many, next to a card title */
+.count {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .sessions {
@@ -355,14 +385,6 @@
 .edit:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
-}
-
-.pager {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
 }
 
 .personalTile {

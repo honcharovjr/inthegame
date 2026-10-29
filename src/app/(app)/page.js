@@ -5,6 +5,7 @@ import Skeleton from "@/components/Skeleton/Skeleton";
 import { checkPlayer } from "@/lib/achievements/award";
 import { getProfile } from "@/lib/auth/session";
 import { activityCalendar } from "@/lib/stats/activity";
+import { averageRating } from "@/lib/stats/average";
 import { monthStats, resultLabel } from "@/lib/stats/month";
 import { loadResults } from "@/lib/stats/results";
 import { headToHead } from "@/lib/stats/rivals";
@@ -17,9 +18,6 @@ export default function Home({ searchParams }) {
   return (
     <PageFrame>
       <PageTop title="Home">
-        <Link href="/games/play" className={`${styles.playButton} btn-secondary btn-tilt`}>
-          Play
-        </Link>
         <Link href="/log" className={`${styles.logButton} btn-primary btn-tilt`} aria-label="Log a session">
           <span>Log</span>
           <span className={styles.logPlus} aria-hidden="true">
@@ -39,11 +37,20 @@ const shortDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "sho
 // How many sessions the rivals are counted from.
 const RIVAL_SESSIONS = 200;
 
+// The shape of Home: the card, then the rating, streak and activity beside it.
 function HomeSkeleton() {
   return (
     <div className={styles.grid}>
-      <Skeleton height={560} radius={36} />
-      <Skeleton height={560} radius={28} delay={120} />
+      <div className={styles.skeletonCard}>
+        <Skeleton height={560} radius={36} />
+      </div>
+      <div className={styles.side}>
+        <div className={styles.pair}>
+          <Skeleton height={200} radius={24} delay={120} />
+          <Skeleton height={200} radius={24} delay={180} />
+        </div>
+        <Skeleton height={220} radius={24} delay={240} />
+      </div>
     </div>
   );
 }
@@ -77,22 +84,12 @@ async function HomeContent({ searchParams }) {
       .from("ratings")
       .select("game_id, rating, games(name, created_by, type, emoji)")
       .eq("profile_id", profile.id)
-      .order("games_count", { ascending: false })
-      .limit(1),
+      .order("games_count", { ascending: false }),
   ]);
 
-  // The rating of the game played most, with its last steps.
-  const top = ratingResult.data?.[0] ?? null;
-  const { data: history } = top
-    ? await supabase
-        .from("rating_history")
-        .select("rating_after, created_at")
-        .eq("profile_id", profile.id)
-        .eq("game_id", top.game_id)
-        .order("created_at", { ascending: false })
-        .limit(30)
-    : { data: [] };
-  const trend = (history ?? []).map((row) => Number(row.rating_after)).reverse();
+  // One rating for the player: the plain average over every rated game.
+  const ratingRows = ratingResult.data ?? [];
+  const rating = { games: ratingRows, average: averageRating(ratingRows) };
 
   const totals = monthStats(results.rows);
   const streak = winStreaks(results.rows);
@@ -134,8 +131,7 @@ async function HomeContent({ searchParams }) {
       totals={totals}
       streak={streak.current}
       calendar={calendar}
-      top={top}
-      trend={trend}
+      rating={rating}
       timeline={timeline}
       rivals={rivals}
       progress={checkPlayer(profile.id).then(

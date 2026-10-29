@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import Chip from "@/components/Chip/Chip";
+import MetaLine from "@/components/MetaLine/MetaLine";
 import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
@@ -13,9 +14,8 @@ export const metadata = { title: "teams" };
 export default function TeamsPage() {
   return (
     <PageFrame>
-      <PageTop title="Teams">
-        <CreateTeamForm />
-      </PageTop>
+      <PageTop title="Teams" />
+      <CreateTeamForm />
       <Suspense fallback={<TeamsSkeleton />}>
         <TeamList />
       </Suspense>
@@ -67,9 +67,7 @@ async function TeamList() {
             </span>
             <span className={styles.teamText}>
               <span className={styles.teamName}>Personal</span>
-              <span className={styles.chips}>
-                <Chip size="s">Sessions without a team</Chip>
-              </span>
+              <MetaLine items={["Sessions without a team"]} />
             </span>
             <span className={styles.arrow} aria-hidden="true">
               &#8250;
@@ -85,9 +83,7 @@ async function TeamList() {
               <span className={styles.teamText}>
                 <span className={`${styles.teamName} keep-case`}>{team.name}</span>
                 <span className={styles.chips}>
-                  <Chip size="s">
-                    {team.members} {team.members === 1 ? "member" : "members"}
-                  </Chip>
+                  <MetaLine items={[`${team.members} ${team.members === 1 ? "member" : "members"}`]} />
                   {team.role === "owner" && (
                     <Chip size="s" tone="pink">
                       Owner

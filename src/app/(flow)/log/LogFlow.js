@@ -364,7 +364,7 @@ export default function LogFlow({
           {!query && !editing && previousGame && (
             <button
               type="button"
-              className={`${styles.again} btn-primary btn-tilt`}
+              className={`${styles.again} btn-primary`}
               onClick={sameAgain}
             >
               <span className={styles.againIcon} aria-hidden="true">
@@ -450,15 +450,12 @@ export default function LogFlow({
 
       {step === 2 && game && (
         <>
-          <div className={styles.chips}>
-            <Chip tone="white">
-              <GameName game={game} />
-            </Chip>
-            <Chip tone="white">
-              {participants.length}{" "}
-              {participants.length === 1 ? "player" : "players"}
-            </Chip>
-          </div>
+          <p className={styles.summary}>
+            <GameName game={game} />
+            <span className={styles.summaryCount}>
+              {participants.length} {participants.length === 1 ? "player" : "players"}
+            </span>
+          </p>
 
           {/* A session stays in the team it was logged in, so editing
               never changes the team. */}
@@ -617,12 +614,10 @@ export default function LogFlow({
                 : `${editing.droppedCount} players are no longer in your team and were taken out of this session.`}
             </p>
           )}
-          <div className={styles.chips}>
-            <Chip tone="white">
-              <GameName game={game} />
-            </Chip>
-            <Chip tone="white">{participants.length} players</Chip>
-          </div>
+          <p className={styles.summary}>
+            <GameName game={game} />
+            <span className={styles.summaryCount}>{participants.length} players</span>
+          </p>
 
           <div
             className={styles.switch}

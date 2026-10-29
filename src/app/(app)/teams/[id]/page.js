@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Chip from "@/components/Chip/Chip";
+import MetaLine from "@/components/MetaLine/MetaLine";
 import UserText from "@/components/UserText/UserText";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import Skeleton from "@/components/Skeleton/Skeleton";
@@ -109,7 +110,7 @@ async function TeamContent({ params, searchParams }) {
       <section className={styles.card} aria-label="Members">
         <div className={styles.cardHead}>
           <span className={styles.cardTitle}>Members</span>
-          <Chip size="s">{members.length}</Chip>
+          <span className={styles.count}>{members.length}</span>
         </div>
         <ul className={styles.members} style={{ marginTop: 10 }}>
           {members.map((member, index) => (
@@ -176,14 +177,15 @@ async function TeamContent({ params, searchParams }) {
                 character={members.find((m) => m.id === row.id)?.character}
               />
               <span className={`${styles.boardName} keep-case`}>{row.name}</span>
-              <span className={styles.boardChips}>
-                <Chip size="s">
-                  {row.games} {row.games === 1 ? "game" : "games"}
-                </Chip>
-                <Chip size="s" tone="pink">
-                  {row.wins} {row.wins === 1 ? "win" : "wins"}
-                </Chip>
-              </span>
+              <MetaLine
+                className={styles.boardMeta}
+                items={[
+                  `${row.games} ${row.games === 1 ? "game" : "games"}`,
+                  <span key="wins" className={styles.winner}>
+                    {row.wins} {row.wins === 1 ? "win" : "wins"}
+                  </span>,
+                ]}
+              />
             </li>
           ))}
         </ol>

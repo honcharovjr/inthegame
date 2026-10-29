@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import BackButton from "@/components/BackButton/BackButton";
-import Chip from "@/components/Chip/Chip";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { checkPlayer } from "@/lib/achievements/award";
 import { ACHIEVEMENTS, GROUPS } from "@/lib/achievements/catalog";
@@ -56,11 +55,9 @@ async function AchievementsContent() {
 
   return (
     <div className={`${styles.body} stagger`}>
-      <div className={styles.chips}>
-        <Chip tone="yellow">
-          {total} of {ACHIEVEMENTS.length} earned
-        </Chip>
-      </div>
+      <p className={styles.summary}>
+        <strong>{total}</strong> of {ACHIEVEMENTS.length} earned
+      </p>
 
       {GROUPS.map((group) => (
         <section key={group.id} className={styles.card} aria-label={group.label}>
@@ -93,17 +90,17 @@ async function AchievementsContent() {
                     )}
                   </span>
                   {done ? (
-                    <Chip size="s" tone="turquoise">
+                    <span className={`${styles.state} ${styles.stateDone}`}>
                       {earnedAt.has(item.code)
                         ? dateFormat.format(new Date(earnedAt.get(item.code)))
                         : "Earned"}
-                    </Chip>
+                    </span>
                   ) : (
                     state &&
                     state.target > 1 && (
-                      <Chip size="s">
+                      <span className={styles.state}>
                         {state.current} of {state.target}
-                      </Chip>
+                      </span>
                     )
                   )}
                 </li>

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Character from "@/components/Character/Character";
 import GearIcon from "@/components/GearIcon/GearIcon";
 import { LockIcon } from "@/components/icons";
+import TradingCard, { ArtWindow } from "@/components/TradingCard/TradingCard";
 import UserText from "@/components/UserText/UserText";
 import { ACHIEVEMENTS } from "@/lib/achievements/catalog";
 import { GEAR_SLOTS } from "@/lib/character/gear";
@@ -57,9 +58,10 @@ async function NextUnlock({ progress }) {
   );
 }
 
-// The player's character on Home: a bright card with the figure, stat bars
-// toward the next milestone, the gear slots and the next item to unlock.
-// progress: a promise of the achievement progress (null if it failed).
+// The player's character on Home, the same card as on the profile: the
+// figure, stat bars toward the next milestone, the gear slots and the next
+// item to unlock. progress: a promise of the achievement progress (null if it
+// failed).
 export default function CharacterCard({ profile, played, wins, streak, progress }) {
   const look = resolveCharacter(profile.character);
   const race = RACES.find((item) => item.code === look.race)?.label;
@@ -69,51 +71,53 @@ export default function CharacterCard({ profile, played, wins, streak, progress 
   const streakBar = milestone(streak, STREAK_STEPS);
 
   return (
-    <section className={styles.card} aria-label="Your character">
-      <div className={styles.figure}>
-        <Character character={profile.character} name={profile.nickname} size="fill" view="full" perks />
-      </div>
-
-      <div className={styles.body}>
-        <div className={styles.identity}>
-          <span className={`${styles.name} ${nameStyle(profile.character)}`}>
-            <UserText>{profile.nickname}</UserText>
-          </span>
-          {profile.character && (
-            <span className={styles.kind}>
-              {race} {outfit}
-            </span>
-          )}
+    <TradingCard
+      label="Your character"
+      tilt
+      className={styles.deck}
+      name={
+        <span className={`${styles.name} ${nameStyle(profile.character)}`}>
+          <UserText>{profile.nickname}</UserText>
+        </span>
+      }
+      kind={profile.character ? `${race} ${outfit}` : ""}
+    >
+      <div className={styles.layout}>
+        <div className={styles.figureColumn}>
+          <ArtWindow className={styles.figure}>
+            <Character character={profile.character} name={profile.nickname} size="fill" view="full" perks />
+          </ArtWindow>
+          <Link href="/profile?mode=look" className={`${styles.customize} btn-primary`}>
+            Customize
+          </Link>
         </div>
 
-        <div className={styles.bars}>
-          <Bar label="Sessions" value={played} share={sessions.share} />
-          <Bar label="Wins" value={wins} share={winBar.share} />
-          <Suspense fallback={<Bar label="Medals" value="…" share={0} tone="pink" />}>
-            <MedalsBar progress={progress} />
+        <div className={styles.body}>
+          <div className={styles.bars}>
+            <Bar label="Sessions" value={played} share={sessions.share} />
+            <Bar label="Wins" value={wins} share={winBar.share} />
+            <Suspense fallback={<Bar label="Medals" value="…" share={0} tone="pink" />}>
+              <MedalsBar progress={progress} />
+            </Suspense>
+            <Bar label="Streak" value={streak} share={streakBar.share} tone="pink" />
+          </div>
+
+          <ul className={styles.gear} aria-label="Gear, coming soon">
+            {GEAR_SLOTS.map((slot) => (
+              <li key={slot.code} className={styles.slot} data-tip={`${slot.label}: soon`} data-tip-pos="below">
+                <GearIcon slot={slot.code} size={24} />
+                <span className={styles.slotLock} aria-hidden="true">
+                  <LockIcon size={10} />
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <Suspense fallback={null}>
+            <NextUnlock progress={progress} />
           </Suspense>
-          <Bar label="Streak" value={streak} share={streakBar.share} tone="pink" />
         </div>
-
-        <ul className={styles.gear} aria-label="Gear, coming soon">
-          {GEAR_SLOTS.map((slot) => (
-            <li key={slot.code} className={styles.slot} data-tip={`${slot.label}: soon`} data-tip-pos="below">
-              <GearIcon slot={slot.code} size={26} />
-              <span className={styles.slotLock} aria-hidden="true">
-                <LockIcon size={10} />
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        <Suspense fallback={null}>
-          <NextUnlock progress={progress} />
-        </Suspense>
-
-        <Link href="/profile?mode=look" className={`${styles.customize} btn-primary btn-tilt`}>
-          Customize
-        </Link>
       </div>
-    </section>
+    </TradingCard>
   );
 }

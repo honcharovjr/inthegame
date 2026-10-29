@@ -1,25 +1,40 @@
-/* The one loud block of Home: yellow, like the "you" cards elsewhere */
-.card {
-  display: grid;
-  gap: 20px;
-  padding: 18px;
-  border-radius: 36px;
-  background: var(--color-yellow);
-  animation: enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+/* Home's card: the figure and its customize button, the bars beside it */
+.deck {
+  align-self: start;
 }
 
-.figure {
+.layout {
+  display: grid;
+  gap: 20px;
+}
+
+.figureColumn {
   position: relative;
   width: min(100%, 280px);
   margin: 0 auto;
-  line-height: 0;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding-bottom: 22px;
 }
 
-@media (hover: hover) {
-  .card:hover .figure {
-    transform: rotate(-2deg) scale(1.01);
-  }
+.figure {
+  aspect-ratio: 0.656;
+  line-height: 0;
+}
+
+/* Sits on the bottom edge of the figure's window */
+.customize {
+  --btn-bg: var(--color-ink);
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 24px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+  transform: translateX(-50%);
 }
 
 .body {
@@ -29,23 +44,12 @@
   min-width: 0;
 }
 
-.identity {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .name {
   font-size: 40px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
   overflow-wrap: anywhere;
-}
-
-.kind {
-  font-size: 17px;
-  font-weight: 700;
 }
 
 .bars {
@@ -176,27 +180,18 @@
   background: var(--color-ink);
 }
 
-.customize {
-  --btn-bg: var(--color-ink);
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  height: 50px;
-  padding: 0 26px;
-  border-radius: var(--radius-pill);
-  font-size: 16px;
-  font-weight: 800;
-}
-
 @media (min-width: 640px) {
-  .card {
+  .layout {
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 28px;
-    padding: 28px;
+    gap: 24px;
   }
 
-  .figure {
+  .figureColumn {
     width: 100%;
-    align-self: start;
+  }
+
+  /* The next unlock rests on the bottom of the card */
+  .next {
+    margin-top: auto;
   }
 }

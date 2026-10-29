@@ -34,3 +34,11 @@
   background: var(--color-chip);
   color: var(--color-muted);
 }
+
+/* A solo session has no place, just its word */
+.solo {
+  flex: none;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-muted);
+}
