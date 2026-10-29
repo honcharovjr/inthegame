@@ -140,6 +140,7 @@ Games played inside the app. Stage 1 of the staged plan in section 9: no network
 |---|---|---|---|
 | FR-43 | The Games tab opens on a choice: Play (games inside the app) or Track (the catalog and logging). Play has its own look | Should | P4 |
 | FR-44 | Yahtzee in the app, solo or with friends on one device (2 to 6 players): dice with holds and three rolls, full score sheet with the upper bonus, Yahtzee bonus and joker rule. A game in progress survives a reload. Results are not saved to history or ratings yet | Should | P4 |
+| FR-51 | Blackjack in the app, solo against the dealer or with friends on one device (2 to 5 players): 6-deck shoe, dealer stands on 17, blackjack pays 3:2, double down, one split per hand. Chips for fun: 1,000 each at the start; a player with no chips is out. A game in progress survives a reload. Results are not saved | Should | P4 |
 | FR-45 | Play with friends by invite: a friend gets a notification, joins and plays from their own phone. Shown as "Coming soon" in the game | Could | Backlog |
 | FR-46 | Save in-app game results to history, ratings and achievements | Could | Backlog |
 

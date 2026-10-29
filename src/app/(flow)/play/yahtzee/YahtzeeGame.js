@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Die from "@/components/Die/Die";
 import UserText from "@/components/UserText/UserText";
-import { ArrowLeftIcon, PlusIcon } from "@/components/icons";
 import {
   LOWER,
   ROLLS_PER_TURN,
@@ -27,49 +26,17 @@ import {
   toggleHold,
   totals,
 } from "@/lib/games/yahtzee/rules";
-import { playerColor } from "@/lib/sessions/colors";
-import { createGuest } from "@/lib/sessions/actions";
 import { placesFromScores } from "@/lib/sessions/places";
+import Handoff from "../shared/Handoff";
+import ModeScreen from "../shared/ModeScreen";
+import { SetupScreen, usePlayerSetup } from "../shared/PlayerSetup";
+import TopBar from "../shared/TopBar";
+import ui from "../shared/play.module.css";
+import { createGameStore } from "../shared/store";
 import styles from "./yahtzee.module.css";
 
-// The game in progress lives in the browser, so a reload or a trip to
-// another tab never loses it. Cleared when the game ends.
-const STORAGE_KEY = "itg.yahtzee";
-
-const listeners = new Set();
-
-function subscribe(listener) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-function readRaw() {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function parseStored(raw, profileId) {
-  try {
-    const stored = JSON.parse(raw);
-    if (stored?.profileId === profileId && isValidGame(stored.game)) return stored;
-  } catch {
-    // Something old or broken. Start fresh.
-  }
-  return null;
-}
-
-function writeStored(value) {
-  try {
-    if (value) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-    else window.localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // Without storage the game still works, it just won't survive a reload.
-  }
-  listeners.forEach((listener) => listener());
-}
+// The game in progress lives in the browser. Cleared when the game ends.
+const store = createGameStore("itg.yahtzee", isValidGame);
 
 const LABELS = Object.fromEntries([...UPPER, ...LOWER].map((item) => [item.id, item.label]));
 
@@ -79,16 +46,10 @@ const LABELS = Object.fromEntries([...UPPER, ...LOWER].map((item) => [item.id, i
 export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers }) {
   // mode | setup | play | over
   const [stage, setStage] = useState("mode");
-  const raw = useSyncExternalStore(subscribe, readRaw, () => null);
-  const stored = raw ? parseStored(raw, profile.id) : null;
-
-  // Setup
-  const [guests, setGuests] = useState(initialGuests);
-  const [teamId, setTeamId] = useState(null);
-  const [picked, setPicked] = useState([]);
-  const [guestName, setGuestName] = useState("");
-  const [guestError, setGuestError] = useState(null);
-  const [addingGuest, startAddingGuest] = useTransition();
+  const raw = useSyncExternalStore(store.subscribe, store.readRaw, () => null);
+  const stored = store.parse(raw, profile.id);
+  const setup = usePlayerSetup({ profile, initialGuests, teams, maxPlayers });
+  const { lineup, teamId, setTeamId } = setup;
 
   // Play
   const [participants, setParticipants] = useState([]);
@@ -103,67 +64,11 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
 
   // Keep the game in the browser after every move, and forget it once over.
   useEffect(() => {
-    if (stage === "over") writeStored(null);
+    if (stage === "over") store.write(null);
     else if (stage === "play" && game) {
-      writeStored({ profileId: profile.id, participants, teamId, game });
+      store.write({ profileId: profile.id, participants, teamId, game });
     }
   }, [stage, game, participants, teamId, profile.id]);
-
-  const team = teams.find((item) => item.id === teamId) ?? null;
-  const me = {
-    key: "me",
-    name: profile.nickname,
-    registered: true,
-    character: profile.character,
-  };
-  const pool = [
-    me,
-    ...(team?.members ?? []).map((member) => ({
-      key: `p:${member.id}`,
-      name: member.nickname,
-      registered: true,
-      character: member.character,
-      tag: "Teammate",
-    })),
-    ...guests.map((guest) => ({ key: guest.id, name: guest.name, tag: "Guest" })),
-  ];
-  const lineup = ["me", ...picked]
-    .map((key) => pool.find((person) => person.key === key))
-    .filter(Boolean)
-    .map((person, index) => ({ ...person, color: playerColor(index) }));
-
-  function togglePick(key) {
-    setPicked((current) =>
-      current.includes(key)
-        ? current.filter((item) => item !== key)
-        : current.length + 1 < maxPlayers
-          ? [...current, key]
-          : current,
-    );
-  }
-
-  function chooseTeam(id) {
-    setTeamId(id);
-    // Teammates of another team leave the lineup, guests stay.
-    setPicked((current) => current.filter((key) => !key.startsWith("p:")));
-  }
-
-  function submitGuest(event) {
-    event.preventDefault();
-    setGuestError(null);
-    startAddingGuest(async () => {
-      const result = await createGuest(guestName);
-      if (result.error) {
-        setGuestError(result.error);
-        return;
-      }
-      setGuests((current) => [...current, result.guest]);
-      setPicked((current) =>
-        current.length + 1 < maxPlayers ? [...current, result.guest.id] : current,
-      );
-      setGuestName("");
-    });
-  }
 
   function begin(players, nextGame, nextTeamId) {
     setParticipants(players);
@@ -176,8 +81,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
   }
 
   function startSolo() {
-    const solo = [{ ...me, color: playerColor(0) }];
-    begin(solo, newGame(["me"]), null);
+    begin([setup.me], newGame(["me"]), null);
   }
 
   function start() {
@@ -189,7 +93,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
   }
 
   function discard() {
-    writeStored(null);
+    store.write(null);
   }
 
   function rematch() {
@@ -228,173 +132,27 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
 
   if (stage === "mode") {
     return (
-      <main className={styles.page}>
-        <div className={styles.column}>
-          <TopBar backHref="/games/play" />
-          <h1 className={styles.headline}>
-            How do
-            <br />
-            you play?
-          </h1>
-
-          {stored && (
-            <section className={styles.resume}>
-              <div className={styles.resumeText}>
-                <strong>Game in progress</strong>
-                <span>
-                  {stored.participants.length === 1
-                    ? "Solo"
-                    : stored.participants.map((item, index) => (
-                        <span key={item.key}>
-                          {index > 0 && ", "}
-                          <UserText>{item.name}</UserText>
-                        </span>
-                      ))}{" "}
-                  · round {round(stored.game)} of {ROUNDS}
-                </span>
-              </div>
-              <div className={styles.resumeActions}>
-                <button type="button" className={styles.primary} onClick={resume}>
-                  Continue
-                </button>
-                <button type="button" className={styles.ghost} onClick={discard}>
-                  Discard
-                </button>
-              </div>
-            </section>
-          )}
-
-          <div className={`${styles.modes} stagger`}>
-            <button type="button" className={`${styles.mode} ${styles.modeSolo}`} onClick={startSolo}>
-              <Die face={1} size={44} className={styles.modeDie} />
-              <span className={styles.modeTitle}>Solo</span>
-              <span className={styles.modeText}>Just you and the dice. Chase your best score.</span>
-            </button>
-
-            <p className={styles.modeLabel}>With friends</p>
-            <button type="button" className={`${styles.mode} ${styles.modePhone}`} onClick={() => setStage("setup")}>
-              <span className={styles.modeTitle}>On this phone</span>
-              <span className={styles.modeText}>Pass the phone around. Up to {maxPlayers} players.</span>
-            </button>
-            <div className={`${styles.mode} ${styles.modeSoon}`} aria-disabled="true">
-              <span className={styles.soonBadge}>Coming soon</span>
-              <span className={styles.modeTitle}>Invite friends</span>
-              <span className={styles.modeText}>
-                Send an invite. Friends get a notification and join from their own phones.
-              </span>
-            </div>
-          </div>
-        </div>
-      </main>
+      <ModeScreen
+        title="Yahtzee"
+        soloArt={<Die face={1} size={44} className={ui.modeDie} />}
+        soloText="Just you and the dice. Chase your best score."
+        maxPlayers={maxPlayers}
+        onSolo={startSolo}
+        onPhone={() => setStage("setup")}
+        resume={
+          stored && {
+            participants: stored.participants,
+            progress: `round ${round(stored.game)} of ${ROUNDS}`,
+            onContinue: resume,
+            onDiscard: discard,
+          }
+        }
+      />
     );
   }
 
   if (stage === "setup") {
-    const enough = lineup.length >= 2;
-    return (
-      <main className={styles.page}>
-        <div className={styles.column}>
-          <TopBar onBack={() => setStage("mode")} />
-          <h1 className={styles.headline}>
-            Who&apos;s
-            <br />
-            playing?
-          </h1>
-
-          <div className={styles.lineup} aria-label="Players in order">
-            {lineup.map((item, index) => (
-              <div key={item.key} className={styles.lineupItem}>
-                <span className={styles.order}>{index + 1}</span>
-                <Avatar name={item.name} size={52} color={item.color} registered={item.registered} character={item.character} />
-                <span className={styles.lineupName}>
-                  {item.key === "me" ? "You" : <UserText>{item.name}</UserText>}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {teams.length > 0 && (
-            <div className={styles.chips} role="group" aria-label="Team">
-              <button
-                type="button"
-                className={`${styles.chip} ${!teamId ? styles.chipOn : ""}`}
-                aria-pressed={!teamId}
-                onClick={() => chooseTeam(null)}
-              >
-                No team
-              </button>
-              {teams.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`${styles.chip} ${teamId === item.id ? styles.chipOn : ""}`}
-                  aria-pressed={teamId === item.id}
-                  onClick={() => chooseTeam(item.id)}
-                >
-                  <UserText>{item.name}</UserText>
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className={styles.pool}>
-            {pool
-              .filter((item) => item.key !== "me")
-              .map((item) => {
-                const on = picked.includes(item.key);
-                return (
-                  <button
-                    key={item.key}
-                    type="button"
-                    className={`${styles.poolItem} ${on ? styles.poolOn : ""}`}
-                    aria-pressed={on}
-                    onClick={() => togglePick(item.key)}
-                  >
-                    <Avatar name={item.name} size={34} color={on ? lineup.find((p) => p.key === item.key)?.color : "#5b4a63"} registered={item.registered} character={item.character} />
-                    <span className={`${styles.poolName} keep-case`}>{item.name}</span>
-                    <span className={styles.poolTag}>{item.tag}</span>
-                  </button>
-                );
-              })}
-          </div>
-
-          <form onSubmit={submitGuest} className={styles.guestForm}>
-            <input
-              className={styles.guestInput}
-              value={guestName}
-              onChange={(event) => setGuestName(event.target.value)}
-              type="text"
-              maxLength={30}
-              placeholder="Add a guest by name"
-              aria-label="Guest name"
-              required
-            />
-            <button
-              type="submit"
-              className={styles.guestAdd}
-              aria-label="Add guest"
-              data-tip="Add guest"
-              data-tip-align="end"
-              disabled={addingGuest}
-            >
-              <PlusIcon size={22} />
-            </button>
-          </form>
-          {guestError && (
-            <p role="alert" className={styles.problem}>
-              {guestError}
-            </p>
-          )}
-
-          <button type="button" className={`${styles.primary} ${styles.big}`} disabled={!enough} onClick={start}>
-            {enough
-              ? `Start with ${lineup.length} players`
-              : "Add at least 1 more player"}
-          </button>
-          <p className={styles.note}>Up to {maxPlayers} players. The order above is the turn order.</p>
-        </div>
-      </main>
-    );
+    return <SetupScreen title="Yahtzee" setup={setup} onBack={() => setStage("mode")} onStart={start} />;
   }
 
   if (stage === "over") {
@@ -412,47 +170,47 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
           : <><UserText>{winners[0].name}</UserText> wins!</>;
 
     return (
-      <main className={styles.page}>
-        <div className={styles.column}>
-          <TopBar backHref="/games/play" />
+      <main className={ui.page}>
+        <div className={ui.column}>
+          <TopBar title="Yahtzee" backHref="/games/play" />
           <div className={styles.confetti} aria-hidden="true">
             {[6, 5, 4, 3, 2, 1].map((face, index) => (
               <Die key={face} face={face} size={34} className={styles.confettiDie} style={{ "--i": index }} />
             ))}
           </div>
-          <h1 className={styles.headline}>{headline}</h1>
+          <h1 className={ui.headline}>{headline}</h1>
 
-          <ol className={`${styles.results} stagger`}>
+          <ol className={`${ui.results} stagger`}>
             {ranked.map((item) => {
               const sum = totals(game.sheets[item.key]);
               const first = places[item.key] === 1;
               return (
-                <li key={item.key} className={`${styles.resultRow} ${first ? styles.resultWin : ""}`}>
-                  {participants.length > 1 && <span className={styles.place}>{places[item.key]}</span>}
+                <li key={item.key} className={`${ui.resultRow} ${first ? ui.resultWin : ""}`}>
+                  {participants.length > 1 && <span className={ui.place}>{places[item.key]}</span>}
                   <Avatar name={item.name} size={44} color={item.color} registered={item.registered} character={item.character} />
-                  <span className={styles.resultText}>
-                    <span className={styles.resultName}>
+                  <span className={ui.resultText}>
+                    <span className={ui.resultName}>
                       {item.key === "me" ? "You" : <UserText>{item.name}</UserText>}
                     </span>
-                    <span className={styles.resultMeta}>
+                    <span className={ui.resultMeta}>
                       Upper {sum.upper}
                       {sum.upperBonus ? ` +${sum.upperBonus}` : ""} · Lower {sum.lower}
                       {sum.yahtzeeBonus ? ` · Bonus ${sum.yahtzeeBonus}` : ""}
                     </span>
                   </span>
-                  <span className={styles.resultTotal}>{sum.total}</span>
+                  <span className={ui.resultTotal}>{sum.total}</span>
                 </li>
               );
             })}
           </ol>
 
-          <p className={styles.note}>In-app games are not saved to your history yet.</p>
+          <p className={ui.note}>In-app games are not saved to your history yet.</p>
 
-          <div className={styles.endActions}>
-            <button type="button" className={`${styles.primary} ${styles.big}`} onClick={rematch}>
+          <div className={ui.endActions}>
+            <button type="button" className={`${ui.primary} ${ui.big}`} onClick={rematch}>
               Play again
             </button>
-            <Link href="/games/play" className={`${styles.ghost} ${styles.big}`}>
+            <Link href="/games/play" className={`${ui.ghost} ${ui.big}`}>
               Done
             </Link>
           </div>
@@ -498,15 +256,15 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
   }
 
   return (
-    <main className={styles.page}>
-      <div className={`${styles.column} ${styles.playColumn}`}>
-        <TopBar backHref="/games/play">
+    <main className={ui.page}>
+      <div className={`${ui.column} ${styles.playColumn}`}>
+        <TopBar title="Yahtzee" backHref="/games/play">
           <span className={styles.round}>
             Round {round(game)} of {ROUNDS}
           </span>
         </TopBar>
 
-        <div className={styles.players}>
+        <div className={ui.players}>
           {participants.map((item) => {
             const isActive = item.key === active;
             const isViewed = item.key === sheetKey;
@@ -514,15 +272,15 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
               <button
                 key={item.key}
                 type="button"
-                className={`${styles.player} ${isActive ? styles.playerActive : ""} ${isViewed && !isActive ? styles.playerViewed : ""}`}
+                className={`${ui.player} ${isActive ? ui.playerActive : ""} ${isViewed && !isActive ? ui.playerViewed : ""}`}
                 onClick={() => setViewing(item.key === active ? null : item.key)}
                 aria-label={`${item.name}: ${totals(game.sheets[item.key]).total} points. Show sheet`}
               >
                 <Avatar name={item.name} size={30} color={item.color} registered={item.registered} character={item.character} />
-                <span className={styles.playerName}>
+                <span className={ui.playerName}>
                   {item.key === "me" ? "You" : <UserText>{item.name}</UserText>}
                 </span>
-                <span className={styles.playerTotal}>{totals(game.sheets[item.key]).total}</span>
+                <span className={ui.playerTotal}>{totals(game.sheets[item.key]).total}</span>
               </button>
             );
           })}
@@ -578,7 +336,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
               </button>
               <button
                 type="button"
-                className={styles.primary}
+                className={ui.primary}
                 disabled={!selected}
                 onClick={doScore}
               >
@@ -593,7 +351,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
                 <span>
                   <UserText>{person(sheetKey).name}</UserText>&apos;s sheet
                 </span>
-                <button type="button" className={styles.link} onClick={() => setViewing(null)}>
+                <button type="button" className={ui.link} onClick={() => setViewing(null)}>
                   Back to the turn
                 </button>
               </div>
@@ -632,43 +390,17 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
       )}
 
       {handoff && next && (
-        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Next player">
-          <div className={styles.handoff}>
-            <p className={styles.handoffLast}>
+        <Handoff
+          next={next}
+          onReady={() => setHandoff(null)}
+          message={
+            <>
               {handoff.who === "me" ? "You" : <UserText>{person(handoff.who).name}</UserText>} scored{" "}
               <strong>{handoff.points}</strong> in {LABELS[handoff.category]}
-            </p>
-            <Avatar name={next.name} size={96} color={next.color} registered={next.registered} character={next.character} />
-            <p className={styles.handoffName}>
-              {next.key === "me" ? "Your turn" : <><UserText>{next.name}</UserText>&apos;s turn</>}
-            </p>
-            <p className={styles.handoffHint}>Pass the phone</p>
-            <button type="button" className={`${styles.primary} ${styles.big}`} onClick={() => setHandoff(null)} autoFocus>
-              {next.key === "me" ? "Let's go" : <span>I&apos;m <UserText>{next.name}</UserText></span>}
-            </button>
-          </div>
-        </div>
+            </>
+          }
+        />
       )}
     </main>
-  );
-}
-
-// Give backHref for a link or onBack for a button.
-function TopBar({ backHref, onBack, children }) {
-  const icon = <ArrowLeftIcon size={20} />;
-  return (
-    <div className={styles.top}>
-      {onBack ? (
-        <button type="button" className={styles.back} onClick={onBack} aria-label="Back" data-tip="Back" data-tip-pos="below">
-          {icon}
-        </button>
-      ) : (
-        <Link href={backHref} className={styles.back} aria-label="Back" data-tip="Back" data-tip-pos="below">
-          {icon}
-        </Link>
-      )}
-      <span className={styles.title}>Yahtzee</span>
-      {children ?? <span />}
-    </div>
   );
 }
