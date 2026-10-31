@@ -14,10 +14,11 @@ function readPassword(formData) {
   return String(formData.get("password") ?? "");
 }
 
-// Where to go after logging in. Only paths inside the app are allowed.
+// Where to go after logging in: the page that sent the player here, or Home
+// in /app. Only paths inside the site are allowed.
 function readNext(formData) {
   const next = String(formData.get("next") ?? "");
-  return next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  return next.startsWith("/") && !next.startsWith("//") ? next : "/app";
 }
 
 async function readOrigin() {
@@ -122,7 +123,7 @@ export async function updatePassword(previousState, formData) {
   if (error) {
     return result({ error: error.message }, {}, ["password"]);
   }
-  redirect("/");
+  redirect("/app");
 }
 
 export async function signOut() {

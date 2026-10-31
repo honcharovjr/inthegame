@@ -25,9 +25,9 @@ async function audit(admin, adminId, action, targetType, targetId, details) {
 }
 
 function refreshCatalog() {
-  revalidatePath("/admin");
-  revalidatePath("/admin/catalog");
-  revalidatePath("/games/track");
+  revalidatePath("/app/admin");
+  revalidatePath("/app/admin/catalog");
+  revalidatePath("/app/games/track");
 }
 
 // Adds a catalog game, or edits one when input.id is given. Custom games
@@ -145,9 +145,9 @@ export async function setBlocked(profileId, blocked) {
   await audit(admin, me.id, blocked ? "player.block" : "player.unblock", "profile", profileId, {
     nickname: target.nickname,
   });
-  revalidatePath("/admin");
-  revalidatePath("/admin/users");
-  revalidatePath(`/admin/users/${profileId}`);
+  revalidatePath("/app/admin");
+  revalidatePath("/app/admin/users");
+  revalidatePath(`/app/admin/users/${profileId}`);
   return { ok: true };
 }
 
@@ -198,7 +198,7 @@ export async function saveSiteSettings(input) {
   }
 
   await audit(admin, me.id, "settings.edit", "settings", null, { name: "site settings" });
-  revalidatePath("/admin");
+  revalidatePath("/app/admin");
   updateTag(SITE_SETTINGS_TAG);
   return { ok: true };
 }

@@ -7,7 +7,7 @@ import { ArrowLeftIcon } from "@/components/icons";
 // Goes back to where the player came from. A page opened directly, with
 // nothing to go back to, goes to fallback instead. With `to`, it always goes
 // there, whatever came before.
-export default function BackButton({ fallback = "/", to }) {
+export default function BackButton({ fallback = "/app", to }) {
   const router = useRouter();
 
   return (

@@ -17,14 +17,14 @@ const ICONS = {
 
 // href is null for screens that are not built yet.
 const TABS = [
-  { id: "home", label: "Home", href: "/" },
-  { id: "games", label: "Games", href: "/games" },
-  { id: "log", label: "Log a session", href: "/log" },
-  { id: "teams", label: "Teams", href: "/teams" },
-  { id: "profile", label: "Profile", href: "/profile" },
+  { id: "home", label: "Home", href: "/app" },
+  { id: "games", label: "Games", href: "/app/games" },
+  { id: "log", label: "Log a session", href: "/app/log" },
+  { id: "teams", label: "Teams", href: "/app/teams" },
+  { id: "profile", label: "Profile", href: "/app/profile" },
 ];
 
-const ADMIN_TAB = { id: "admin", label: "Admin panel", href: "/admin" };
+const ADMIN_TAB = { id: "admin", label: "Admin panel", href: "/app/admin" };
 
 // Floating capsule menu with icon tabs. The active tab is a pink circle.
 // A tab lights up the moment it is pressed, not when the next page arrives.
@@ -41,8 +41,8 @@ export default function TabBar({ isAdmin = false }) {
         const isLog = tab.id === "log";
         const active =
           !isLog &&
-          (tab.href === "/"
-            ? shown === "/"
+          (tab.href === "/app"
+            ? shown === "/app"
             : Boolean(tab.href) && shown.startsWith(tab.href));
         const className = [
           styles.tab,

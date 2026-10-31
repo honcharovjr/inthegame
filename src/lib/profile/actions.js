@@ -59,6 +59,6 @@ export async function deleteGuest(guestId) {
     return { error: "Unknown guest." };
   }
 
-  revalidatePath("/profile");
+  revalidatePath("/app/profile");
   return { ok: true };
 }

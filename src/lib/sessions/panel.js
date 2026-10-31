@@ -35,5 +35,5 @@ export function readPage(value) {
 
 // Where a session is managed.
 export function panelHref(teamId) {
-  return teamId ? `/teams/${teamId}` : "/teams/personal";
+  return teamId ? `/app/teams/${teamId}` : "/app/teams/personal";
 }

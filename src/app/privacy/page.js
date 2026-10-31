@@ -39,7 +39,7 @@ export default async function PrivacyPage() {
           <Link href="/" className={styles.brand}>
             in the game
           </Link>
-          <Link href="/login" className={`${styles.login} btn-secondary`}>
+          <Link href="/app" className={`${styles.login} btn-secondary`}>
             Log in
           </Link>
         </div>
