@@ -92,7 +92,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-36 | Feedback link | Could | Pilot | Open | |
 | FR-37 | Pilot with seed data and a tournament | Must | Pilot | Open | |
 
-Non-functional gaps: NFR-07 asks for CI in GitHub Actions (not set up); NFR-01 timing not measured yet.
+Non-functional gaps: NFR-01 timing not measured yet. NFR-07: CI in GitHub Actions runs lint, tests and the build on every pull request.
 
 ## 4. Next steps (corrective actions)
 
