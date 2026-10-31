@@ -2,6 +2,7 @@ import Link from "next/link";
 import ActivityCalendar from "@/components/ActivityCalendar/ActivityCalendar";
 import Avatar from "@/components/Avatar/Avatar";
 import Flames from "@/components/Flames/Flames";
+import GameInvites from "@/components/GameInvites/GameInvites";
 import { InfoIcon } from "@/components/icons";
 import Toast from "@/components/Toast/Toast";
 import UserText, { GameName } from "@/components/UserText/UserText";
@@ -20,6 +21,8 @@ export default function HomeView({ saved, profile, totals, streak, calendar, rat
   return (
     <>
       {saved && <Toast message="Session saved. Nice game." tone="success" dismissTo="/" />}
+
+      <GameInvites profileId={profile.id} />
 
       <div className={styles.grid}>
         <CharacterCard profile={profile} played={totals.played} wins={totals.wins} streak={streak} progress={progress} />

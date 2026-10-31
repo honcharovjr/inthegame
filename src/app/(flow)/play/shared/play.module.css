@@ -227,6 +227,50 @@ button.mode:active {
   color: var(--color-ink);
 }
 
+/* Online lobby */
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.rosterItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  animation: pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.rosterOff {
+  opacity: 0.6;
+}
+
+.rosterName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.rosterStatus {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.modeInvite {
+  background: var(--color-pink);
+  color: #fff;
+}
+
 .modeSoon {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.6);
