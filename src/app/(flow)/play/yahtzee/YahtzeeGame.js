@@ -19,6 +19,7 @@ import {
   toggleHold,
 } from "@/lib/games/yahtzee/rules";
 import { playRoll, playYahtzee } from "../shared/feedback";
+import { RulesButton, SoundButton } from "../shared/GameButtons";
 import Handoff from "../shared/Handoff";
 import InviteScreen from "../shared/InviteScreen";
 import ModeScreen from "../shared/ModeScreen";
@@ -27,6 +28,7 @@ import ui from "../shared/play.module.css";
 import { createGameStore } from "../shared/store";
 import YahtzeeBoard, { LABELS } from "./YahtzeeBoard";
 import YahtzeeResults from "./YahtzeeResults";
+import { yahtzeeRules } from "./YahtzeeRules";
 import styles from "./yahtzee.module.css";
 
 // The game in progress lives in the browser. Cleared when the game ends.
@@ -178,6 +180,12 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
         onRoll={doRoll}
         onHold={(index) => setGame(toggleHold(game, index))}
         onScore={doScore}
+        actions={
+          <>
+            <RulesButton title="How to play Yahtzee" tabs={yahtzeeRules()} />
+            <SoundButton />
+          </>
+        }
       />
 
       {flash && (

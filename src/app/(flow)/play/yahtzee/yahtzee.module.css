@@ -1,6 +1,6 @@
 /* Yahtzee: bright dice and a white score sheet on the shared dark table */
 .playColumn {
-  max-width: 1080px;
+  max-width: 1320px;
 }
 
 .round {
@@ -29,6 +29,14 @@
   flex-direction: column;
   gap: 12px;
   min-width: 0;
+}
+
+.turnLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
 }
 
 .turn {
@@ -199,36 +207,35 @@
   text-align: center;
 }
 
-.actions {
-  position: sticky;
-  bottom: 12px;
-  z-index: 5;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 8px;
-  padding: 8px;
-  border-radius: var(--radius-pill);
-  background: rgba(18, 10, 26, 0.85);
-  backdrop-filter: blur(10px);
-}
-
 .roll {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 0 20px;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 8px 0 26px;
   border-radius: var(--radius-pill);
   background: var(--color-yellow);
   color: var(--color-ink);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.rollLeft {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-yellow);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
 .roll:active:not(:disabled) {
-  transform: scale(0.95) rotate(-2deg);
+  transform: scale(0.97);
 }
 
 .roll:disabled {
@@ -237,64 +244,54 @@
   cursor: default;
 }
 
-.rollDots {
-  display: inline-flex;
-  gap: 4px;
+.roll:disabled .rollLeft {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.dot,
-.dotOn {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.25;
-}
-
-.dotOn {
-  opacity: 1;
-}
-
-/* Score sheet: a column per player, the same width each. The name column
-   takes the rest. Upper and lower are separate cards. */
+/* Score sheet: one grid from the faces down to the total, so the column of
+   the player on turn runs unbroken through each card. Every player column
+   has the same width. Upper and lower are separate cards. */
 .sheet {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  --col: 44px;
+  --name: minmax(0, 1fr);
+  --col: 56px;
 }
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(var(--cols), var(--col));
-  align-items: center;
-  min-height: 30px;
+  grid-template-columns: var(--name) repeat(var(--cols), var(--col));
+  align-items: stretch;
+  min-height: 34px;
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  padding: 4px 6px;
-  border-radius: 20px;
+  border-radius: 18px;
   background: var(--color-surface);
   color: var(--color-ink);
+  overflow: hidden;
 }
 
-.card .row + .row {
+.card .row + .row > * {
   border-top: 1px solid var(--color-chip);
 }
 
+.card .row + .row > .colOn {
+  border-top-color: #f3e3a0;
+}
+
 .rowName {
-  justify-self: start;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0 6px;
+  min-width: 0;
+  padding-left: 12px;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   text-decoration: underline dotted rgba(110, 97, 112, 0.5);
   text-underline-offset: 4px;
@@ -302,10 +299,9 @@
 }
 
 .cell {
-  align-self: stretch;
   display: grid;
   place-items: center;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -314,16 +310,22 @@
   background: var(--color-yellow-tint);
 }
 
-/* The points a box would give: tap to score */
-.pick {
+/* Scored is plain black. A box you can score is a teal chip; hover fills
+   it, a click scores it. A 0 is grey. The best box has a star beside it. */
+.pickWrap {
   position: relative;
-  min-width: 30px;
-  height: 24px;
-  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pick {
+  min-width: 36px;
+  height: 26px;
+  padding: 0 7px;
   border-radius: 8px;
-  background: none;
-  color: var(--color-pink-deep);
-  font-size: 15px;
+  background: var(--color-turquoise-tint);
+  color: var(--color-turquoise-ink);
+  font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
@@ -331,40 +333,37 @@
 }
 
 .pickZero {
+  background: var(--color-chip);
   color: var(--color-muted);
-  font-weight: 700;
 }
 
 @media (hover: hover) {
   .pick:hover {
-    background: var(--color-pink-tint);
+    background: var(--color-turquoise);
+    color: var(--color-ink);
   }
 }
 
 .pick:active {
-  background: var(--color-pink);
-  color: #fff;
+  background: var(--color-turquoise);
+  color: var(--color-ink);
 }
 
-/* The open box worth the most */
-.star {
+.best {
   position: absolute;
-  top: -3px;
-  right: -5px;
-  width: 9px;
-  height: 9px;
-  background: var(--color-pink);
-  clip-path: polygon(50% 0, 62% 35%, 100% 38%, 70% 60%, 80% 100%, 50% 77%, 20% 100%, 30% 60%, 0 38%, 38% 35%);
+  left: calc(100% + 2px);
+  color: var(--color-turquoise-ink);
+  font-size: 12px;
+  line-height: 1;
 }
 
 /* Column heads: the players as faces, the name on hover */
 .heads {
-  min-height: 46px;
+  min-height: 52px;
 }
 
 .head {
   position: relative;
-  align-self: stretch;
   display: grid;
   place-items: end center;
   padding-bottom: 6px;
@@ -375,16 +374,16 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
 }
 
 .ring {
   position: absolute;
   inset: -2px;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   transform: rotate(-90deg);
   pointer-events: none;
 }
@@ -399,8 +398,8 @@
 
 .presence {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: 1px;
+  bottom: 1px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -414,7 +413,7 @@
 
 .sticker {
   position: absolute;
-  bottom: calc(100% - 4px);
+  bottom: calc(100% - 6px);
   left: 50%;
   z-index: 2;
   padding: 3px 8px;
@@ -446,21 +445,19 @@
   }
 }
 
-/* Upper bonus: a chest, a meter per player, +35 once reached */
-.bonusRow {
-  min-height: 34px;
-}
-
-.chest {
-  width: 16px;
-  height: 14px;
-  border-radius: 3px 3px 2px 2px;
-  background: linear-gradient(var(--color-yellow) 0 45%, var(--color-ink) 45% 55%, var(--color-yellow) 55%);
-  box-shadow: inset 0 0 0 2px var(--color-ink);
+/* Upper bonus: a meter per player, +35 once reached */
+.plus {
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-turquoise);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 18px;
 }
 
 .meter {
-  width: 30px;
+  align-self: center;
+  width: 38px;
   height: 8px;
   border-radius: 4px;
   background: var(--color-chip);
@@ -476,6 +473,7 @@
 }
 
 .bonusWon {
+  align-self: center;
   padding: 1px 7px;
   border-radius: var(--radius-pill);
   background: var(--color-turquoise);
@@ -483,13 +481,11 @@
   font-size: 13px;
 }
 
-.totalRow {
-  min-height: 40px;
-  padding: 0 6px;
-  border-radius: 16px;
-  background: var(--color-ink);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+.card .totalRow > * {
+  min-height: 42px;
+  border-top: 2px solid var(--color-ink);
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .totalRow .rowName {
@@ -497,33 +493,94 @@
   cursor: default;
 }
 
-.totalRow .cell {
-  font-size: 17px;
+/* Side panel: an end request, standings, reactions, last moves */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
 }
 
-/* Online: the last turn, reactions */
-.feed {
+.panel {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panelTitle {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.standings {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stand {
+  display: grid;
+  grid-template-columns: 16px 38px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  border-radius: 16px;
+  padding: 4px 12px 4px 10px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
+}
+
+.standOn {
+  background: rgba(255, 225, 77, 0.14);
+  box-shadow: inset 0 0 0 2px var(--color-yellow);
+}
+
+.standPlace {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.standName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.hostTag {
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.standTotal {
+  font-size: 19px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.moves {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   color: rgba(255, 255, 255, 0.75);
   font-size: 13px;
   font-weight: 600;
 }
 
-.feed strong {
+.moves strong {
   color: #fff;
-}
-
-.feedDot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-turquoise);
 }
 
 .reactions {
@@ -548,49 +605,34 @@
   }
 }
 
-.topButton {
-  display: inline-flex;
+/* A request to end the game: a small strip at the top of the side panel */
+.requestStrip {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 36px;
-  min-width: 36px;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border-radius: 16px;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.requestStrip > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.requestStrip button {
+  height: 32px;
   padding: 0 12px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
 }
 
-/* Ending the game: the host's request card and the confirm sheet */
-.request {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: 22px;
-  background: var(--color-yellow);
-  color: var(--color-ink);
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.requestActions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.requestActions button {
-  min-height: 44px;
-  border-radius: var(--radius-pill);
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
+/* Ending the game: the buttons of the request strip and the confirm sheet */
 .requestEnd {
   background: var(--color-ink);
   color: #fff;
@@ -725,34 +767,58 @@
   }
 }
 
-/* Desktop: dice on the left, the sheet on the right */
+/* Wide screens: dice and the side panel on the left, the sheet beside them;
+   very wide screens give the side panel its own column on the right. */
 @media (min-width: 900px) {
   .layout {
     display: grid;
-    grid-template-columns: 360px minmax(0, 1fr);
+    grid-template-columns: 340px auto;
+    grid-template-areas: "table sheet" "side sheet";
+    justify-content: center;
     align-items: start;
-    gap: 32px;
+    gap: 24px 32px;
   }
 
   .table {
-    position: sticky;
-    top: 24px;
-  }
-
-  .turn {
-    font-size: 48px;
-  }
-
-  .tray {
-    padding: 26px 16px 14px;
+    grid-area: table;
   }
 
   .sheet {
-    --col: 60px;
+    grid-area: sheet;
+    --name: 150px;
+    --col: 76px;
   }
 
-  .actions {
-    position: static;
+  .side {
+    grid-area: side;
+  }
+
+  .row {
+    min-height: 37px;
+  }
+
+  .rowName {
+    font-size: 16px;
+  }
+
+  .cell,
+  .pick {
+    font-size: 17px;
+  }
+
+  .turn {
+    font-size: 44px;
+  }
+
+  .tray {
+    padding: 26px 14px 12px;
+  }
+}
+
+@media (min-width: 1240px) {
+  .layout {
+    grid-template-columns: 340px auto 280px;
+    grid-template-areas: "table sheet side";
   }
 }
 
@@ -772,4 +838,10 @@
   margin-top: 10px;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
+}
+
+.confirmPanel .requestKeep {
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  cursor: pointer;
 }

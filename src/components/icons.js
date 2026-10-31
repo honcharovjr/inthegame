@@ -205,3 +205,35 @@ export function CollapseIcon(props) {
     </Icon>
   );
 }
+
+export function BookIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z" />
+    </Icon>
+  );
+}
+
+export function SoundIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />
+    </Icon>
+  );
+}
+
+export function SoundOffIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6" />
+    </Icon>
+  );
+}
+
+export function FlagIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 22V4M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+    </Icon>
+  );
+}

@@ -6,7 +6,6 @@ import Die from "@/components/Die/Die";
 import UserText from "@/components/UserText/UserText";
 import {
   LOWER,
-  ROLLS_PER_TURN,
   ROUNDS,
   UPPER,
   UPPER_BONUS,
@@ -43,18 +42,18 @@ const ROWS = {
 };
 
 // The time on a turn, for the ring around the player on turn.
-const RING = 2 * Math.PI * 17;
+const RING = 2 * Math.PI * 18;
 
 // The Yahtzee table, shared by the game on one device and the online game:
-// the dice, then one score sheet with a column per player. Clicking the
-// points a box would give scores it at once. The parent owns the game.
-// participants: [{ key, name, color, registered, character }], keyed like
-// game.players. meKey is shown as "You". canAct is false while this device
-// waits for another player. rolling shakes the loose dice until a roll
-// arrives. timer: { left, total } in ms for the player on turn, or null.
+// the dice, one score sheet with a column per player, and a side panel.
+// Tapping the points a box would give scores it at once.
+// participants: [{ key, name, color, registered, character, host? }], keyed
+// like game.players. meKey is shown as "You". canAct is false while this
+// device waits for another player. rolling shakes the loose dice until a
+// roll arrives. timer: { left, total } in ms for the player on turn, or null.
 // presence: a Set of keys online, or null. reactions: { key: { label, id } }.
-// actions sit in the top bar; banner above the dice; feed under them;
-// footer under the sheet.
+// actions sit in the top bar, banner beside the turn line, notice at the top
+// of the side panel, side in it under the standings.
 export default function YahtzeeBoard({
   game,
   participants,
@@ -71,8 +70,8 @@ export default function YahtzeeBoard({
   reactions = {},
   actions,
   banner,
-  feed,
-  footer,
+  notice,
+  side,
 }) {
   const person = (key) => participants.find((item) => item.key === key);
   const active = currentPlayer(game);
@@ -89,7 +88,7 @@ export default function YahtzeeBoard({
   // Desktop keys: space rolls, 1 to 5 hold a die.
   useEffect(() => {
     function onKey(event) {
-      if (event.target.closest?.("button, a, input, textarea, select")) return;
+      if (event.target.closest?.("button, a, input, textarea, select, [role='dialog']")) return;
       if (event.key === " " && canRoll) {
         event.preventDefault();
         onRoll();
@@ -101,8 +100,8 @@ export default function YahtzeeBoard({
     return () => window.removeEventListener("keydown", onKey);
   }, [canRoll, canHold, onRoll, onHold]);
 
-  const columns = { "--cols": participants.length };
   const col = (key) => (key === active ? styles.colOn : "");
+  const totalOf = (key) => totals(game.sheets[key]).total;
 
   function scoreRow(item) {
     const [label, hint, value] = ROWS[item.id];
@@ -113,22 +112,27 @@ export default function YahtzeeBoard({
         </span>
         {participants.map((p) => {
           const box = game.sheets[p.key].boxes[item.id];
-          const open = box === null;
-          const can = p.key === active && item.id in choices;
+          const can = box === null && p.key === active && item.id in choices;
           return (
             <span key={p.key} className={`${styles.cell} ${col(p.key)}`}>
-              {!open ? (
+              {box !== null ? (
                 box
               ) : can ? (
-                <button
-                  type="button"
-                  className={`${styles.pick} ${choices[item.id] === 0 ? styles.pickZero : ""}`}
-                  onClick={() => onScore(item.id)}
-                  aria-label={`Score ${choices[item.id]} in ${LABELS[item.id]}`}
-                >
-                  {choices[item.id]}
-                  {item.id === best && <span className={styles.star} aria-hidden="true" />}
-                </button>
+                <span className={styles.pickWrap}>
+                  <button
+                    type="button"
+                    className={`${styles.pick} ${choices[item.id] === 0 ? styles.pickZero : ""}`}
+                    onClick={() => onScore(item.id)}
+                    aria-label={`Score ${choices[item.id]} in ${LABELS[item.id]}${item.id === best ? ", the best box" : ""}`}
+                  >
+                    {choices[item.id]}
+                  </button>
+                  {item.id === best && (
+                    <span className={styles.best} aria-hidden="true">
+                      ★
+                    </span>
+                  )}
+                </span>
               ) : null}
             </span>
           );
@@ -136,6 +140,8 @@ export default function YahtzeeBoard({
       </div>
     );
   }
+
+  const standings = [...participants].sort((a, b) => totalOf(b.key) - totalOf(a.key));
 
   return (
     <div className={`${ui.column} ${styles.playColumn}`}>
@@ -150,10 +156,12 @@ export default function YahtzeeBoard({
 
       <div className={styles.layout}>
         <section className={styles.table} aria-label="Dice">
-          <p className={styles.turn}>
-            {active === meKey ? "Your turn" : <><UserText>{person(active)?.name}</UserText>&apos;s turn</>}
-          </p>
-          {banner}
+          <div className={styles.turnLine}>
+            <p className={styles.turn}>
+              {active === meKey ? "Your turn" : <><UserText>{person(active)?.name}</UserText>&apos;s turn</>}
+            </p>
+            {banner}
+          </div>
           <div className={`${styles.tray} ${mine ? styles.trayMine : ""} ${canAct ? "" : styles.trayIdle}`}>
             {mine && <span className={styles.trayTag}>You&apos;re rolling</span>}
             <div className={styles.dice}>
@@ -185,81 +193,72 @@ export default function YahtzeeBoard({
               ) : !rolled ? (
                 "Roll to start the turn."
               ) : game.rollsLeft > 0 ? (
-                "Hold dice, roll again, or tap the points of a box."
+                "Hold dice, roll again, or tap a score."
               ) : (
-                "No rolls left. Tap the points of a box."
+                "No rolls left. Tap a score."
               )}
             </p>
           </div>
 
-          <div className={styles.actions}>
-            <button type="button" className={styles.roll} disabled={!canRoll} onClick={onRoll}>
-              {canAct ? "Roll" : "Waiting"}
-              <span className={styles.rollDots} aria-label={`${game.rollsLeft} rolls left`}>
-                {Array.from({ length: ROLLS_PER_TURN }, (_, index) => (
-                  <span key={index} className={index < game.rollsLeft ? styles.dotOn : styles.dot} />
-                ))}
-              </span>
-            </button>
-          </div>
-          {feed}
+          <button type="button" className={styles.roll} disabled={!canRoll} onClick={onRoll}>
+            <span>{canAct ? "Roll" : "Waiting"}</span>
+            <span className={styles.rollLeft}>{game.rollsLeft} left</span>
+          </button>
         </section>
 
-        <section className={styles.sheet} aria-label="Score sheet" style={columns}>
-          <div className={`${styles.row} ${styles.heads}`}>
-            <span />
-            {participants.map((p) => {
-              const on = p.key === active;
-              const reaction = reactions[p.key];
-              return (
-                <span key={p.key} className={`${styles.head} ${col(p.key)}`}>
-                  <span className={styles.face} data-tip={p.key === meKey ? "You" : p.name} tabIndex={0}>
-                    <Avatar name={p.name} size={30} color={p.color} registered={p.registered} character={p.character} />
-                    {on && timer && (
-                      <svg className={styles.ring} viewBox="0 0 40 40" aria-hidden="true">
-                        <circle
-                          cx="20"
-                          cy="20"
-                          r="17"
-                          style={{ strokeDasharray: RING, strokeDashoffset: RING * (1 - Math.max(0, timer.left) / timer.total) }}
-                        />
-                      </svg>
-                    )}
-                    {presence && (
-                      <span className={`${styles.presence} ${presence.has(p.key) ? styles.online : ""}`} />
-                    )}
-                  </span>
-                  {reaction && (
-                    <span key={reaction.id} className={styles.sticker}>
-                      {reaction.label}
-                    </span>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-
-          <div className={styles.card}>
-            {UPPER.map(scoreRow)}
-            <div className={`${styles.row} ${styles.bonusRow}`}>
-              <span className={styles.rowName} tabIndex={0} data-tip={`Reach ${UPPER_BONUS_AT} in 1s to 6s`} data-tip-value={`+${UPPER_BONUS}`}>
-                <span className={styles.chest} aria-hidden="true" />
-                bonus
-              </span>
+        <section className={styles.sheet} aria-label="Score sheet" style={{ "--cols": participants.length }}>
+          <div>
+            <div className={`${styles.row} ${styles.heads}`}>
+              <span />
               {participants.map((p) => {
-                const sum = totals(game.sheets[p.key]);
+                const reaction = reactions[p.key];
                 return (
-                  <span key={p.key} className={`${styles.cell} ${col(p.key)}`}>
-                    {sum.upperBonus ? (
-                      <span className={styles.bonusWon}>+{UPPER_BONUS}</span>
-                    ) : (
-                      <span className={styles.meter} data-tip={`${sum.upper} of ${UPPER_BONUS_AT}`} tabIndex={0}>
-                        <span style={{ width: `${Math.min(100, (sum.upper / UPPER_BONUS_AT) * 100)}%` }} />
+                  <span key={p.key} className={`${styles.head} ${col(p.key)}`}>
+                    <span className={styles.face} data-tip={p.key === meKey ? "You" : p.name} tabIndex={0}>
+                      <Avatar name={p.name} size={34} color={p.color} registered={p.registered} character={p.character} />
+                      {p.key === active && timer && (
+                        <svg className={styles.ring} viewBox="0 0 42 42" aria-hidden="true">
+                          <circle
+                            cx="21"
+                            cy="21"
+                            r="18"
+                            style={{ strokeDasharray: RING, strokeDashoffset: RING * (1 - Math.max(0, timer.left) / timer.total) }}
+                          />
+                        </svg>
+                      )}
+                      {presence && <span className={`${styles.presence} ${presence.has(p.key) ? styles.online : ""}`} />}
+                    </span>
+                    {reaction && (
+                      <span key={reaction.id} className={styles.sticker}>
+                        {reaction.label}
                       </span>
                     )}
                   </span>
                 );
               })}
+            </div>
+
+            <div className={styles.card}>
+              {UPPER.map(scoreRow)}
+              <div className={styles.row}>
+                <span className={styles.rowName} tabIndex={0} data-tip={`Reach ${UPPER_BONUS_AT} in 1s to 6s`} data-tip-value={`+${UPPER_BONUS}`}>
+                  bonus <span className={styles.plus}>+{UPPER_BONUS}</span>
+                </span>
+                {participants.map((p) => {
+                  const sum = totals(game.sheets[p.key]);
+                  return (
+                    <span key={p.key} className={`${styles.cell} ${col(p.key)}`}>
+                      {sum.upperBonus ? (
+                        <span className={styles.bonusWon}>+{UPPER_BONUS}</span>
+                      ) : (
+                        <span className={styles.meter} data-tip={`${sum.upper} of ${UPPER_BONUS_AT}`} tabIndex={0}>
+                          <span style={{ width: `${Math.min(100, (sum.upper / UPPER_BONUS_AT) * 100)}%` }} />
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -277,18 +276,42 @@ export default function YahtzeeBoard({
                 ))}
               </div>
             )}
+            <div className={`${styles.row} ${styles.totalRow}`}>
+              <span className={styles.rowName}>total</span>
+              {participants.map((p) => (
+                <span key={p.key} className={`${styles.cell} ${col(p.key)}`}>
+                  {totalOf(p.key)}
+                </span>
+              ))}
+            </div>
           </div>
-
-          <div className={`${styles.row} ${styles.totalRow}`}>
-            <span className={styles.rowName}>total</span>
-            {participants.map((p) => (
-              <span key={p.key} className={styles.cell}>
-                {totals(game.sheets[p.key]).total}
-              </span>
-            ))}
-          </div>
-          {footer}
         </section>
+
+        <aside className={styles.side} aria-label="Players">
+          {notice}
+          {participants.length > 1 && (
+            <section className={styles.panel}>
+              <h2 className={styles.panelTitle}>Standings</h2>
+              <ol className={styles.standings}>
+                {standings.map((p, index) => (
+                  <li key={p.key} className={`${styles.stand} ${p.key === active ? styles.standOn : ""}`}>
+                    <span className={styles.standPlace}>{index + 1}</span>
+                    <span className={styles.face}>
+                      <Avatar name={p.name} size={28} color={p.color} registered={p.registered} character={p.character} />
+                      {presence && <span className={`${styles.presence} ${presence.has(p.key) ? styles.online : ""}`} />}
+                    </span>
+                    <span className={styles.standName}>
+                      {p.key === meKey ? "You" : <UserText>{p.name}</UserText>}
+                      {p.host && <span className={styles.hostTag}>Host</span>}
+                    </span>
+                    <span className={styles.standTotal}>{totalOf(p.key)}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+          {side}
+        </aside>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 // these with the current time and a random source, and save what they
 // return. Each game plugs in through an adapter, such as yahtzeeOnline.
 //
-// State: { host, game, timer: { phase, endsAt }, end, last, endRequest }
+// State: { host, game, timer: { phase, endsAt }, end, last, recent, endRequest }
 // Timer phases, times in epoch milliseconds:
 //   turn    the player on turn has until endsAt
 //   grace   a second timer. The host may wait for the player or remove them
@@ -11,7 +11,8 @@
 //   final   the host's own turn ran out twice: a third timer, then the game
 //           is dismissed
 // end is null while the game runs, then { status, reason, scores? }.
-// last is the latest finished turn, { player, ...adapter.lastMove, at }.
+// last is the latest finished turn, { player, ...adapter.lastMove, at },
+// and recent the last three of them, newest first.
 // endRequest is { by, at } while a player asks the host to end the game.
 
 export const INVITE_MS = 15 * 60_000;
@@ -56,7 +57,10 @@ export function advance(adapter, state, now, random) {
       next = { ...next, timer: { phase: "final", endsAt: endsAt + GRACE_MS } };
     } else if (phase === "grace") {
       next = afterTurn(adapter, next, adapter.skipTurn(next.game, random), endsAt);
-      if (next.last) next = { ...next, last: { ...next.last, skipped: true } };
+      if (next.last) {
+        const last = { ...next.last, skipped: true };
+        next = { ...next, last, recent: [last, ...next.recent.slice(1)] };
+      }
     } else {
       next = { ...next, end: { status: "cancelled", reason: "dismissed" } };
     }
@@ -128,16 +132,18 @@ export function onTurn(adapter, state) {
 function afterTurn(adapter, state, game, now) {
   const move = adapter.lastMove?.(state.game, game);
   const last = move ? { player: adapter.currentPlayer(state.game), ...move, at: now } : state.last ?? null;
+  const recent = move ? [last, ...(state.recent ?? [])].slice(0, 3) : state.recent ?? [];
   if (adapter.isOver(game)) {
     return {
       ...state,
       game,
       last,
+      recent,
       timer: { phase: "turn", endsAt: null },
       end: { status: "finished", reason: "finished", scores: adapter.result(game) },
     };
   }
-  return startTurn(adapter, { ...state, game, last }, now);
+  return startTurn(adapter, { ...state, game, last, recent }, now);
 }
 
 function startTurn(adapter, state, now) {

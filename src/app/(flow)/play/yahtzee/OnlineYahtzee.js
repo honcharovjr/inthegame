@@ -4,16 +4,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import UserText from "@/components/UserText/UserText";
+import { FlagIcon } from "@/components/icons";
 import { REACTIONS, clock, createRoom, roomAction, useNow, useRoomLive } from "@/lib/games/online/client";
 import { GRACE_MS } from "@/lib/games/online/room";
 import { yahtzeeOnline } from "@/lib/games/yahtzee/online";
 import { CATEGORIES, YAHTZEE_BONUS, currentPlayer, hasRolled, isYahtzee, totals } from "@/lib/games/yahtzee/rules";
 import { playerColor } from "@/lib/sessions/colors";
-import { playRoll, playYahtzee, playYourTurn, setSoundOn, useSoundOn } from "../shared/feedback";
+import { playRoll, playYahtzee, playYourTurn } from "../shared/feedback";
+import { IconAction, RulesButton, SoundButton } from "../shared/GameButtons";
 import { Ended } from "../shared/Lobby";
 import ui from "../shared/play.module.css";
 import YahtzeeBoard, { LABELS } from "./YahtzeeBoard";
 import YahtzeeResults from "./YahtzeeResults";
+import { yahtzeeRules } from "./YahtzeeRules";
 import styles from "./yahtzee.module.css";
 
 // How often a device asks again when the server did not see a deadline pass
@@ -35,7 +38,6 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
   const game = state.game;
   const now = useNow(500) + offset;
   const live = useRoomLive(room.id, me);
-  const soundOn = useSoundOn();
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [rolling, setRolling] = useState(false);
@@ -115,6 +117,7 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
       color: playerColor(row?.seat ?? index),
       registered: true,
       character: row?.character ?? null,
+      host: key === state.host,
     };
   });
   const nameOf = (key) => players.find((item) => item.profile_id === key)?.nickname ?? "Player";
@@ -207,42 +210,21 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
     );
   }
 
-  const last = state.last;
-  const feed = last && (
-    <p className={styles.feed}>
-      <span className={styles.feedDot} aria-hidden="true" />
-      <span>
-        <strong>{name(last.player)}</strong>{" "}
-        {last.skipped ? "ran out of time:" : "scored"} {last.points} in {LABELS[last.category]?.toLowerCase()}
-      </span>
-    </p>
-  );
+  const recent = state.recent ?? (state.last ? [state.last] : []);
 
   const actions = (
     <>
-      <button
-        type="button"
-        className={styles.topButton}
-        aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
-        data-tip={soundOn ? "Sound on" : "Sound off"}
-        data-tip-pos="below"
-        onClick={() => setSoundOn(!soundOn)}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M4 9v6h4l5 4V5L8 9H4z" />
-          {soundOn ? <path d="M17 8a5 5 0 0 1 0 8" /> : <path d="M17 9l5 6M22 9l-5 6" />}
-        </svg>
-      </button>
+      <RulesButton title="How to play Yahtzee" tabs={yahtzeeRules({ online: true })} />
+      <SoundButton />
       {isHost ? (
-        <button type="button" className={styles.topButton} onClick={() => setConfirm("end")}>
-          End game
-        </button>
-      ) : request?.by === me ? (
-        <span className={styles.topButton}>Asked to end</span>
+        <IconAction icon={<FlagIcon size={18} />} label="End game" onClick={() => setConfirm("end")} />
       ) : (
-        <button type="button" className={styles.topButton} disabled={Boolean(request)} onClick={() => setConfirm("ask")}>
-          Ask to end
-        </button>
+        <IconAction
+          icon={<FlagIcon size={18} />}
+          label={request?.by === me ? "Waiting for the host" : request ? "Someone asked to end" : "Ask to end"}
+          disabled={Boolean(request)}
+          onClick={() => setConfirm("ask")}
+        />
       )}
     </>
   );
@@ -266,21 +248,6 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
         actions={actions}
         banner={
           <>
-            {isHost && request && (
-              <div className={styles.request} role="status">
-                <span>
-                  <UserText>{nameOf(request.by)}</UserText> asks to end the game
-                </span>
-                <div className={styles.requestActions}>
-                  <button type="button" className={styles.requestEnd} disabled={busy} onClick={() => send({ action: "end" })}>
-                    End game
-                  </button>
-                  <button type="button" className={styles.requestKeep} disabled={busy} onClick={() => send({ action: "keep" })}>
-                    Keep playing
-                  </button>
-                </div>
-              </div>
-            )}
             {banner}
             {error && (
               <p role="alert" className={ui.problem}>
@@ -289,15 +256,48 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
             )}
           </>
         }
-        feed={feed}
-        footer={
-          <div className={styles.reactions} role="group" aria-label="Reactions">
-            {REACTIONS.map((label) => (
-              <button key={label} type="button" className={styles.reaction} onClick={() => live.react(label)}>
-                {label}
+        notice={
+          isHost &&
+          request && (
+            <div className={styles.requestStrip} role="status">
+              <span>
+                <UserText>{nameOf(request.by)}</UserText> asks to end
+              </span>
+              <button type="button" className={styles.requestEnd} disabled={busy} onClick={() => send({ action: "end" })}>
+                End
               </button>
-            ))}
-          </div>
+              <button type="button" className={styles.requestKeep} disabled={busy} onClick={() => send({ action: "keep" })}>
+                Keep
+              </button>
+            </div>
+          )
+        }
+        side={
+          <>
+            <section className={styles.panel}>
+              <h2 className={styles.panelTitle}>React</h2>
+              <div className={styles.reactions}>
+                {REACTIONS.map((label) => (
+                  <button key={label} type="button" className={styles.reaction} onClick={() => live.react(label)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </section>
+            {recent.length > 0 && (
+              <section className={styles.panel}>
+                <h2 className={styles.panelTitle}>Last moves</h2>
+                <ul className={styles.moves}>
+                  {recent.map((move) => (
+                    <li key={`${move.player}-${move.at}`}>
+                      <strong>{name(move.player)}</strong> {move.skipped ? "ran out of time:" : "scored"} {move.points} in{" "}
+                      {LABELS[move.category]?.toLowerCase()}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
         }
       />
 

@@ -187,11 +187,28 @@ describe("last move", () => {
     let state = applyMove(yahtzee, started(), "host", { type: "roll" }, T0, random);
     state = applyMove(yahtzee, state, "host", { type: "score", category: "chance" }, T0 + 5, random);
     expect(state.last).toEqual({ player: "host", category: "chance", points: 20, at: T0 + 5 });
+    expect(state.recent).toEqual([state.last]);
+  });
+
+  it("keeps the last three turns, newest first", () => {
+    let state = started(["host", "amy"]);
+    for (let turn = 0; turn < 4; turn += 1) {
+      const player = turn % 2 === 0 ? "host" : "amy";
+      const category = ["chance", "chance", "sixes", "sixes"][turn];
+      state = applyMove(yahtzee, state, player, { type: "roll" }, T0, random);
+      state = applyMove(yahtzee, state, player, { type: "score", category }, T0, random);
+    }
+    expect(state.recent.map((item) => [item.player, item.category])).toEqual([
+      ["amy", "sixes"],
+      ["host", "sixes"],
+      ["amy", "chance"],
+    ]);
   });
 
   it("marks a skipped turn", () => {
     const state = advance(yahtzee, started(["amy", "host"]), T0 + TURN + GRACE_MS, random);
     expect(state.last).toMatchObject({ player: "amy", points: 0, skipped: true });
+    expect(state.recent[0]).toBe(state.last);
   });
 });
 
