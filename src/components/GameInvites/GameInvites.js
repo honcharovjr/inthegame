@@ -20,7 +20,7 @@ export default function GameInvites({ profileId }) {
   const [error, setError] = useState(null);
   const [busy, startBusy] = useTransition();
 
-  const href = (item) => `/play/${item.gameKey}/room/${item.roomId}`;
+  const href = (item) => `/app/play/${item.gameKey}/room/${item.roomId}`;
   const left = (item) => new Date(item.invitedAt).getTime() + INVITE_MS - now;
   const visible = (items ?? []).filter((item) => item.status === "joined" || left(item) > 0);
   if (visible.length === 0) return null;

@@ -20,8 +20,8 @@ export async function createTeam(previousState, formData) {
     return { error: "Could not create the team. Try again.", values: { name } };
   }
 
-  revalidatePath("/teams");
-  redirect(`/teams/${data}`);
+  revalidatePath("/app/teams");
+  redirect(`/app/teams/${data}`);
 }
 
 // Joins a team with the code from an invite link.
@@ -34,8 +34,8 @@ export async function joinTeam(code) {
     return { error: "This invite link is not valid any more." };
   }
 
-  revalidatePath("/teams");
-  redirect(`/teams/${data}`);
+  revalidatePath("/app/teams");
+  redirect(`/app/teams/${data}`);
 }
 
 // Leaves a team. The owner cannot leave while other members remain.
@@ -54,8 +54,8 @@ export async function leaveTeam(teamId) {
     };
   }
 
-  revalidatePath("/teams");
-  redirect("/teams");
+  revalidatePath("/app/teams");
+  redirect("/app/teams");
 }
 
 // The owner can switch the invite link off and on.
@@ -74,6 +74,6 @@ export async function setInviteEnabled(teamId, enabled) {
     return { error: "Only the owner can change the invite link." };
   }
 
-  revalidatePath(`/teams/${teamId}`);
+  revalidatePath(`/app/teams/${teamId}`);
   return { ok: true };
 }
