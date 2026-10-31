@@ -152,12 +152,16 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
   if (stage === "over") {
     return (
       <main className={ui.page}>
-        <YahtzeeResults game={game} participants={participants} meKey="me">
+        <YahtzeeResults game={game} participants={participants} meKey="me" onBack={() => setStage("mode")}>
           <div className={ui.endActions}>
             <button type="button" className={`${ui.primary} ${ui.big}`} onClick={rematch}>
               Play again
             </button>
-            <Link href="/games/play" className={`${ui.ghost} ${ui.big}`}>
+            <button type="button" className={`${ui.ghost} ${ui.big}`} onClick={() => setStage("mode")}>
+              New game
+            </button>
+            {/* The page keeps its state while away, so it opens on the modes next time */}
+            <Link href="/games/play" className={`${ui.ghost} ${ui.big}`} onClick={() => setStage("mode")}>
               Done
             </Link>
           </div>

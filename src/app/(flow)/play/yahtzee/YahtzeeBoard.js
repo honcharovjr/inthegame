@@ -213,7 +213,7 @@ export default function YahtzeeBoard({
               {participants.map((p) => {
                 const reaction = reactions[p.key];
                 return (
-                  <span key={p.key} className={`${styles.head} ${col(p.key)}`}>
+                  <span key={p.key} className={styles.head}>
                     <span className={styles.face} data-tip={p.key === meKey ? "You" : p.name} tabIndex={0}>
                       <Avatar name={p.name} size={34} color={p.color} registered={p.registered} character={p.character} />
                       {p.key === active && timer && (

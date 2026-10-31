@@ -9,8 +9,9 @@ import styles from "./yahtzee.module.css";
 
 // The end of a Yahtzee game: the winner, then everyone by place with their
 // sections. Shared by the game on one device and the online game.
-// children are the buttons below, such as play again.
-export default function YahtzeeResults({ game, participants, meKey, children }) {
+// children are the buttons below, such as play again. onBack replaces the
+// back link, for example to return to choosing how to play.
+export default function YahtzeeResults({ game, participants, meKey, onBack, children }) {
   const scores = finalScores(game);
   const places = placesFromScores(scores);
   const ranked = participants
@@ -28,7 +29,7 @@ export default function YahtzeeResults({ game, participants, meKey, children }) 
 
   return (
     <div className={ui.column}>
-      <TopBar title="Yahtzee" backHref="/games/play" />
+      <TopBar title="Yahtzee" backHref="/games/play" onBack={onBack} />
       <div className={styles.confetti} aria-hidden="true">
         {[6, 5, 4, 3, 2, 1].map((face, index) => (
           <Die key={face} face={face} size={34} className={styles.confettiDie} style={{ "--i": index }} />

@@ -249,8 +249,8 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Score sheet: one grid from the faces down to the total, so the column of
-   the player on turn runs unbroken through each card. Every player column
+/* Score sheet: one grid from the faces down to the total. The column of the
+   player on turn is tinted inside the cards only, unbroken through each. Every player column
    has the same width. Upper and lower are separate cards. */
 .sheet {
   display: flex;
@@ -367,7 +367,6 @@
   display: grid;
   place-items: end center;
   padding-bottom: 6px;
-  border-radius: 14px 14px 0 0;
 }
 
 .face {
