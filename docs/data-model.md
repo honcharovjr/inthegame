@@ -220,6 +220,22 @@ One row per admin action (FR-47). Written server-side only.
 
 Blocking a player uses the login ban of Supabase Auth, so no column stores it.
 
+### 3.12a site_settings
+
+One row with the details the public pages show (C31). Edited in the admin panel, read by anyone, including visitors.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | boolean, PK | Always `true`, so there is only one row |
+| operator_name | text | Who runs the service, up to 120 characters. Empty shows a placeholder |
+| contact_email | text | Up to 254 characters |
+| minimum_age | smallint | 13 to 21 |
+| privacy_updated_on | date | Last update of the privacy policy |
+| updated_by | uuid | References `profiles(id)` |
+| updated_at | timestamptz, not null | Default `now()` |
+
+`admin_audit.target_type` also allows `settings`.
+
 ### 3.13 game_rooms
 
 One online game of an in-app game (FR-45, change C22). Written server-side only.
@@ -274,6 +290,7 @@ Admin pages check `is_super_admin()` on the server and then read and write with 
 | achievements | Any logged-in user | Migration only | Migration only | Migration only |
 | user_achievements | Same visibility as the player's profile | Server-side only | Server-side only | Server-side only |
 | admin_audit | Super admins (`is_super_admin()`) | Server-side only | None | None |
+| site_settings | Everyone, also without a login | None (one row from the migration) | Server-side only | None |
 | game_rooms | Players with a row in `game_room_players` (any status) | Server-side only | Server-side only | None |
 | game_room_players | Players of the same room | Server-side only | Server-side only | None |
 

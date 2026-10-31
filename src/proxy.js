@@ -30,7 +30,15 @@ export async function proxy(request) {
 
   // Refreshes the session when it has expired. getClaims verifies the login
   // token locally, so it avoids a round trip to Supabase on most requests.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  // Visitors who are not logged in see the landing page at "/"; players keep
+  // Home there. The address stays "/", and refreshed cookies are kept.
+  if (request.nextUrl.pathname === "/" && !data?.claims?.sub) {
+    const landing = NextResponse.rewrite(new URL("/welcome", request.url), { request });
+    response.cookies.getAll().forEach((cookie) => landing.cookies.set(cookie));
+    return landing;
+  }
 
   return response;
 }

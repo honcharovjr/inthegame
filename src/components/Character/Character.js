@@ -146,6 +146,8 @@ function Figure({ scene, uid, height, fade }) {
 // size "fill": as wide as the parent, keeping the shape of the view.
 // perks: show the animated perks of the accessory. Use it where the character
 // is large. The gold ring of the laurel wreath always shows.
+// backdrop: false leaves out the background, for a figure placed on a scene
+// of its own (the landing page).
 export default function Character({
   character,
   name = "",
@@ -153,6 +155,7 @@ export default function Character({
   color = "#ff4fa3",
   perks = false,
   view = "portrait",
+  backdrop = true,
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const chosen = Boolean(character);
@@ -197,12 +200,12 @@ export default function Character({
           <clipPath id={clipId}>
             {full ? <rect width="100" height={height} rx="8" /> : <circle cx="50" cy="50" r="50" />}
           </clipPath>
-          {background.kind !== "plain" && <Pattern id={patternId} background={background} />}
+          {backdrop && background.kind !== "plain" && <Pattern id={patternId} background={background} />}
         </defs>
 
         <g clipPath={`url(#${clipId})`}>
-          <rect width="100" height={height} fill={background.fill} />
-          {background.kind !== "plain" && (
+          {backdrop && <rect width="100" height={height} fill={background.fill} />}
+          {backdrop && background.kind !== "plain" && (
             <rect width="100" height={height} fill={`url(#${patternId})`} />
           )}
           {scene ? (
