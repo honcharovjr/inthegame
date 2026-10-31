@@ -17,11 +17,18 @@
   gap: var(--space-4);
 }
 
+.topRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Dice */
 .table {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .turn {
@@ -31,12 +38,49 @@
 }
 
 .tray {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 6px;
   padding: 18px 12px 10px;
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.06);
+  transition: background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+.dice {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Your turn: a turquoise ring and a tag */
+.trayMine {
+  background: rgba(47, 214, 214, 0.1);
+  box-shadow: inset 0 0 0 3px var(--color-turquoise);
+}
+
+.trayTag {
+  position: absolute;
+  top: -11px;
+  left: 20px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-turquoise);
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Someone else's turn: flat, grey and dashed */
+.trayIdle {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.trayIdle .dice {
+  filter: grayscale(1);
+  opacity: 0.4;
 }
 
 .dieButton {
@@ -77,6 +121,20 @@
 .tumble > span:first-child {
   animation: tumble 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--i) * 45ms);
+}
+
+.shaking > span:first-child {
+  animation: shake 0.3s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * 40ms);
+}
+
+@keyframes shake {
+  from {
+    transform: translateY(-4px) rotate(-14deg);
+  }
+  to {
+    transform: translateY(2px) rotate(14deg);
+  }
 }
 
 @keyframes tumble {
@@ -197,151 +255,409 @@
   opacity: 1;
 }
 
-/* Score sheet */
+/* Score sheet: a column per player, the same width each. The name column
+   takes the rest. Upper and lower are separate cards. */
 .sheet {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px;
-  border-radius: 28px;
+  min-width: 0;
+  --col: 44px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(var(--cols), var(--col));
+  align-items: center;
+  min-height: 30px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 6px;
+  border-radius: 20px;
   background: var(--color-surface);
   color: var(--color-ink);
 }
 
-.viewing {
-  display: flex;
-  justify-content: space-between;
+.card .row + .row {
+  border-top: 1px solid var(--color-chip);
+}
+
+.rowName {
+  justify-self: start;
+  display: inline-flex;
   align-items: center;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: var(--color-violet-tint);
-  color: var(--color-violet-ink);
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.sectionHead {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 6px 4px 0;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--color-muted);
-}
-
-.bonusText {
-  letter-spacing: 0;
-  color: var(--color-turquoise-ink);
-}
-
-.bonusBar {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--color-chip);
+  gap: 6px;
+  padding: 0 6px;
   overflow: hidden;
-}
-
-.bonusBar span {
-  display: block;
-  height: 100%;
-  border-radius: 3px;
-  background: var(--color-turquoise);
-  transition: width 0.4s ease;
-}
-
-.boxes {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.box {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 14px;
-  background: none;
-  text-align: left;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.boxCan {
-  background: var(--color-chip);
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  .boxCan:hover {
-    background: var(--color-pink-tint);
-  }
-}
-
-.boxOn,
-.boxOn:hover {
-  background: var(--color-pink);
-  color: #fff;
-  transform: scale(1.01);
-}
-
-.boxText {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.boxLabel {
-  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
   font-weight: 700;
+  text-decoration: underline dotted rgba(110, 97, 112, 0.5);
+  text-underline-offset: 4px;
+  cursor: help;
 }
 
-.boxHint {
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.6;
-}
-
-.boxValue {
-  min-width: 40px;
-  text-align: right;
-  font-size: 18px;
+.cell {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
-.boxCan .boxValue {
+.colOn {
+  background: var(--color-yellow-tint);
+}
+
+/* The points a box would give: tap to score */
+.pick {
+  position: relative;
+  min-width: 30px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: none;
   color: var(--color-pink-deep);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
-.boxCan .boxZero {
+.pickZero {
   color: var(--color-muted);
+  font-weight: 700;
 }
 
-.boxOn .boxValue {
+@media (hover: hover) {
+  .pick:hover {
+    background: var(--color-pink-tint);
+  }
+}
+
+.pick:active {
+  background: var(--color-pink);
   color: #fff;
 }
 
-.boxDone {
-  opacity: 0.9;
+/* The open box worth the most */
+.star {
+  position: absolute;
+  top: -3px;
+  right: -5px;
+  width: 9px;
+  height: 9px;
+  background: var(--color-pink);
+  clip-path: polygon(50% 0, 62% 35%, 100% 38%, 70% 60%, 80% 100%, 50% 77%, 20% 100%, 30% 60%, 0 38%, 38% 35%);
 }
 
-.boxDone .boxHint {
-  display: none;
+/* Column heads: the players as faces, the name on hover */
+.heads {
+  min-height: 46px;
 }
 
-.total {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding: 12px 14px;
+.head {
+  position: relative;
+  align-self: stretch;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 6px;
+  border-radius: 14px 14px 0 0;
+}
+
+.face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.ring {
+  position: absolute;
+  inset: -2px;
+  width: 40px;
+  height: 40px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.ring circle {
+  fill: none;
+  stroke: var(--color-pink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s linear;
+}
+
+.presence {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--color-ink);
+  background: #8d7f96;
+}
+
+.online {
+  background: var(--color-success);
+}
+
+.sticker {
+  position: absolute;
+  bottom: calc(100% - 4px);
+  left: 50%;
+  z-index: 2;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  animation: sticker 3s ease both;
+}
+
+@keyframes sticker {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.6) rotate(-8deg);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.05) rotate(3deg);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -6px) scale(1);
+  }
+}
+
+/* Upper bonus: a chest, a meter per player, +35 once reached */
+.bonusRow {
+  min-height: 34px;
+}
+
+.chest {
+  width: 16px;
+  height: 14px;
+  border-radius: 3px 3px 2px 2px;
+  background: linear-gradient(var(--color-yellow) 0 45%, var(--color-ink) 45% 55%, var(--color-yellow) 55%);
+  box-shadow: inset 0 0 0 2px var(--color-ink);
+}
+
+.meter {
+  width: 30px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-chip);
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--color-turquoise);
+  transition: width 0.4s ease;
+}
+
+.bonusWon {
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-turquoise);
+  color: var(--color-ink);
+  font-size: 13px;
+}
+
+.totalRow {
+  min-height: 40px;
+  padding: 0 6px;
   border-radius: 16px;
   background: var(--color-ink);
   color: #fff;
-  font-size: 18px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.totalRow .rowName {
+  text-decoration: none;
+  cursor: default;
+}
+
+.totalRow .cell {
+  font-size: 17px;
+}
+
+/* Online: the last turn, reactions */
+.feed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.feed strong {
+  color: #fff;
+}
+
+.feedDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-turquoise);
+}
+
+.reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reaction {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .reaction:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.topButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Ending the game: the host's request card and the confirm sheet */
+.request {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.requestActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.requestActions button {
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.requestEnd {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.requestKeep {
+  background: rgba(18, 10, 26, 0.08);
+  color: var(--color-ink);
+}
+
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: end center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(18, 10, 26, 0.6);
+}
+
+.confirmPanel {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 26px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  animation: enter 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.confirmPanel h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.confirmPanel p {
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.recap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.recapItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.recapItem strong {
+  color: #fff;
+  font-size: 17px;
   font-weight: 800;
 }
 
@@ -413,7 +729,7 @@
 @media (min-width: 900px) {
   .layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 420px;
+    grid-template-columns: 360px minmax(0, 1fr);
     align-items: start;
     gap: 32px;
   }
@@ -428,7 +744,11 @@
   }
 
   .tray {
-    padding: 32px 24px 20px;
+    padding: 26px 16px 14px;
+  }
+
+  .sheet {
+    --col: 60px;
   }
 
   .actions {
@@ -438,7 +758,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tumble > span:first-child,
+  .shaking > span:first-child,
+  .sticker,
   .confettiDie {
     animation: none;
   }
+}
+
+.endScores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
 }

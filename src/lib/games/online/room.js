@@ -3,7 +3,7 @@
 // these with the current time and a random source, and save what they
 // return. Each game plugs in through an adapter, such as yahtzeeOnline.
 //
-// State: { host, game, timer: { phase, endsAt }, end }
+// State: { host, game, timer: { phase, endsAt }, end, last, endRequest }
 // Timer phases, times in epoch milliseconds:
 //   turn    the player on turn has until endsAt
 //   grace   a second timer. The host may wait for the player or remove them
@@ -11,6 +11,8 @@
 //   final   the host's own turn ran out twice: a third timer, then the game
 //           is dismissed
 // end is null while the game runs, then { status, reason, scores? }.
+// last is the latest finished turn, { player, ...adapter.lastMove, at }.
+// endRequest is { by, at } while a player asks the host to end the game.
 
 export const INVITE_MS = 15 * 60_000;
 export const GRACE_MS = 60_000;
@@ -54,6 +56,7 @@ export function advance(adapter, state, now, random) {
       next = { ...next, timer: { phase: "final", endsAt: endsAt + GRACE_MS } };
     } else if (phase === "grace") {
       next = afterTurn(adapter, next, adapter.skipTurn(next.game, random), endsAt);
+      if (next.last) next = { ...next, last: { ...next.last, skipped: true } };
     } else {
       next = { ...next, end: { status: "cancelled", reason: "dismissed" } };
     }
@@ -75,11 +78,28 @@ export function applyMove(adapter, state, playerId, move, now, random) {
   return afterTurn(adapter, state, game, now);
 }
 
-// action: "wait", "resume" or "remove". Only the host, and only about
-// another player who is late.
+// A player other than the host asks to end the game. The host answers with
+// "end" or "keep".
+export function requestEnd(state, playerId, now) {
+  assertRunning(state);
+  if (playerId === state.host) throw new RoomError("You can end the game yourself");
+  if (state.endRequest) throw new RoomError("Someone already asked. Wait for the host", 409);
+  return { ...state, endRequest: { by: playerId, at: now } };
+}
+
+// action: "end" or "keep" at any time; "wait", "resume" or "remove" about
+// another player who is late. Only the host.
 export function hostAction(adapter, state, playerId, action, now) {
   assertRunning(state);
   if (playerId !== state.host) throw new RoomError("Only the host can do this", 403);
+  // An ended game is not finished: nobody wins and nothing is recorded.
+  if (action === "end") {
+    return { ...state, endRequest: null, end: { status: "cancelled", reason: "ended" } };
+  }
+  if (action === "keep") {
+    if (!state.endRequest) throw new RoomError("Nobody asked to end the game", 409);
+    return { ...state, endRequest: null };
+  }
   const late = adapter.currentPlayer(state.game);
   if (late === state.host) throw new RoomError("This is your own turn");
   const { phase } = state.timer;
@@ -106,15 +126,18 @@ export function onTurn(adapter, state) {
 }
 
 function afterTurn(adapter, state, game, now) {
+  const move = adapter.lastMove?.(state.game, game);
+  const last = move ? { player: adapter.currentPlayer(state.game), ...move, at: now } : state.last ?? null;
   if (adapter.isOver(game)) {
     return {
       ...state,
       game,
+      last,
       timer: { phase: "turn", endsAt: null },
       end: { status: "finished", reason: "finished", scores: adapter.result(game) },
     };
   }
-  return startTurn(adapter, { ...state, game }, now);
+  return startTurn(adapter, { ...state, game, last }, now);
 }
 
 function startTurn(adapter, state, now) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 // Browser side of online rooms (FR-45): calls to the room routes, and hooks
@@ -40,16 +40,18 @@ export function useNow(interval = 1000) {
 // Opens a Realtime channel as the logged-in player. Realtime applies the
 // read policies with the token it has when the channel joins, so the
 // session is loaded and handed over first; otherwise the channel joins as
-// anonymous and receives nothing. listen adds the .on() handlers.
+// anonymous and receives nothing. listen adds the .on() handlers; config
+// goes to the channel; onJoined runs once it has joined.
 // Answers a function that closes the channel.
-function follow(supabase, name, listen) {
+function follow(supabase, name, listen, { config, onJoined } = {}) {
   let channel = null;
   let closed = false;
   (async () => {
     await supabase.auth.getSession();
     await supabase.realtime.setAuth();
     if (closed) return;
-    channel = listen(supabase.channel(name)).subscribe((status, error) => {
+    channel = listen(supabase.channel(name, config ? { config } : undefined)).subscribe((status, error) => {
+      if (status === "SUBSCRIBED") onJoined?.(channel);
       if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
         console.error("realtime channel failed", name, status, error);
       }
@@ -187,6 +189,52 @@ export function useMyRooms(profileId) {
   }, [profileId]);
 
   return items;
+}
+
+export const REACTIONS = ["Nice roll", "Ouch", "GG", "Hurry"];
+
+// Who has the room open, and quick reactions, through Realtime presence and
+// broadcast. Nothing is stored. online is a Set of profile ids; reactions
+// maps a player to their latest { label, id }; react sends one.
+export function useRoomLive(roomId, me) {
+  const [online, setOnline] = useState(() => new Set([me]));
+  const [reactions, setReactions] = useState({});
+  const channelRef = useRef(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const stop = follow(
+      supabase,
+      `live:${roomId}`,
+      (channel) => {
+        channelRef.current = channel;
+        return channel
+          .on("presence", { event: "sync" }, () => {
+            const ids = Object.values(channel.presenceState()).flat().map((item) => item.id);
+            setOnline(new Set([me, ...ids]));
+          })
+          .on("broadcast", { event: "react" }, ({ payload }) => {
+            if (!REACTIONS.includes(payload?.label)) return;
+            setReactions((current) => ({ ...current, [payload.from]: { label: payload.label, id: Date.now() } }));
+          });
+      },
+      {
+        config: { presence: { key: me }, broadcast: { self: true } },
+        onJoined: (channel) => channel.track({ id: me }),
+      },
+    );
+    return () => {
+      channelRef.current = null;
+      stop();
+    };
+  }, [roomId, me]);
+
+  const react = useCallback(
+    (label) => channelRef.current?.send({ type: "broadcast", event: "react", payload: { from: me, label } }),
+    [me],
+  );
+
+  return { online, reactions, react };
 }
 
 // "14:05" for a countdown in milliseconds.

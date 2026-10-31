@@ -81,6 +81,15 @@ export const yahtzeeOnline = {
     };
   },
 
+  // The box the player on turn just filled: { category, points }, or null.
+  lastMove(before, after) {
+    const key = currentPlayer(before);
+    const was = before.sheets[key]?.boxes ?? {};
+    const now = after.sheets[key]?.boxes ?? {};
+    const category = CATEGORIES.map((item) => item.id).find((id) => was[id] === null && now[id] !== null);
+    return category ? { category, points: now[category] } : null;
+  },
+
   // Takes a player out. The others keep their sheets and their place in the
   // round; when the removed player was on turn, the next one starts fresh.
   removePlayer(game, key) {

@@ -11,7 +11,8 @@ const EDGE = 8;
 // keyboard focus. The tip floats over the whole page, so a block that hides
 // its overflow cannot cut it off. data-tip-pos="below" prefers the space under
 // the element; a tip that does not fit flips to the other side and slides
-// along the edge to stay on screen.
+// along the edge to stay on screen. data-tip-value adds a highlighted value
+// after the text, such as the points a Yahtzee box scores.
 export default function TipLayer() {
   const [target, setTarget] = useState(null);
   const bubble = useRef(null);
@@ -68,6 +69,9 @@ export default function TipLayer() {
   return (
     <div ref={bubble} className={styles.tip} role="tooltip">
       {target.getAttribute("data-tip")}
+      {target.getAttribute("data-tip-value") && (
+        <span className={styles.value}>{target.getAttribute("data-tip-value")}</span>
+      )}
     </div>
   );
 }

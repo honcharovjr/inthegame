@@ -19,6 +19,16 @@
   animation: tip-in 0.15s ease both;
 }
 
+.value {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-yellow);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
 .tip[data-side="below"] {
   animation-name: tip-in-below;
 }

@@ -18,6 +18,7 @@ import {
   score,
   toggleHold,
 } from "@/lib/games/yahtzee/rules";
+import { playRoll, playYahtzee } from "../shared/feedback";
 import Handoff from "../shared/Handoff";
 import InviteScreen from "../shared/InviteScreen";
 import ModeScreen from "../shared/ModeScreen";
@@ -45,8 +46,6 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
   // Play
   const [participants, setParticipants] = useState([]);
   const [game, setGame] = useState(null);
-  const [selected, setSelected] = useState(null);
-  const [viewing, setViewing] = useState(null);
   const [handoff, setHandoff] = useState(null);
   const [rollId, setRollId] = useState(0);
   // Which dice moved in the last roll, so only they tumble.
@@ -65,8 +64,6 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
     setParticipants(players);
     setTeamId(nextTeamId);
     setGame(nextGame);
-    setSelected(null);
-    setViewing(null);
     setHandoff(null);
     setStage(isOver(nextGame) ? "over" : "play");
   }
@@ -97,27 +94,24 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
     const next = roll(game);
     setMoved(hasRolled(game) ? game.held.map((held) => !held) : game.dice.map(() => true));
     setGame(next);
-    setSelected(null);
-    setViewing(null);
     setRollId((id) => id + 1);
+    playRoll();
     if (isYahtzee(next.dice)) {
+      playYahtzee();
       setFlash(true);
       setTimeout(() => setFlash(false), 1600);
     }
   }
 
-  function doScore() {
-    if (!selected) return;
+  function doScore(category) {
     const who = currentPlayer(game);
-    const points = options(game.sheets[who], game.dice)[selected];
-    const next = score(game, selected);
+    const points = options(game.sheets[who], game.dice)[category];
+    const next = score(game, category);
     setGame(next);
-    setSelected(null);
-    setViewing(null);
     if (isOver(next)) {
       setStage("over");
     } else if (participants.length > 1) {
-      setHandoff({ who, category: selected, points });
+      setHandoff({ who, category, points });
     }
   }
 
@@ -179,10 +173,6 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
         game={game}
         participants={participants}
         meKey="me"
-        selected={selected}
-        onSelect={setSelected}
-        viewing={viewing}
-        onView={setViewing}
         moved={moved}
         rollId={rollId}
         onRoll={doRoll}
