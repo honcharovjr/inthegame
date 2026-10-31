@@ -2,10 +2,11 @@ import UserText from "@/components/UserText/UserText";
 import TopBar from "./TopBar";
 import ui from "./play.module.css";
 
-// How do you play: solo, on this phone, or by invite (coming soon). A game
-// in progress can be continued or discarded from here.
+// How do you play: solo, on this phone, or by invite. Without onInvite the
+// invite option shows as coming soon. A game in progress can be continued
+// or discarded from here.
 // resume: { participants, progress, onContinue, onDiscard } or null.
-export default function ModeScreen({ title, soloArt, soloText, maxPlayers, onSolo, onPhone, resume }) {
+export default function ModeScreen({ title, soloArt, soloText, maxPlayers, onSolo, onPhone, onInvite, resume }) {
   return (
     <main className={ui.page}>
       <div className={ui.column}>
@@ -55,13 +56,22 @@ export default function ModeScreen({ title, soloArt, soloText, maxPlayers, onSol
             <span className={ui.modeTitle}>On this phone</span>
             <span className={ui.modeText}>Pass the phone around. Up to {maxPlayers} players.</span>
           </button>
-          <div className={`${ui.mode} ${ui.modeSoon}`} aria-disabled="true">
-            <span className={ui.soonBadge}>Coming soon</span>
-            <span className={ui.modeTitle}>Invite friends</span>
-            <span className={ui.modeText}>
-              Send an invite. Friends get a notification and join from their own phones.
-            </span>
-          </div>
+          {onInvite ? (
+            <button type="button" className={`${ui.mode} ${ui.modeInvite}`} onClick={onInvite}>
+              <span className={ui.modeTitle}>Invite friends</span>
+              <span className={ui.modeText}>
+                Teammates get an invite and join from their own phone or computer.
+              </span>
+            </button>
+          ) : (
+            <div className={`${ui.mode} ${ui.modeSoon}`} aria-disabled="true">
+              <span className={ui.soonBadge}>Coming soon</span>
+              <span className={ui.modeTitle}>Invite friends</span>
+              <span className={ui.modeText}>
+                Send an invite. Friends get a notification and join from their own phones.
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </main>

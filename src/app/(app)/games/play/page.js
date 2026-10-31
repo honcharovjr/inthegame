@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import BackButton from "@/components/BackButton/BackButton";
 import Die from "@/components/Die/Die";
+import GameInvites from "@/components/GameInvites/GameInvites";
 import LoginGuard from "@/components/LoginGuard/LoginGuard";
 import PlayingCard from "@/components/PlayingCard/PlayingCard";
+import { getProfile } from "@/lib/auth/session";
 import { PLAYABLE_GAMES } from "@/lib/games/playable";
 import styles from "./play.module.css";
 
@@ -20,6 +23,10 @@ export default function PlayPicker() {
       <h1 className={styles.headline}>
         Pick a<br />game
       </h1>
+
+      <Suspense fallback={null}>
+        <Invites />
+      </Suspense>
 
       <ul className={`${styles.list} stagger`}>
         {PLAYABLE_GAMES.map((game) => (
@@ -56,4 +63,10 @@ export default function PlayPicker() {
       </ul>
     </main>
   );
+}
+
+// Reads the session, so it streams in behind the Suspense boundary.
+async function Invites() {
+  const { profile } = await getProfile();
+  return profile ? <GameInvites profileId={profile.id} /> : null;
 }

@@ -28,6 +28,7 @@ import {
 } from "@/lib/games/yahtzee/rules";
 import { placesFromScores } from "@/lib/sessions/places";
 import Handoff from "../shared/Handoff";
+import InviteScreen from "../shared/InviteScreen";
 import ModeScreen from "../shared/ModeScreen";
 import { SetupScreen, usePlayerSetup } from "../shared/PlayerSetup";
 import TopBar from "../shared/TopBar";
@@ -40,11 +41,11 @@ const store = createGameStore("itg.yahtzee", isValidGame);
 
 const LABELS = Object.fromEntries([...UPPER, ...LOWER].map((item) => [item.id, item.label]));
 
-// Yahtzee in the app: solo, or with friends passing one phone. Playing with
-// friends on their own phones by invite is planned; its option is shown as
-// coming soon. Results are not saved to history or ratings yet.
+// Yahtzee in the app: solo, with friends passing one phone, or by invite
+// with friends on their own devices (the invite opens an online room).
+// Results are not saved to history or ratings yet.
 export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers }) {
-  // mode | setup | play | over
+  // mode | setup | invite | play | over
   const [stage, setStage] = useState("mode");
   const raw = useSyncExternalStore(store.subscribe, store.readRaw, () => null);
   const stored = store.parse(raw, profile.id);
@@ -139,6 +140,7 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
         maxPlayers={maxPlayers}
         onSolo={startSolo}
         onPhone={() => setStage("setup")}
+        onInvite={() => setStage("invite")}
         resume={
           stored && {
             participants: stored.participants,
@@ -148,6 +150,12 @@ export default function YahtzeeGame({ profile, initialGuests, teams, maxPlayers 
           }
         }
       />
+    );
+  }
+
+  if (stage === "invite") {
+    return (
+      <InviteScreen title="Yahtzee" gameKey="yahtzee" teams={teams} maxPlayers={maxPlayers} onBack={() => setStage("mode")} />
     );
   }
 

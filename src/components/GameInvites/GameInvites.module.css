@@ -1,0 +1,81 @@
+/* Yellow cards that read on the light Home and the dark Play table alike */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--space-4);
+}
+
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  animation: pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.text {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.text strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.primary,
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.ghost {
+  background: rgba(18, 10, 26, 0.08);
+  color: var(--color-ink);
+}
+
+.primary:disabled,
+.ghost:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.problem {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--color-danger-tint);
+  color: var(--color-danger-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
