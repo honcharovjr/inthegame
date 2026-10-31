@@ -16,7 +16,7 @@ Each player has one rating per game. The system is Elo-style. A session with N p
 
 Uncertainty: Elo is designed for 1 vs 1 results. The pairwise extension to several players is a common approximation, but it has not been validated for this product. Results should be checked against pilot data.
 
-## 3. Parameters (Assumption, tune later)
+## 3. Parameters (accepted for the MVP, tune later)
 
 | Parameter | Starting value | Meaning |
 |---|---|---|
@@ -24,7 +24,7 @@ Uncertainty: Elo is designed for 1 vs 1 results. The pairwise extension to sever
 | K | 32 | Maximum change scale |
 | Scale | 400 | Standard Elo scale |
 | Minimum participants | 2 | Sessions with fewer are stored but not rated |
-| Minimum games to appear on a leaderboard | 3 | Reduces noise (Assumption) |
+| Minimum games to appear on a leaderboard | 3 | Reduces noise |
 
 All parameters live in one config file in `src/lib/rating/`.
 
@@ -53,9 +53,10 @@ Ratings are stored as numbers and shown rounded to integers.
 | Winner only | Winner has place 1, all others share place 2. Others therefore tie with each other, which slightly pulls their ratings together. Accepted for the MVP |
 | Points result type | Places are derived from scores, equal scores give a tie |
 | One participant | Session is stored, no rating change |
-| Guests | Rated like any player (Assumption). If a guest is later merged into an account, ratings of affected games are rebuilt |
-| Side (team game) results | Not in the MVP |
-| Unconfirmed sessions | Only sessions with status confirmed count. In the MVP all sessions are confirmed |
+| Guests | A session with at least one guest is stored and shown in history, marked as unrated, and changes nobody's rating. Guests have no ratings. When a guest is linked to an account, history shows the account name with a guest mark; old sessions are not re-rated (change C23) |
+| Deleted custom game | Its ratings and rating history are removed and it is not replayed again; its sessions stay in history (change C24) |
+| Side (team game) results | Not in the MVP. Stored as `side_no` on each participant (FR-12) |
+| Unconfirmed sessions | Only sessions with status confirmed count. In team-managed teams a pending session is confirmed automatically after 48 hours (FR-50) |
 | Session order | Sessions are replayed by `played_at`, then by `created_at` as a tie-breaker |
 | Edit or delete of a session | Rebuild the rating of that game from scratch by replaying its sessions |
 
@@ -63,9 +64,13 @@ Ratings are stored as numbers and shown rounded to integers.
 
 | Metric | Definition |
 |---|---|
-| Games played | Number of sessions the player took part in |
-| Win | Place 1 in a session with at least 2 participants. A shared first place counts as a win (Assumption) |
+| Games played | Number of sessions the player took part in, including unrated sessions with guests |
+| Win | Place 1 in a session with at least 2 participants. A shared first place counts as a win. Unrated sessions with guests count too |
 | Win rate | Wins divided by sessions with at least 2 participants |
+
+### Overall rating
+
+The overall rating of a player is the average of their game ratings, weighted by `games_count`, over games with at least 3 rated sessions. A player with no such game has no overall rating. The overall team leaderboard ranks by it (FR-18); wins and games played are shown beside it. It is derived from `ratings`, so nothing extra is stored (change C23).
 
 ## 7. Implementation notes
 
@@ -96,7 +101,8 @@ Property checks:
 
 ## 9. Open questions
 
-1. **Overall leaderboard:** ratings of different games are not comparable. Proposal for the MVP: the overall leaderboard of a team is ranked by wins and games played, and only per-game leaderboards use rating. Needs your decision
-2. Is 1000 and K = 32 acceptable, or should new players have a higher K for their first games?
-3. Should guest ratings be hidden from leaderboards?
-4. Luck-heavy games (dice, simple card games) will produce noisy ratings. Show a "casual" label for such games, or accept the noise?
+1. Answered: the overall leaderboard ranks by the weighted average of game ratings (section 6)
+2. Answered: 1000 and K = 32 for the MVP
+3. Answered: guests have no ratings (section 5)
+4. Answered: luck-heavy games keep the general Elo and accept the noise for now. Later, parameters can be tuned per game after analysing pilot data
+5. Answered: all ratings are rebuilt once without sessions with a guest; those sessions count toward wins and win rate (section 6)

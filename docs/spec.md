@@ -48,7 +48,9 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-02 | Profile with nickname and avatar | Must | P1 |
 | FR-03 | A player can create guest profiles with a name only | Must | P1 |
 | FR-04 | A guest profile can later be linked to a real account, transferring its history | Could | P4 |
-| FR-05 | Account deletion with removal or anonymization of personal data | Should | Pilot |
+| FR-05 | Account deletion with removal or anonymization of personal data. Required before public launch because users may be in the US, the EU and elsewhere (change C28) | Must | Pilot |
+| FR-53 | Delete a guest: its creator, or the owner of any team the guest played in. History keeps the guest's sessions and shows "deleted guest" (change C24) | Should | P4 |
+| FR-55 | Each profile has a time zone, detected from the browser and editable. Days for streaks, activity and achievements use the player's local day (change C25) | Should | P4 |
 
 ### 4.2 Game catalog
 
@@ -58,6 +60,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 | FR-07 | Search and filter the catalog by name, player count and type | Must | P1 |
 | FR-08 | Game page with description, player count, typical duration and the player's own stats | Should | P2 |
 | FR-09 | A player can add a custom game when it is missing from the catalog | Should | P1 |
+| FR-54 | Delete a custom game: its author, or the owner of a team that used it. Ratings, wins and games played of that game are removed; its sessions stay in history, marked as a deleted game; earned achievements stay (change C24) | Should | P4 |
 
 ### 4.3 Sessions
 
@@ -76,7 +79,7 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 |---|---|---|---|
 | FR-16 | Personal stats: games played, wins, win rate, overall and per game | Must | P2 |
 | FR-17 | Rating per player per game, recalculated after each session. Algorithm is described in docs/rating.md (to be written) | Must | P2 |
-| FR-18 | Team leaderboard per game and overall | Must | P2 |
+| FR-18 | Team leaderboard per game and overall. Both rank by Elo: per game by the game's rating, overall by the weighted average of a player's game ratings (docs/rating.md section 6). Wins and games played are extra columns, not the ranking (change C23) | Must | P2 |
 | FR-19 | Head to head stats between two players | Should | P2 |
 | FR-20 | Progress charts over time (Recharts) | Should | P2 |
 
@@ -96,12 +99,13 @@ Priority: Must, Should, Could. Phase: P1 to P4, Pilot (see section 5).
 |---|---|---|---|
 | FR-26 | Create a team, invite by link, join and leave (minimal teams) | Must | P2 |
 | FR-27 | Team roles: owner and member. The owner can remove members | Must | P4 |
+| FR-52 | The owner can transfer ownership to another member, then leave the team (change C26) | Should | P4 |
 | FR-28 | Social feed with team sessions and earned achievements | Must | P4 |
 | FR-29 | Reactions on feed items | Could | P4 |
 | FR-38 | Session history of a team | Must | P2 |
 | FR-48 | Team management mode, set by the owner. Owner-managed: the owner can edit and delete every session of the team, with no approvals. Team-managed: every new session and every edit of a team session needs approval (FR-50) | Should | P4 |
 | FR-49 | Team logging setting, set by the owner: only the owner can log team sessions, or any member can | Should | P4 |
-| FR-50 | Approvals in team-managed teams. Every registered team member who took part approves; the logger counts as approved; members who did not play are not asked. A pending session or edit does not count in ratings, stats or achievements, and an edit keeps the old version counting until approved. A rejection, with an optional reason, goes back to the logger, who edits and resends or deletes it | Should | P4 |
+| FR-50 | Approvals in team-managed teams. Every registered team member who took part approves; the logger counts as approved; members who did not play are not asked. A pending session or edit does not count in ratings, stats or achievements, and an edit keeps the old version counting until approved. A rejection, with an optional reason, goes back to the logger, who edits and resends or deletes it. A session nobody rejects is confirmed automatically 48 hours after it was sent; the time left is shown on the session. Sessions with a guest are not rated, so they need no approval (change C27) | Should | P4 |
 
 ### 4.7 Table tools
 
@@ -130,18 +134,18 @@ Not scheduled. These depend on open questions in section 9.
 | FR-39 | Squads inside a team. The team owner creates squads and manages roles such as squad leader | Could | Backlog |
 | FR-40 | Replaced by FR-48 to FR-50 (team management modes, change C17) | | |
 | FR-41 | Replaced by FR-48 to FR-50 (team management modes, change C17) | | |
-| FR-42 | Rules for sessions that wait for approval too long: timeout and reminders | Could | Backlog |
+| FR-42 | Merged into FR-50: automatic confirmation after 48 hours (change C27) | | |
 
 ### 4.10 Own games
 
-Games played inside the app. Stage 1 of the staged plan in section 9: no network play, one device passed between players. Added by change C13 in [project/changes.md](project/changes.md).
+Games played inside the app. Stage 1: one device passed between players (change C13). Stage 2: online play by invite, each player on their own device (change C22 in [project/changes.md](project/changes.md)).
 
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
 | FR-43 | The Games tab opens on a choice: Play (games inside the app) or Track (the catalog and logging). Play has its own look | Should | P4 |
 | FR-44 | Yahtzee in the app, solo or with friends on one device (2 to 6 players): dice with holds and three rolls, full score sheet with the upper bonus, Yahtzee bonus and joker rule. A game in progress survives a reload. Results are not saved to history or ratings yet | Should | P4 |
 | FR-51 | Blackjack in the app, solo against the dealer or with friends on one device (2 to 5 players): 6-deck shoe, dealer stands on 17, blackjack pays 3:2, double down, one split per hand. Chips for fun: 1,000 each at the start; a player with no chips is out. A game in progress survives a reload. Results are not saved | Should | P4 |
-| FR-45 | Play with friends by invite: a friend gets a notification, joins and plays from their own phone. Shown as "Coming soon" in the game | Could | Backlog |
+| FR-45 | Online Yahtzee by invite (2 to 6 players). The host invites teammates; an invited player sees the invite in the app without reloading, accepts or declines, and plays from their own device. Desktop and phone players share the same game, and each player picks the layout that suits them. The server rolls the dice, checks whose turn it is and applies the rules, so moves cannot be faked and two moves at once cannot overwrite each other. A player who reloads or switches device returns to the same game. Results are not saved (FR-46). An invite expires after 15 minutes, or earlier if the host cancels it; both the host and the invited player see the time left and the reason when it ends. Each turn has a time limit set per game, 60 seconds by default. When it runs out, a second 60-second timer starts and the host can wait for the player or remove them. Waiting stops the timer, and the host can then resume the game or remove the player. If the host does nothing during the second timer, the turn is skipped by the game's own rule. Yahtzee: the current dice are scored in the open box that gives the most points; if no dice were rolled or the best score is 0, a random open box is scored as 0. When it is the host's own turn, nobody else decides: after the turn limit and the second timer, a third 60-second timer runs, and then the game is dismissed. A game that ends early, because it is dismissed or because a removal leaves one player, is not finished: nobody wins and nothing is recorded | Should | P4 |
 | FR-46 | Save in-app game results to history, ratings and achievements | Could | Backlog |
 
 ### 4.11 Administration
@@ -184,7 +188,7 @@ Dates, the critical path and the actual progress are in [project/schedule.md](pr
 ## 7. Constraints and assumptions
 
 - One developer (the project author), who combines the roles of manager, analyst, developer and tester
-- Stack as in CLAUDE.md: Next.js, Supabase, Vercel, Recharts
+- Stack as in CLAUDE.md: Next.js, Supabase, Vercel, Recharts. Online games use Supabase Realtime (FR-45)
 - Free-tier limits and prices have not been verified and must be checked on the service websites before relying on them
 - No legal entity is created during development
 - Budget and schedule are defined in the project plan ([project/](project/README.md)), not in this document
@@ -204,7 +208,8 @@ Out of scope for this project:
 
 - Monetization and payments
 - Native mobile apps
-- Own online games with network multiplayer or ranked mode. Stage 1, games on one device, is in scope (section 4.10); simple multiplayer and ranked stay after the project
+- Ranked mode for own games. Stage 1 (one device) and stage 2 (online Yahtzee by invite, change C22) are in scope (section 4.10)
+- Push notifications. Invites are shown inside the app only
 - Integrations with external catalogs such as BoardGameGeek
 
 Decisions made:
@@ -213,12 +218,18 @@ Decisions made:
 - In the MVP the session creator records the result alone. Confirmation by squad leaders is in the backlog (section 4.9). The session `status` field is kept in the data model for it
 - The catalog is managed by super admins in the admin panel (FR-47). Custom games are visible to their author and the author's teams
 - Profiles are visible to team members only
-- Rating is Elo-style, details in docs/rating.md
+- Rating is Elo-style, details in docs/rating.md. Sessions with at least one guest are kept in history but not rated, and guests have no ratings (change C23)
+- Email verification is required, also during the pilot (change C28)
+- Users may be in the US, the EU and elsewhere, so a privacy policy and account deletion are needed before public launch (change C28)
+- Online games are server-authoritative: a device sends a move, the server checks it, rolls the dice, updates the game and every device shows the result. Server routes accept a login token as well as the browser session, so future store apps can reuse them (change C22)
 
 Open questions:
 
 1. Rating parameters and how an overall leaderboard is defined (see docs/rating.md)
 2. Confirmation rules for the backlog: timeout for non-responding confirmers, dispute handling, how guests are covered
 3. Answered: scope of character customization is in [character.md](character.md) (5 races, hair, beards, eye colour, 10 free outfits, backgrounds; accessories need art)
-4. Is email verification required during the pilot?
-5. Data protection: are users in the EU, and is a privacy policy needed before public launch?
+4. Answered: email verification is required (change C28)
+5. Answered: users may be in the US, the EU and elsewhere; a privacy policy is needed before public launch (change C28)
+6. Answered: online invites and turn limits are in FR-45 (change C22)
+7. Answered: current ratings are rebuilt without sessions with a guest; those sessions still count toward games played, wins, win rate and achievements (change C23)
+8. Answered: the host's own timeout and early ends are in FR-45 (change C22)
