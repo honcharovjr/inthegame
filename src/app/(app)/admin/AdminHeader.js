@@ -5,6 +5,7 @@ const SECTIONS = [
   { id: "overview", label: "Overview", href: "/admin" },
   { id: "catalog", label: "Catalog", href: "/admin/catalog" },
   { id: "users", label: "Players", href: "/admin/users" },
+  { id: "settings", label: "Settings", href: "/admin/settings" },
 ];
 
 // Title and section switch shared by the admin pages.

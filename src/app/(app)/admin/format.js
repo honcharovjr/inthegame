@@ -8,6 +8,7 @@ const ACTIONS = {
   "player.block": "blocked",
   "player.unblock": "unblocked",
   "ratings.rebuild": "rebuilt the ratings of",
+  "settings.edit": "edited",
 };
 
 // The verb of an admin action, for example "added" or "blocked".

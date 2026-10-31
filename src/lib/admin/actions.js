@@ -1,7 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { validateGameInput } from "@/lib/games/validate";
+import { SITE_SETTINGS_TAG } from "@/lib/site/settings";
+import { validateSiteSettings } from "@/lib/site/validate";
 import { rebuildGameRatings } from "@/lib/rating/rebuild";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { adminProfile } from "./access";
@@ -173,5 +175,30 @@ export async function rebuildAllRatings() {
 
   await audit(admin, me.id, "ratings.rebuild", "game", null, { name: `${games.length} games` });
   revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Saves the details the public pages show: who runs the service, the contact
+// email, the minimum age and when the privacy policy last changed (C31).
+export async function saveSiteSettings(input) {
+  const me = await adminProfile();
+  if (!me) return NOT_ALLOWED;
+
+  const checked = validateSiteSettings(input);
+  if (checked.error) return { error: checked.error };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("site_settings")
+    .update({ ...checked.settings, updated_by: me.id, updated_at: new Date().toISOString() })
+    .eq("id", true);
+  if (error) {
+    console.error("saveSiteSettings failed", error);
+    return { error: "Could not save the settings. Try again." };
+  }
+
+  await audit(admin, me.id, "settings.edit", "settings", null, { name: "site settings" });
+  revalidatePath("/admin");
+  updateTag(SITE_SETTINGS_TAG);
   return { ok: true };
 }
