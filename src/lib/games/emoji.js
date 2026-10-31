@@ -4,7 +4,7 @@ const TYPE_DEFAULTS = {
   board: "♟️",
   card: "🃏",
   dice: "🎲",
-  dominoes: "🀄",
+  tile: "🀄",
   party: "🎉",
   other: "🎮",
 };

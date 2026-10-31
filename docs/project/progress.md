@@ -48,7 +48,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-01 | Email registration, login, logout, password reset | Must | P1 | Done | |
 | FR-02 | Profile with nickname and avatar | Must | P1 | Done | Avatar is the character |
 | FR-03 | Guest profiles | Must | P1 | Done | |
-| FR-06 | Catalog of 30+ games incl. classic games | Must | P1 | **Partial** | 3 games left after change C8; refill through the admin panel |
+| FR-06 | Catalog of 30+ games incl. classic games | Must | P1 | Done | 34 games again (migration after change C8); type `tile` replaces `dominoes` (C28) |
 | FR-07 | Search and filter by name, player count, type | Must | P1 | Done | |
 | FR-09 | Custom game | Should | P1 | Partial | No warning for duplicate names |
 | FR-10 | Create a session | Must | P1 | Done | |
