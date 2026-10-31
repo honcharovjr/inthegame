@@ -3,7 +3,7 @@ export const GAME_TYPES = [
   { value: "board", label: "Board", tone: "yellow" },
   { value: "card", label: "Card", tone: "pink" },
   { value: "dice", label: "Dice", tone: "turquoise" },
-  { value: "dominoes", label: "Dominoes", tone: "violet" },
+  { value: "tile", label: "Tiles", tone: "violet" },
   { value: "party", label: "Party", tone: "pink" },
   { value: "other", label: "Other", tone: "default" },
 ];
