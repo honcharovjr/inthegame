@@ -111,14 +111,14 @@ export function useRoom(initialRoom, initialPlayers) {
     };
   }, [roomId, take]);
 
-  async function reload() {
+  const reload = useCallback(async () => {
     take(...(await readRoom(createClient(), roomId)));
-  }
+  }, [roomId, take]);
 
   // An answer from a room route is newer than what Realtime has sent so far.
-  function applyRoom(next) {
+  const applyRoom = useCallback((next) => {
     setRoom((current) => (next.version >= current.version ? { ...current, ...next } : current));
-  }
+  }, []);
 
   return { room, players, reload, applyRoom };
 }

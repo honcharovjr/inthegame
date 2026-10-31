@@ -93,6 +93,46 @@
   }
 }
 
+/* Online: the turn timer and a late player */
+.clock {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.clockLow {
+  background: var(--color-pink);
+}
+
+.late {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.lateActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.late .ghost,
+.lateActions button {
+  min-height: 44px;
+  background: rgba(18, 10, 26, 0.08);
+  color: var(--color-ink);
+}
+
 .tip {
   min-height: 18px;
   color: rgba(255, 255, 255, 0.65);
