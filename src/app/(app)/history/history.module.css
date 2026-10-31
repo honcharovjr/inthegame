@@ -211,11 +211,4 @@
   font-weight: 700;
 }
 
-@media (min-width: 900px) {
-  /* Two columns of sessions under the filters */
-  .list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
-    gap: 12px;
-  }
-}
+

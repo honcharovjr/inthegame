@@ -28,6 +28,7 @@ function readFilters(params) {
     from: DATE.test(String(params.from ?? "")) ? params.from : "",
     to: DATE.test(String(params.to ?? "")) ? params.to : "",
     result: ["won", "lost"].includes(params.result) ? params.result : "",
+    rating: ["rated", "unrated"].includes(params.rating) ? params.rating : "",
   };
 }
 
@@ -37,6 +38,7 @@ function pageHref(filters, page) {
   if (filters.from) query.set("from", filters.from);
   if (filters.to) query.set("to", filters.to);
   if (filters.result) query.set("result", filters.result);
+  if (filters.rating) query.set("rating", filters.rating);
   if (page > 1) query.set("page", String(page));
   const text = query.toString();
   return text ? `/history?${text}` : "/history";
@@ -101,6 +103,7 @@ async function HistoryList({ searchParams }) {
   if (filters.game) query = query.eq("game_id", filters.game);
   if (filters.from) query = query.gte("played_at", `${filters.from}T00:00:00.000Z`);
   if (filters.to) query = query.lte("played_at", `${filters.to}T23:59:59.999Z`);
+  if (filters.rating) query = query.eq("rated", filters.rating === "rated");
   if (byResult && profile) {
     query = query.eq("mine.profile_id", profile.id);
     query = filters.result === "won" ? query.eq("mine.place", 1) : query.neq("mine.place", 1);
@@ -129,8 +132,9 @@ async function HistoryList({ searchParams }) {
         .filter((p) => p.profile_id !== profile?.id)
         .map((p) => p.profiles?.nickname ?? p.guests?.name),
       result: resultLabel(mine?.place ?? 0, people.length),
-      // A session with a guest changes no rating (change C23).
-      unrated: people.some((p) => p.guest_id),
+      // Only sessions of 2 or more players without a guest change ratings
+      // (change C23).
+      unrated: people.length < 2 || people.some((p) => p.guest_id),
       won: mine?.place === 1 && people.length >= 2,
     };
   });
@@ -186,7 +190,7 @@ async function HistoryList({ searchParams }) {
                   <Chip size="s">Former team</Chip>
                 )}
                 {session.unrated && (
-                  <span data-tip="Sessions with a guest do not change ratings">
+                  <span data-tip="Sessions with a guest or one player do not change ratings">
                     <Chip size="s">Unrated</Chip>
                   </span>
                 )}

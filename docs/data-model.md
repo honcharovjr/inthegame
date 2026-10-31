@@ -125,6 +125,8 @@ One recorded play (FR-10).
 
 Replay order for rating is `played_at`, then `created_at` (docs/rating.md section 5).
 
+Computed field `rated` (a SQL function on the row, no stored column): true when the session has at least 2 participants and no guest, so it changes ratings (change C23). The history filters on it.
+
 ### 3.7 session_participants
 
 | Column | Type | Notes |

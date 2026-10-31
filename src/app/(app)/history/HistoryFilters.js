@@ -12,6 +12,12 @@ const RESULTS = [
   { value: "lost", label: "Not won" },
 ];
 
+const RATINGS = [
+  { value: "", label: "All" },
+  { value: "rated", label: "Rated" },
+  { value: "unrated", label: "Unrated" },
+];
+
 // Filters of the history. They live in the address, so a filtered view can be
 // reloaded or shared, and every change starts again from page one.
 export default function HistoryFilters({ games, filters }) {
@@ -24,12 +30,13 @@ export default function HistoryFilters({ games, filters }) {
     if (next.from) query.set("from", next.from);
     if (next.to) query.set("to", next.to);
     if (next.result) query.set("result", next.result);
+    if (next.rating) query.set("rating", next.rating);
     const text = query.toString();
     go(text ? `/history?${text}` : "/history");
   }
 
   const active = Boolean(
-    filters.game || filters.from || filters.to || filters.result,
+    filters.game || filters.from || filters.to || filters.result || filters.rating,
   );
 
   return (
@@ -81,6 +88,22 @@ export default function HistoryFilters({ games, filters }) {
           ))}
         </div>
       </div>
+      <div className={`${styles.field} ${styles.fieldResult}`}>
+        <span className={styles.fieldLabel}>Rating</span>
+        <div className={styles.switch} role="group" aria-label="Rating">
+          {RATINGS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className={`${styles.switchButton} ${filters.rating === option.value ? styles.switchOn : ""}`}
+              aria-pressed={filters.rating === option.value}
+              onClick={() => update({ rating: option.value })}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className={styles.field}>
         <span className={styles.fieldLabel} aria-hidden="true">
           &nbsp;
@@ -91,7 +114,7 @@ export default function HistoryFilters({ games, filters }) {
           label="Reset filters"
           icon={<ResetIcon size={20} />}
           disabled={!active}
-          onClick={() => update({ game: "", from: "", to: "", result: "" })}
+          onClick={() => update({ game: "", from: "", to: "", result: "", rating: "" })}
         />
       </div>
     </section>
