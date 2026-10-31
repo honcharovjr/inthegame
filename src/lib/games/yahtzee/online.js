@@ -13,7 +13,6 @@ import {
   options,
   roll,
   score,
-  toggleHold,
 } from "./rules";
 
 const FRESH_TURN = {
@@ -33,16 +32,17 @@ export const yahtzeeOnline = {
   players: (game) => game.players,
   turnNumber: (game) => game.turn,
 
-  // move: { type: "roll" } | { type: "hold", index } | { type: "score", category }.
-  // Returns the same game when the move changes nothing, so the engine can
-  // refuse it.
+  // move: { type: "roll", held } | { type: "score", category }.
+  // Holds are chosen on the device and sent with the next roll, five
+  // booleans; the first roll of a turn ignores them. Returns the same game
+  // when the move changes nothing, so the engine can refuse it.
   move(game, move, random) {
     switch (move?.type) {
-      case "roll":
-        return roll(game, random);
-      case "hold":
-        if (!Number.isInteger(move.index) || move.index < 0 || move.index > 4) return game;
-        return toggleHold(game, move.index);
+      case "roll": {
+        if (game.rollsLeft === 0) return game;
+        const held = validHeld(move.held) && hasRolled(game) ? move.held : game.held;
+        return roll({ ...game, held }, random);
+      }
       case "score":
         if (!hasRolled(game) || !(move.category in options(currentSheet(game), game.dice))) {
           return game;
@@ -103,6 +103,10 @@ export const yahtzeeOnline = {
     };
   },
 };
+
+function validHeld(held) {
+  return Array.isArray(held) && held.length === 5 && held.every((item) => typeof item === "boolean");
+}
 
 function currentSheet(game) {
   return game.sheets[currentPlayer(game)];

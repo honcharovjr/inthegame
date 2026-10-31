@@ -19,7 +19,9 @@ const TICK_RETRY_MS = 1000;
 const TICK_TRIES = 10;
 
 // Online Yahtzee (FR-45). Every device shows the same game from the server;
-// only the player on turn can roll, hold and score. Timers run on the
+// only the player on turn can roll, hold and score. Holding dice and the
+// points of each box stay on this device; the holds go to the server with
+// the next roll, which the server makes. Timers run on the
 // server: when a deadline passes on this device it asks the server to apply
 // it. offset is the server clock minus this device's clock.
 export default function OnlineYahtzee({ me, roomState, offset }) {
@@ -32,6 +34,8 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [tries, setTries] = useState(0);
+  // The holds picked on this device since the last roll.
+  const [held, setHeld] = useState(game.held);
 
   // Only the dice of a new roll tumble. Compared with the last game seen.
   const [seen, setSeen] = useState({ version: room.version, game, moved: [], rollId: 0 });
@@ -41,10 +45,11 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
     setSeen({
       version: room.version,
       game,
-      moved: rolled ? (hasRolled(before) ? before.held.map((held) => !held) : game.dice.map(() => true)) : seen.moved,
+      moved: rolled ? (hasRolled(before) ? game.held.map((on) => !on) : game.dice.map(() => true)) : seen.moved,
       rollId: rolled ? seen.rollId + 1 : seen.rollId,
     });
     if (game.turn !== before.turn) setSelected(null);
+    setHeld(game.held);
     setTries(0);
   }
 
@@ -163,7 +168,7 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
   return (
     <main className={ui.page}>
       <YahtzeeBoard
-        game={game}
+        game={{ ...game, held }}
         participants={people}
         meKey={me}
         canAct={active === me && !busy}
@@ -173,8 +178,8 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
         onView={setViewing}
         moved={seen.moved}
         rollId={seen.rollId}
-        onRoll={() => send({ action: "move", move: { type: "roll" } })}
-        onHold={(index) => send({ action: "move", move: { type: "hold", index } })}
+        onRoll={() => send({ action: "move", move: { type: "roll", held } })}
+        onHold={(index) => setHeld((current) => current.map((on, i) => (i === index ? !on : on)))}
         onScore={() => {
           send({ action: "move", move: { type: "score", category: selected } });
           setSelected(null);
