@@ -9,6 +9,7 @@ import {
   hostAction,
   inviteExpired,
   onTurn,
+  requestEnd,
   startState,
 } from "./room";
 
@@ -178,5 +179,57 @@ describe("hostAction", () => {
     expect(() => hostAction(yahtzee, late(), "bo", "remove", T0)).toThrow("Only the host");
     expect(() => hostAction(yahtzee, late(), "host", "resume", T0)).toThrow("not allowed");
     expect(() => hostAction(yahtzee, started(), "host", "wait", T0)).toThrow("your own turn");
+  });
+});
+
+describe("last move", () => {
+  it("records the box and points of each finished turn", () => {
+    let state = applyMove(yahtzee, started(), "host", { type: "roll" }, T0, random);
+    state = applyMove(yahtzee, state, "host", { type: "score", category: "chance" }, T0 + 5, random);
+    expect(state.last).toEqual({ player: "host", category: "chance", points: 20, at: T0 + 5 });
+    expect(state.recent).toEqual([state.last]);
+  });
+
+  it("keeps the last three turns, newest first", () => {
+    let state = started(["host", "amy"]);
+    for (let turn = 0; turn < 4; turn += 1) {
+      const player = turn % 2 === 0 ? "host" : "amy";
+      const category = ["chance", "chance", "sixes", "sixes"][turn];
+      state = applyMove(yahtzee, state, player, { type: "roll" }, T0, random);
+      state = applyMove(yahtzee, state, player, { type: "score", category }, T0, random);
+    }
+    expect(state.recent.map((item) => [item.player, item.category])).toEqual([
+      ["amy", "sixes"],
+      ["host", "sixes"],
+      ["amy", "chance"],
+    ]);
+  });
+
+  it("marks a skipped turn", () => {
+    const state = advance(yahtzee, started(["amy", "host"]), T0 + TURN + GRACE_MS, random);
+    expect(state.last).toMatchObject({ player: "amy", points: 0, skipped: true });
+    expect(state.recent[0]).toBe(state.last);
+  });
+});
+
+describe("ending a game", () => {
+  it("lets the host end it at any time, with no winner", () => {
+    const state = hostAction(yahtzee, started(), "host", "end", T0);
+    expect(state.end).toEqual({ status: "cancelled", reason: "ended" });
+  });
+
+  it("lets a player ask, and the host keep playing", () => {
+    let state = requestEnd(started(), "amy", T0);
+    expect(state.endRequest).toEqual({ by: "amy", at: T0 });
+    expect(() => requestEnd(state, "bo", T0)).toThrow("already asked");
+    state = hostAction(yahtzee, state, "host", "keep", T0);
+    expect(state.endRequest).toBeNull();
+    expect(state.end).toBeNull();
+  });
+
+  it("is the host's decision only", () => {
+    expect(() => requestEnd(started(), "host", T0)).toThrow("end the game yourself");
+    expect(() => hostAction(yahtzee, started(), "amy", "end", T0)).toThrow("Only the host");
+    expect(() => hostAction(yahtzee, started(), "host", "keep", T0)).toThrow("Nobody asked");
   });
 });

@@ -29,5 +29,6 @@ export async function loadRoom(id, gameKey) {
     return { ...row, nickname: person?.nickname ?? "Player", character: person?.character ?? null };
   });
 
-  return { me: profile.id, room, players };
+  // The server's clock, so countdowns on the device can match it.
+  return { me: profile.id, room, players, serverNow: Date.now() };
 }

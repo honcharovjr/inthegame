@@ -175,7 +175,7 @@ export default function BlackjackGame({ profile, initialGuests, teams, maxPlayer
     return (
       <main className={ui.page}>
         <div className={ui.column}>
-          <TopBar title="Blackjack" backHref="/games/play" />
+          <TopBar title="Blackjack" onBack={() => setStage("mode")} />
           <div className={styles.fan} aria-hidden="true">
             {["AS", "KH", "QD", "JC", "10S"].map((card, index) => (
               <span key={card} className={styles.fanCard}>
@@ -211,7 +211,11 @@ export default function BlackjackGame({ profile, initialGuests, teams, maxPlayer
             <button type="button" className={`${ui.primary} ${ui.big}`} onClick={rematch}>
               Play again
             </button>
-            <Link href="/games/play" className={`${ui.ghost} ${ui.big}`}>
+            <button type="button" className={`${ui.ghost} ${ui.big}`} onClick={() => setStage("mode")}>
+              New game
+            </button>
+            {/* The page keeps its state while away, so it opens on the modes next time */}
+            <Link href="/games/play" className={`${ui.ghost} ${ui.big}`} onClick={() => setStage("mode")}>
               Done
             </Link>
           </div>

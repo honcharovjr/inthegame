@@ -85,7 +85,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-43 | Games tab: Play or Track | Should | P4 | Done | Change C13 |
 | FR-44 | Yahtzee solo and on one device | Should | P4 | Done | Changes C13, C14; 22 rule tests |
 | FR-51 | Blackjack solo and on one device | Should | P4 | Done | Change C19; 19 rule tests |
-| FR-45 | Online Yahtzee by invite | Should | P4 | Partial | Change C22. Parts 1 and 2 of 3: database, room engine with tests, server routes, invites on Home and Play, lobby. Online game screen next |
+| FR-45 | Online Yahtzee by invite | Should | P4 | Partial | Change C22. Built: database, room engine with tests, server routes, invites on Home and Play, lobby, online game with timers and host actions, ending a game, presence and reactions (C29). Waiting for a two-device test |
 | FR-46 | In-app results saved to history and ratings | Could | Backlog | Open | |
 | FR-47 | Admin panel: overview, catalog, players | Should | P4 | Done | Change C15 |
 | FR-05 | Account deletion | Must | Pilot | Open | Raised by change C28 |

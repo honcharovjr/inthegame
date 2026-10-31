@@ -1,6 +1,6 @@
 /* Yahtzee: bright dice and a white score sheet on the shared dark table */
 .playColumn {
-  max-width: 1080px;
+  max-width: 1320px;
 }
 
 .round {
@@ -17,11 +17,26 @@
   gap: var(--space-4);
 }
 
+.topRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Dice */
 .table {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
+}
+
+.turnLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
 }
 
 .turn {
@@ -31,12 +46,49 @@
 }
 
 .tray {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 6px;
   padding: 18px 12px 10px;
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.06);
+  transition: background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+.dice {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Your turn: a turquoise ring and a tag */
+.trayMine {
+  background: rgba(47, 214, 214, 0.1);
+  box-shadow: inset 0 0 0 3px var(--color-turquoise);
+}
+
+.trayTag {
+  position: absolute;
+  top: -11px;
+  left: 20px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-turquoise);
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Someone else's turn: flat, grey and dashed */
+.trayIdle {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.trayIdle .dice {
+  filter: grayscale(1);
+  opacity: 0.4;
 }
 
 .dieButton {
@@ -79,6 +131,20 @@
   animation-delay: calc(var(--i) * 45ms);
 }
 
+.shaking > span:first-child {
+  animation: shake 0.3s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * 40ms);
+}
+
+@keyframes shake {
+  from {
+    transform: translateY(-4px) rotate(-14deg);
+  }
+  to {
+    transform: translateY(2px) rotate(14deg);
+  }
+}
+
 @keyframes tumble {
   0% {
     transform: translateY(-26px) rotate(-200deg) scale(0.7);
@@ -93,6 +159,46 @@
   }
 }
 
+/* Online: the turn timer and a late player */
+.clock {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.clockLow {
+  background: var(--color-pink);
+}
+
+.late {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.lateActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.late .ghost,
+.lateActions button {
+  min-height: 44px;
+  background: rgba(18, 10, 26, 0.08);
+  color: var(--color-ink);
+}
+
 .tip {
   min-height: 18px;
   color: rgba(255, 255, 255, 0.65);
@@ -101,36 +207,35 @@
   text-align: center;
 }
 
-.actions {
-  position: sticky;
-  bottom: 12px;
-  z-index: 5;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 8px;
-  padding: 8px;
-  border-radius: var(--radius-pill);
-  background: rgba(18, 10, 26, 0.85);
-  backdrop-filter: blur(10px);
-}
-
 .roll {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 0 20px;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 8px 0 26px;
   border-radius: var(--radius-pill);
   background: var(--color-yellow);
   color: var(--color-ink);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.rollLeft {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-yellow);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
 .roll:active:not(:disabled) {
-  transform: scale(0.95) rotate(-2deg);
+  transform: scale(0.97);
 }
 
 .roll:disabled {
@@ -139,169 +244,461 @@
   cursor: default;
 }
 
-.rollDots {
-  display: inline-flex;
-  gap: 4px;
+.roll:disabled .rollLeft {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.dot,
-.dotOn {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.25;
-}
-
-.dotOn {
-  opacity: 1;
-}
-
-/* Score sheet */
+/* Score sheet: one grid from the faces down to the total. The column of the
+   player on turn is tinted inside the cards only, unbroken through each. Every player column
+   has the same width. Upper and lower are separate cards. */
 .sheet {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border-radius: 28px;
+  gap: 10px;
+  min-width: 0;
+  --name: minmax(0, 1fr);
+  --col: 56px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--name) repeat(var(--cols), var(--col));
+  align-items: stretch;
+  min-height: 34px;
+}
+
+.card {
+  border-radius: 18px;
   background: var(--color-surface);
   color: var(--color-ink);
-}
-
-.viewing {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: var(--color-violet-tint);
-  color: var(--color-violet-ink);
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.sectionHead {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 6px 4px 0;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--color-muted);
-}
-
-.bonusText {
-  letter-spacing: 0;
-  color: var(--color-turquoise-ink);
-}
-
-.bonusBar {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--color-chip);
   overflow: hidden;
 }
 
-.bonusBar span {
-  display: block;
-  height: 100%;
-  border-radius: 3px;
-  background: var(--color-turquoise);
-  transition: width 0.4s ease;
+.card .row + .row > * {
+  border-top: 1px solid var(--color-chip);
 }
 
-.boxes {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.card .row + .row > .colOn {
+  border-top-color: #f3e3a0;
 }
 
-.box {
-  width: 100%;
+.rowName {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 14px;
-  background: none;
-  text-align: left;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.boxCan {
-  background: var(--color-chip);
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  .boxCan:hover {
-    background: var(--color-pink-tint);
-  }
-}
-
-.boxOn,
-.boxOn:hover {
-  background: var(--color-pink);
-  color: #fff;
-  transform: scale(1.01);
-}
-
-.boxText {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.boxLabel {
+  gap: 6px;
+  min-width: 0;
+  padding-left: 12px;
+  overflow: hidden;
+  white-space: nowrap;
   font-size: 15px;
   font-weight: 700;
+  text-decoration: underline dotted rgba(110, 97, 112, 0.5);
+  text-underline-offset: 4px;
+  cursor: help;
 }
 
-.boxHint {
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.6;
-}
-
-.boxValue {
-  min-width: 40px;
-  text-align: right;
-  font-size: 18px;
+.cell {
+  display: grid;
+  place-items: center;
+  font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
-.boxCan .boxValue {
-  color: var(--color-pink-deep);
+.colOn {
+  background: var(--color-yellow-tint);
 }
 
-.boxCan .boxZero {
+/* Scored is plain black. A box you can score is a teal chip; hover fills
+   it, a click scores it. A 0 is grey. The best box has a star beside it. */
+.pickWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pick {
+  min-width: 36px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 8px;
+  background: var(--color-turquoise-tint);
+  color: var(--color-turquoise-ink);
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.pickZero {
+  background: var(--color-chip);
   color: var(--color-muted);
 }
 
-.boxOn .boxValue {
+@media (hover: hover) {
+  .pick:hover {
+    background: var(--color-turquoise);
+    color: var(--color-ink);
+  }
+}
+
+.pick:active {
+  background: var(--color-turquoise);
+  color: var(--color-ink);
+}
+
+.best {
+  position: absolute;
+  left: calc(100% + 2px);
+  color: var(--color-turquoise-ink);
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Column heads: the players as faces, the name on hover */
+.heads {
+  min-height: 52px;
+}
+
+.head {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 6px;
+}
+
+.face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.ring {
+  position: absolute;
+  inset: -2px;
+  width: 42px;
+  height: 42px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.ring circle {
+  fill: none;
+  stroke: var(--color-pink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s linear;
+}
+
+.presence {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--color-ink);
+  background: #8d7f96;
+}
+
+.online {
+  background: var(--color-success);
+}
+
+.sticker {
+  position: absolute;
+  bottom: calc(100% - 6px);
+  left: 50%;
+  z-index: 2;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  animation: sticker 3s ease both;
+}
+
+@keyframes sticker {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.6) rotate(-8deg);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.05) rotate(3deg);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -6px) scale(1);
+  }
+}
+
+/* Upper bonus: a meter per player, +35 once reached */
+.plus {
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-turquoise);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 18px;
+}
+
+.meter {
+  align-self: center;
+  width: 38px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-chip);
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--color-turquoise);
+  transition: width 0.4s ease;
+}
+
+.bonusWon {
+  align-self: center;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-turquoise);
+  color: var(--color-ink);
+  font-size: 13px;
+}
+
+.card .totalRow > * {
+  min-height: 42px;
+  border-top: 2px solid var(--color-ink);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.totalRow .rowName {
+  text-decoration: none;
+  cursor: default;
+}
+
+/* Side panel: an end request, standings, reactions, last moves */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panelTitle {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.standings {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stand {
+  display: grid;
+  grid-template-columns: 16px 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.standOn {
+  background: rgba(255, 225, 77, 0.14);
+  box-shadow: inset 0 0 0 2px var(--color-yellow);
+}
+
+.standPlace {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.standName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.hostTag {
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.standTotal {
+  font-size: 19px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.moves {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.moves strong {
   color: #fff;
 }
 
-.boxDone {
-  opacity: 0.9;
-}
-
-.boxDone .boxHint {
-  display: none;
-}
-
-.total {
+.reactions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding: 12px 14px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reaction {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .reaction:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* A request to end the game: a small strip at the top of the side panel */
+.requestStrip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
   border-radius: 16px;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.requestStrip > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.requestStrip button {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Ending the game: the buttons of the request strip and the confirm sheet */
+.requestEnd {
   background: var(--color-ink);
   color: #fff;
-  font-size: 18px;
+}
+
+.requestKeep {
+  background: rgba(18, 10, 26, 0.08);
+  color: var(--color-ink);
+}
+
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: end center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(18, 10, 26, 0.6);
+}
+
+.confirmPanel {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 26px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  animation: enter 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.confirmPanel h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.confirmPanel p {
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.recap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.recapItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.recapItem strong {
+  color: #fff;
+  font-size: 17px;
   font-weight: 800;
 }
 
@@ -369,36 +766,81 @@
   }
 }
 
-/* Desktop: dice on the left, the sheet on the right */
+/* Wide screens: dice and the side panel on the left, the sheet beside them;
+   very wide screens give the side panel its own column on the right. */
 @media (min-width: 900px) {
   .layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 420px;
+    grid-template-columns: 340px auto;
+    grid-template-areas: "table sheet" "side sheet";
+    justify-content: center;
     align-items: start;
-    gap: 32px;
+    gap: 24px 32px;
   }
 
   .table {
-    position: sticky;
-    top: 24px;
+    grid-area: table;
+  }
+
+  .sheet {
+    grid-area: sheet;
+    --name: 150px;
+    --col: 76px;
+  }
+
+  .side {
+    grid-area: side;
+  }
+
+  .row {
+    min-height: 37px;
+  }
+
+  .rowName {
+    font-size: 16px;
+  }
+
+  .cell,
+  .pick {
+    font-size: 17px;
   }
 
   .turn {
-    font-size: 48px;
+    font-size: 44px;
   }
 
   .tray {
-    padding: 32px 24px 20px;
+    padding: 26px 14px 12px;
   }
+}
 
-  .actions {
-    position: static;
+@media (min-width: 1240px) {
+  .layout {
+    grid-template-columns: 340px auto 280px;
+    grid-template-areas: "table sheet side";
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .tumble > span:first-child,
+  .shaking > span:first-child,
+  .sticker,
   .confettiDie {
     animation: none;
   }
+}
+
+.endScores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.confirmPanel .requestKeep {
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  cursor: pointer;
 }

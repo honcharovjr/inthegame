@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { UUID } from "@/lib/games/online/server";
-import Lobby from "../../../shared/Lobby";
 import { loadRoom } from "../../../shared/loadRoom";
 import ui from "../../../shared/play.module.css";
+import YahtzeeRoom from "./YahtzeeRoom";
 
 export const metadata = { title: "yahtzee" };
 
-// An online Yahtzee game (FR-45): the lobby until the host starts it.
+// An online Yahtzee game (FR-45): the lobby, then the game.
 export default function YahtzeeRoomPage({ params }) {
   return (
     <Suspense fallback={<main className={ui.page} />}>
@@ -22,5 +22,7 @@ async function RoomData({ params }) {
   const data = await loadRoom(id, "yahtzee");
   if (!data) notFound();
 
-  return <Lobby title="Yahtzee" me={data.me} initialRoom={data.room} initialPlayers={data.players} />;
+  return (
+    <YahtzeeRoom me={data.me} initialRoom={data.room} initialPlayers={data.players} serverNow={data.serverNow} />
+  );
 }

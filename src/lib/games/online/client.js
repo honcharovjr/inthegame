@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 // Browser side of online rooms (FR-45): calls to the room routes, and hooks
@@ -37,6 +37,42 @@ export function useNow(interval = 1000) {
   return now;
 }
 
+// Opens a Realtime channel as the logged-in player. Realtime applies the
+// read policies with the token it has when the channel joins, so the
+// session is loaded and handed over first; otherwise the channel joins as
+// anonymous and receives nothing. listen adds the .on() handlers; config
+// goes to the channel; onJoined runs once it has joined.
+// Answers a function that closes the channel.
+function follow(supabase, name, listen, { config, onJoined } = {}) {
+  let channel = null;
+  let closed = false;
+  (async () => {
+    await supabase.auth.getSession();
+    await supabase.realtime.setAuth();
+    if (closed) return;
+    channel = listen(supabase.channel(name, config ? { config } : undefined)).subscribe((status, error) => {
+      if (status === "SUBSCRIBED") onJoined?.(channel);
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error("realtime channel failed", name, status, error);
+      }
+    });
+  })();
+  return () => {
+    closed = true;
+    if (channel) supabase.removeChannel(channel);
+  };
+}
+
+// Calls back when the player returns to the tab, so anything Realtime
+// missed while the device slept is read once. Not polling.
+function onReturn(callback) {
+  const handler = () => {
+    if (document.visibilityState === "visible") callback();
+  };
+  document.addEventListener("visibilitychange", handler);
+  return () => document.removeEventListener("visibilitychange", handler);
+}
+
 // A room and its player rows, kept fresh by Realtime. Starts from what the
 // page loaded on the server. reload reads both again, for example after a
 // conflict.
@@ -45,52 +81,57 @@ export function useRoom(initialRoom, initialPlayers) {
   const [players, setPlayers] = useState(initialPlayers);
   const roomId = initialRoom.id;
 
-  useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`room:${roomId}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "game_rooms", filter: `id=eq.${roomId}` },
-        ({ new: row }) => setRoom((current) => (row.version >= current.version ? row : current)),
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "game_room_players", filter: `room_id=eq.${roomId}` },
-        ({ new: row }) =>
-          setPlayers((current) =>
-            current.map((item) => (item.profile_id === row.profile_id ? { ...item, ...row } : item)),
-          ),
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [roomId]);
-
-  async function reload() {
-    const supabase = createClient();
-    const [roomResult, playersResult] = await Promise.all([
-      supabase.from("game_rooms").select("*").eq("id", roomId).maybeSingle(),
-      supabase.from("game_room_players").select("*").eq("room_id", roomId),
-    ]);
-    if (roomResult.data) setRoom(roomResult.data);
-    if (playersResult.data) {
+  // Takes rows read from the database. Names stay from the first load.
+  const take = useCallback((nextRoom, rows) => {
+    if (nextRoom) setRoom(nextRoom);
+    if (rows) {
       setPlayers((current) =>
-        current.map((item) => ({
-          ...item,
-          ...playersResult.data.find((row) => row.profile_id === item.profile_id),
-        })),
+        current.map((item) => ({ ...item, ...rows.find((row) => row.profile_id === item.profile_id) })),
       );
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const stop = follow(supabase, `room:${roomId}`, (channel) =>
+      channel
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "game_rooms", filter: `id=eq.${roomId}` },
+          ({ new: row }) => setRoom((current) => (row.version >= current.version ? row : current)),
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "game_room_players", filter: `room_id=eq.${roomId}` },
+          ({ new: row }) => take(null, [row]),
+        ),
+    );
+    const stopReturn = onReturn(async () => take(...(await readRoom(supabase, roomId))));
+    return () => {
+      stop();
+      stopReturn();
+    };
+  }, [roomId, take]);
+
+  const reload = useCallback(async () => {
+    take(...(await readRoom(createClient(), roomId)));
+  }, [roomId, take]);
 
   // An answer from a room route is newer than what Realtime has sent so far.
-  function applyRoom(next) {
+  const applyRoom = useCallback((next) => {
     setRoom((current) => (next.version >= current.version ? { ...current, ...next } : current));
-  }
+  }, []);
 
   return { room, players, reload, applyRoom };
+}
+
+// [room, player rows]; either is null when it could not be read.
+async function readRoom(supabase, roomId) {
+  const [roomResult, playersResult] = await Promise.all([
+    supabase.from("game_rooms").select("*").eq("id", roomId).maybeSingle(),
+    supabase.from("game_room_players").select("*").eq("room_id", roomId),
+  ]);
+  return [roomResult.data, playersResult.data];
 }
 
 // The player's open invites and running games, newest first. Each item:
@@ -106,7 +147,11 @@ export function useMyRooms(profileId) {
     async function load() {
       const { data, error } = await supabase
         .from("game_room_players")
-        .select("room_id, status, invited_at, game_rooms!inner(game_key, status, profiles(nickname, character))")
+        // Rooms reach profiles both through the host and through the player
+        // rows, so the host link is named.
+        .select(
+          "room_id, status, invited_at, game_rooms!inner(game_key, status, profiles!game_rooms_host_id_fkey(nickname, character))",
+        )
         .eq("profile_id", profileId)
         .in("status", ["invited", "joined"])
         .in("game_rooms.status", ["waiting", "playing"])
@@ -128,21 +173,68 @@ export function useMyRooms(profileId) {
     load();
     // Any change to the player's own rows: a new invite, an answer, a start
     // or a cancel (both also update the invite rows).
-    const channel = supabase
-      .channel(`my-rooms:${profileId}`)
-      .on(
+    const stop = follow(supabase, `my-rooms:${profileId}`, (channel) =>
+      channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table: "game_room_players", filter: `profile_id=eq.${profileId}` },
         load,
-      )
-      .subscribe();
+      ),
+    );
+    const stopReturn = onReturn(load);
     return () => {
       active = false;
-      supabase.removeChannel(channel);
+      stop();
+      stopReturn();
     };
   }, [profileId]);
 
   return items;
+}
+
+export const REACTIONS = ["Nice roll", "Ouch", "GG", "Hurry"];
+
+// Who has the room open, and quick reactions, through Realtime presence and
+// broadcast. Nothing is stored. online is a Set of profile ids; reactions
+// maps a player to their latest { label, id }; react sends one.
+export function useRoomLive(roomId, me) {
+  const [online, setOnline] = useState(() => new Set([me]));
+  const [reactions, setReactions] = useState({});
+  const channelRef = useRef(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const stop = follow(
+      supabase,
+      `live:${roomId}`,
+      (channel) => {
+        channelRef.current = channel;
+        return channel
+          .on("presence", { event: "sync" }, () => {
+            const ids = Object.values(channel.presenceState()).flat().map((item) => item.id);
+            setOnline(new Set([me, ...ids]));
+          })
+          .on("broadcast", { event: "react" }, ({ payload }) => {
+            if (!REACTIONS.includes(payload?.label)) return;
+            setReactions((current) => ({ ...current, [payload.from]: { label: payload.label, id: Date.now() } }));
+          });
+      },
+      {
+        config: { presence: { key: me }, broadcast: { self: true } },
+        onJoined: (channel) => channel.track({ id: me }),
+      },
+    );
+    return () => {
+      channelRef.current = null;
+      stop();
+    };
+  }, [roomId, me]);
+
+  const react = useCallback(
+    (label) => channelRef.current?.send({ type: "broadcast", event: "react", payload: { from: me, label } }),
+    [me],
+  );
+
+  return { online, reactions, react };
 }
 
 // "14:05" for a countdown in milliseconds.

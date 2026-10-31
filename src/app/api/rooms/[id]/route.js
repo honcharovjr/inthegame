@@ -6,6 +6,7 @@ import {
   applyMove,
   hostAction,
   inviteExpired,
+  requestEnd,
   startState,
 } from "@/lib/games/online/room";
 import {
@@ -20,8 +21,9 @@ import { callerProfileId } from "@/lib/supabase/request";
 
 // One action on a room (FR-45). Body: { action, version, ... }.
 // Before the game: accept, decline, cancel, start.
-// During the game: move ({ move }), wait, resume, remove, and tick, which a
-// device sends when a deadline has passed. Moves and host actions name the
+// During the game: move ({ move }), request_end, the host's end, keep, wait,
+// resume and remove, and tick, which a device sends when a deadline has
+// passed. Moves and host actions name the
 // room version the device saw, so nobody acts on an old view.
 // Answers { room: { id, status, version, state } }.
 export async function POST(request, ctx) {
@@ -52,7 +54,9 @@ export async function POST(request, ctx) {
       }
       if (body.action === "move") {
         state = applyMove(adapter, advanced, caller, body.move, now, serverRandom);
-      } else if (["wait", "resume", "remove"].includes(body.action)) {
+      } else if (body.action === "request_end") {
+        state = requestEnd(advanced, caller, now);
+      } else if (["end", "keep", "wait", "resume", "remove"].includes(body.action)) {
         state = hostAction(adapter, advanced, caller, body.action, now);
       } else if (body.action !== "tick") {
         throw new RoomError("Unknown action");

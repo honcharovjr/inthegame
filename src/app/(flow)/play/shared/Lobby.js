@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import UserText from "@/components/UserText/UserText";
-import { clock, roomAction, useNow, useRoom } from "@/lib/games/online/client";
+import { clock, roomAction, useNow } from "@/lib/games/online/client";
 import { INVITE_MS } from "@/lib/games/online/room";
 import { playerColor } from "@/lib/sessions/colors";
 import TopBar from "./TopBar";
@@ -15,10 +15,11 @@ const STATUS = { joined: "Joined", declined: "Declined", left: "Left" };
 
 // The room before the game (FR-45). Everyone sees who joined and how long
 // open invites last. The invited player accepts or declines here; the host
-// starts once a friend has joined, or cancels.
-export default function Lobby({ title, me, initialRoom, initialPlayers }) {
+// starts once a friend has joined, or cancels. roomState comes from
+// useRoom in the parent, which also shows the game once it starts.
+export default function Lobby({ title, me, roomState }) {
   const router = useRouter();
-  const { room, players, reload, applyRoom } = useRoom(initialRoom, initialPlayers);
+  const { room, players, reload, applyRoom } = roomState;
   const now = useNow();
   const [error, setError] = useState(null);
   const [busy, startBusy] = useTransition();
@@ -42,18 +43,6 @@ export default function Lobby({ title, me, initialRoom, initialPlayers }) {
       await reload();
       after?.();
     });
-  }
-
-  if (room.status !== "waiting") {
-    return (
-      <Ended title={title}>
-        {room.status === "cancelled"
-          ? "This game was cancelled."
-          : room.status === "playing"
-            ? "The game has started. Online play opens in the next update."
-            : "This game is over."}
-      </Ended>
-    );
   }
 
   // Sorted: host, then joined, then the rest.
@@ -153,7 +142,8 @@ export default function Lobby({ title, me, initialRoom, initialPlayers }) {
   );
 }
 
-function Ended({ title, children }) {
+// A room that is over without results, such as a cancelled one.
+export function Ended({ title, children }) {
   return (
     <main className={ui.page}>
       <div className={ui.column}>

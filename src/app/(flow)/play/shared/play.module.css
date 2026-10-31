@@ -611,3 +611,135 @@ button.mode:active {
     animation: none;
   }
 }
+
+/* Icon buttons in a game's top bar; the name is the tooltip */
+.iconAction {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+@media (hover: hover) {
+  .iconAction:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+.iconAction:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* A pop-up over the game, such as the rules */
+.dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(18, 10, 26, 0.75);
+}
+
+.dialogPanel {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 26px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  animation: enter 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.dialogHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dialogHead h2 {
+  flex: 1;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.dialogClose,
+.dialogTab {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dialogTabOn {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.ruleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ruleSection h3 {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+}
+
+.ruleSection p {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.ruleLine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--color-chip);
+  font-size: 15px;
+}
+
+.ruleLine span {
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ruleLine .ruleValue {
+  min-width: 44px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}

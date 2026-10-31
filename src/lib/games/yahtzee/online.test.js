@@ -14,10 +14,26 @@ function sheetWith(boxes) {
 describe("move", () => {
   it("returns the same game for a move that is not allowed", () => {
     const game = yahtzee.newGame(["a", "b"]);
-    expect(yahtzee.move(game, { type: "hold", index: 0 })).toBe(game);
     expect(yahtzee.move(game, { type: "score", category: "chance" })).toBe(game);
-    expect(yahtzee.move(game, { type: "hold", index: 9 })).toBe(game);
-    expect(yahtzee.move(game, { type: "cheat" })).toBe(game);
+    expect(yahtzee.move({ ...game, rollsLeft: 0 }, { type: "roll" })).toEqual({ ...game, rollsLeft: 0 });
+    expect(yahtzee.move(game, { type: "hold", index: 0 })).toBe(game);
+  });
+
+  it("keeps the dice held on the device and rolls the rest", () => {
+    const game = { ...yahtzee.newGame(["a", "b"]), dice: [6, 6, 2, 3, 4], rollsLeft: 2 };
+    const held = [true, true, false, false, false];
+    const next = yahtzee.move(game, { type: "roll", held }, () => 0);
+    expect(next.dice).toEqual([6, 6, 1, 1, 1]);
+    expect(next.held).toEqual(held);
+    expect(next.rollsLeft).toBe(1);
+  });
+
+  it("ignores holds on the first roll and bad holds", () => {
+    const game = yahtzee.newGame(["a", "b"]);
+    const first = yahtzee.move(game, { type: "roll", held: [true, true, true, true, true] }, () => 0);
+    expect(first.dice).toEqual([1, 1, 1, 1, 1]);
+    const later = { ...game, dice: [6, 6, 6, 6, 6], rollsLeft: 2 };
+    expect(yahtzee.move(later, { type: "roll", held: ["yes"] }, () => 0).dice).toEqual([1, 1, 1, 1, 1]);
   });
 });
 

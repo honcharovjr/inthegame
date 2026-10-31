@@ -37,10 +37,18 @@ export async function POST(request) {
       .single();
     if (error) throw error;
 
+    // Every row names the same columns: in a multi-row insert, a column one
+    // row leaves out becomes null, not its default.
     const now = new Date().toISOString();
     const { error: playersError } = await admin.from("game_room_players").insert([
-      { room_id: room.id, profile_id: host, status: "joined", responded_at: now },
-      ...invitees.map((id) => ({ room_id: room.id, profile_id: id })),
+      { room_id: room.id, profile_id: host, status: "joined", invited_at: now, responded_at: now },
+      ...invitees.map((id) => ({
+        room_id: room.id,
+        profile_id: id,
+        status: "invited",
+        invited_at: now,
+        responded_at: null,
+      })),
     ]);
     if (playersError) {
       await admin.from("game_rooms").delete().eq("id", room.id);
