@@ -106,7 +106,11 @@ export function useMyRooms(profileId) {
     async function load() {
       const { data, error } = await supabase
         .from("game_room_players")
-        .select("room_id, status, invited_at, game_rooms!inner(game_key, status, profiles(nickname, character))")
+        // Rooms reach profiles both through the host and through the player
+        // rows, so the host link is named.
+        .select(
+          "room_id, status, invited_at, game_rooms!inner(game_key, status, profiles!game_rooms_host_id_fkey(nickname, character))",
+        )
         .eq("profile_id", profileId)
         .in("status", ["invited", "joined"])
         .in("game_rooms.status", ["waiting", "playing"])
