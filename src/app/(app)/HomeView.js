@@ -38,7 +38,7 @@ export default function HomeView({ saved, profile, totals, streak, calendar, rat
                     across {rating.counted} {rating.counted === 1 ? "game" : "games"}
                   </span>
                 ) : (
-                  rating.games.length > 0 && <span className={styles.note}>3 rated sessions in a game to start</span>
+                  <span className={styles.note}>Play 3 sessions without guests in one game to get a rating</span>
                 )}
               </div>
               <span className={styles.big}>
