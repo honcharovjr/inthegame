@@ -90,7 +90,7 @@ async function HistoryList({ searchParams }) {
   let query = supabase
     .from("sessions")
     .select(
-      `id, played_at, team_id, teams(id, name), games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))${
+      `id, played_at, team_id, teams(id, name), games(name, created_by, type, emoji), session_participants(place, profile_id, guest_id, profiles(nickname), guests(name))${
         byResult ? ", mine:session_participants!inner(place)" : ""
       }`,
       { count: "exact" },
@@ -129,6 +129,8 @@ async function HistoryList({ searchParams }) {
         .filter((p) => p.profile_id !== profile?.id)
         .map((p) => p.profiles?.nickname ?? p.guests?.name),
       result: resultLabel(mine?.place ?? 0, people.length),
+      // A session with a guest changes no rating (change C23).
+      unrated: people.some((p) => p.guest_id),
       won: mine?.place === 1 && people.length >= 2,
     };
   });
@@ -182,6 +184,11 @@ async function HistoryList({ searchParams }) {
                   </Chip>
                 ) : (
                   <Chip size="s">Former team</Chip>
+                )}
+                {session.unrated && (
+                  <span data-tip="Sessions with a guest do not change ratings">
+                    <Chip size="s">Unrated</Chip>
+                  </span>
                 )}
               </span>
               <MetaLine

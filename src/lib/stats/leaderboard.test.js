@@ -78,4 +78,17 @@ describe("teamLeaderboard", () => {
     expect(rows).toHaveLength(3);
     expect(rows.every((r) => r.games === 0 && r.wins === 0)).toBe(true);
   });
+
+  it("ranks by rating when ratings are given, players without one last", () => {
+    const ratings = new Map([
+      ["b", 1300],
+      ["c", 1450],
+    ]);
+    const rows = teamLeaderboard([], members, ratings);
+    expect(rows.map((r) => [r.id, r.rating])).toEqual([
+      ["c", 1450],
+      ["b", 1300],
+      ["a", null],
+    ]);
+  });
 });

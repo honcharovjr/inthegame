@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { validateGameInput } from "@/lib/games/validate";
+import { rebuildGameRatings } from "@/lib/rating/rebuild";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { adminProfile } from "./access";
 
@@ -145,5 +146,32 @@ export async function setBlocked(profileId, blocked) {
   revalidatePath("/admin");
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${profileId}`);
+  return { ok: true };
+}
+
+// Recomputes the ratings of every game from its sessions, for example after
+// a change to the rating rules (change C23). Games are rebuilt one by one.
+export async function rebuildAllRatings() {
+  const me = await adminProfile();
+  if (!me) return NOT_ALLOWED;
+
+  const admin = createAdminClient();
+  const { data: games, error } = await admin.from("games").select("id");
+  if (error) {
+    console.error("rebuildAllRatings failed", error);
+    return { error: "Could not read the games. Try again." };
+  }
+
+  for (const game of games) {
+    try {
+      await rebuildGameRatings(game.id);
+    } catch (rebuildError) {
+      console.error("rebuildAllRatings failed on a game", game.id, rebuildError);
+      return { error: "Some ratings could not be rebuilt. Try again." };
+    }
+  }
+
+  await audit(admin, me.id, "ratings.rebuild", "game", null, { name: `${games.length} games` });
+  revalidatePath("/", "layout");
   return { ok: true };
 }

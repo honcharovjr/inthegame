@@ -14,8 +14,9 @@ const RIVAL_COLORS = ["turquoise", "pink", "white"];
 // Games listed under the average rating
 const RATING_GAMES = 3;
 
-// Home below its title, from data read by the page. rating: the average over
-// all rated games and the rows behind it, played most first. progress: a
+// Home below its title, from data read by the page. rating: the overall
+// rating, how many games count toward it, and the rows behind it, played
+// most first. progress: a
 // promise of the achievement progress, which streams in on its own.
 export default function HomeView({ saved, profile, totals, streak, calendar, rating, timeline, rivals, progress }) {
   return (
@@ -32,10 +33,12 @@ export default function HomeView({ saved, profile, totals, streak, calendar, rat
             <section className={styles.section} aria-label="Rating">
               <div className={styles.head}>
                 <h2 className={styles.title}>Rating</h2>
-                {rating.games.length > 0 && (
+                {rating.counted > 0 ? (
                   <span className={styles.note}>
-                    average of {rating.games.length} {rating.games.length === 1 ? "game" : "games"}
+                    across {rating.counted} {rating.counted === 1 ? "game" : "games"}
                   </span>
+                ) : (
+                  rating.games.length > 0 && <span className={styles.note}>3 rated sessions in a game to start</span>
                 )}
               </div>
               <span className={styles.big}>

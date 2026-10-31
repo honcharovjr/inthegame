@@ -55,15 +55,25 @@ export function compareSessions(a, b) {
   return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
 }
 
+// A session changes ratings only with enough players and no guest in it.
+// A session with a guest still counts for games played, wins and
+// achievements (docs/rating.md section 5, change C23).
+export function isRated(session, config = RATING_CONFIG) {
+  return (
+    session.participants.length >= config.minParticipants &&
+    !session.participants.some((p) => p.guest)
+  );
+}
+
 // Rebuilds the ratings of one game from scratch by replaying its sessions.
-// sessions: [{ id, playedAt, createdAt, participants: [{ key, place }] }]
+// sessions: [{ id, playedAt, createdAt, participants: [{ key, place, guest? }] }]
 // Returns { ratings: Map(key -> { rating, gamesCount }), history: [...] }.
 export function replaySessions(sessions, config = RATING_CONFIG) {
   const ratings = new Map();
   const history = [];
 
   for (const session of [...sessions].sort(compareSessions)) {
-    if (session.participants.length < config.minParticipants) continue;
+    if (!isRated(session, config)) continue;
 
     const players = session.participants.map((p) => ({
       key: p.key,

@@ -12,6 +12,7 @@ import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { playerColor } from "@/lib/sessions/colors";
 import { loadPanelSessions, readPage } from "@/lib/sessions/panel";
+import { memberRatings } from "@/lib/stats/average";
 import { teamLeaderboard } from "@/lib/stats/leaderboard";
 import { leaveTeam } from "@/lib/teams/actions";
 import { createClient } from "@/lib/supabase/server";
@@ -88,6 +89,11 @@ async function TeamContent({ params, searchParams }) {
   }));
 
   const sessions = sessionsResult.data ?? [];
+  // Ranked by overall rating (change C23).
+  const { data: ratingRows } = await supabase
+    .from("ratings")
+    .select("profile_id, rating, games_count")
+    .in("profile_id", members.map((member) => member.id));
   const board = teamLeaderboard(
     sessions.map((session) => ({
       participants: session.session_participants.map((p) => ({
@@ -96,6 +102,7 @@ async function TeamContent({ params, searchParams }) {
       })),
     })),
     members,
+    memberRatings(ratingRows ?? [], false),
   );
 
   const requestHeaders = await headers();
@@ -165,7 +172,7 @@ async function TeamContent({ params, searchParams }) {
             <li key={row.id} className={styles.boardRow}>
               <span
                 className={styles.rank}
-                style={{ color: index === 0 && row.wins > 0 ? "var(--color-pink-deep)" : undefined }}
+                style={{ color: index === 0 && (row.rating !== null || row.wins > 0) ? "var(--color-pink-deep)" : undefined }}
               >
                 {index + 1}
               </span>
@@ -184,6 +191,7 @@ async function TeamContent({ params, searchParams }) {
                   <span key="wins" className={styles.winner}>
                     {row.wins} {row.wins === 1 ? "win" : "wins"}
                   </span>,
+                  row.rating !== null && `rating ${row.rating}`,
                 ]}
               />
             </li>

@@ -61,8 +61,8 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-12 | Sides result type | Should | P2 | Open | |
 | FR-15 | Session note | Could | P2 | Open | Database field exists |
 | FR-16 | Personal stats overall and per game | Must | P2 | Done | All-time numbers on Profile and History, a "your stats" card per game on Profile, this month on Home |
-| FR-17 | Rating per player per game | Must | P2 | Partial | Elo-style, tests on synthetic data; sessions with a guest must stop being rated, then all ratings rebuilt once (change C23) |
-| FR-18 | Team leaderboard per game and overall | Must | P2 | Partial | Team stats page; overall must rank by weighted average Elo (change C23) |
+| FR-17 | Rating per player per game | Must | P2 | Done | Elo-style, tests on synthetic data; sessions with a guest are not rated (C23); rebuild from the admin panel |
+| FR-18 | Team leaderboard per game and overall | Must | P2 | Done | Ranked by game rating or the weighted overall rating (C23); wins and games as extra columns |
 | FR-19 | Head to head | Should | P2 | Open | |
 | FR-20 | Progress charts | Should | P2 | Open | Rating history is stored |
 | FR-26 | Teams: create, invite link, join, leave | Must | P2 | Done | |

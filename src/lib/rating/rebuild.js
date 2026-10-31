@@ -35,6 +35,7 @@ export async function rebuildGameRatings(gameId) {
       participants: session.session_participants.map((p) => ({
         key: p.profile_id ? `p:${p.profile_id}` : `g:${p.guest_id}`,
         place: p.place,
+        guest: Boolean(p.guest_id),
       })),
     })),
   );

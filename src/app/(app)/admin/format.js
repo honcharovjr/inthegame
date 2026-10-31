@@ -7,6 +7,7 @@ const ACTIONS = {
   "game.promote": "added to the catalog",
   "player.block": "blocked",
   "player.unblock": "unblocked",
+  "ratings.rebuild": "rebuilt the ratings of",
 };
 
 // The verb of an admin action, for example "added" or "blocked".

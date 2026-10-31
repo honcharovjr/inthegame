@@ -9,6 +9,7 @@ import Skeleton from "@/components/Skeleton/Skeleton";
 import { requireUser } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
 import { playerColor } from "@/lib/sessions/colors";
+import { memberRatings } from "@/lib/stats/average";
 import { teamGames } from "@/lib/stats/teamGames";
 import { teamLeaderboard } from "@/lib/stats/leaderboard";
 import { createClient } from "@/lib/supabase/server";
@@ -83,6 +84,16 @@ async function StatsContent({ params, searchParams }) {
   const shown = game
     ? sessions.filter((session) => session.game_id === game.id)
     : sessions;
+
+  // The board ranks by rating (change C23): the game's rating once a game is
+  // chosen, otherwise the overall rating. Both need 3 rated sessions.
+  const { data: ratingRows } = await supabase
+    .from("ratings")
+    .select("profile_id, game_id, rating, games_count")
+    .in("profile_id", members.map((member) => member.id))
+    .match(game ? { game_id: game.id } : {});
+  const ratings = memberRatings(ratingRows ?? [], Boolean(game));
+
   const board = teamLeaderboard(
     shown.map((session) => ({
       participants: session.session_participants.map((p) => ({
@@ -91,20 +102,8 @@ async function StatsContent({ params, searchParams }) {
       })),
     })),
     members,
+    ratings,
   );
-
-  // Ratings exist per game, so they only show once one game is chosen.
-  const ratings = new Map();
-  if (game) {
-    const { data } = await supabase
-      .from("ratings")
-      .select("profile_id, rating")
-      .eq("game_id", game.id)
-      .in("profile_id", members.map((member) => member.id));
-    for (const row of data ?? []) {
-      ratings.set(row.profile_id, Math.round(Number(row.rating)));
-    }
-  }
 
   const href = (gameId) =>
     gameId ? `/teams/${id}/stats?game=${gameId}` : `/teams/${id}/stats`;
@@ -160,7 +159,7 @@ async function StatsContent({ params, searchParams }) {
                   className={styles.rank}
                   style={{
                     color:
-                      index === 0 && row.wins > 0
+                      index === 0 && (row.rating !== null || row.wins > 0)
                         ? "var(--color-pink-deep)"
                         : undefined,
                   }}
@@ -183,7 +182,7 @@ async function StatsContent({ params, searchParams }) {
                       {row.wins} {row.wins === 1 ? "win" : "wins"}
                     </span>,
                     row.winRate !== null && `${row.winRate}%`,
-                    ratings.has(row.id) && `rating ${ratings.get(row.id)}`,
+                    row.rating !== null && `rating ${row.rating}`,
                   ]}
                 />
               </li>
