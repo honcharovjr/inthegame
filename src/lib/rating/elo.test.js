@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isRated,
   actualScore,
   expectedScore,
   rateSession,
@@ -170,5 +171,38 @@ describe("replaySessions", () => {
       participants: [{ key: "a", place: 1 }],
     };
     expect(replaySessions([solo]).ratings.size).toBe(0);
+  });
+});
+
+describe("sessions with a guest", () => {
+  const withGuest = {
+    id: "g1",
+    playedAt: "2026-10-01T10:00:00Z",
+    createdAt: "2026-10-01T10:00:00Z",
+    participants: [
+      { key: "p:a", place: 1 },
+      { key: "g:x", place: 2, guest: true },
+    ],
+  };
+  const plain = {
+    id: "p1",
+    playedAt: "2026-10-02T10:00:00Z",
+    createdAt: "2026-10-02T10:00:00Z",
+    participants: [
+      { key: "p:a", place: 1 },
+      { key: "p:b", place: 2 },
+    ],
+  };
+
+  it("are not rated", () => {
+    expect(isRated(withGuest)).toBe(false);
+    expect(isRated(plain)).toBe(true);
+  });
+
+  it("change nobody's rating and give guests no rating", () => {
+    const { ratings, history } = replaySessions([withGuest, plain]);
+    expect(ratings.has("g:x")).toBe(false);
+    expect(ratings.get("p:a")).toEqual({ rating: 1016, gamesCount: 1 });
+    expect(history.map((row) => row.sessionId)).toEqual(["p1", "p1"]);
   });
 });

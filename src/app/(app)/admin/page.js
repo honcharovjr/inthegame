@@ -4,6 +4,7 @@ import UserText from "@/components/UserText/UserText";
 import { requireSuperAdmin } from "@/lib/admin/access";
 import { loadDashboard } from "@/lib/admin/queries";
 import AdminHeader from "./AdminHeader";
+import RebuildRatings from "./RebuildRatings";
 import { actionTarget, actionVerb, formatDate } from "./format";
 import styles from "./admin.module.css";
 
@@ -102,7 +103,10 @@ async function Overview() {
         </section>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Admin activity</h2>
+          <div className={styles.cardHead}>
+            <h2 className={styles.cardTitle}>Admin activity</h2>
+            <RebuildRatings />
+          </div>
           {audit.length === 0 ? (
             <p className={styles.empty}>No admin actions yet.</p>
           ) : (

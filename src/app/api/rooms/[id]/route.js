@@ -28,11 +28,15 @@ import { callerProfileId } from "@/lib/supabase/request";
 // Answers { room: { id, status, version, state } }.
 export async function POST(request, ctx) {
   try {
-    const caller = await callerProfileId(request);
-    if (!caller) throw new RoomError("Log in first", 401);
-
+    // Who is asking and the room are read at the same time, to save a trip
+    // to the database on every action.
     const { id } = await ctx.params;
-    const { room, players } = await loadRoom(id);
+    const [who, loaded] = await Promise.allSettled([callerProfileId(request), loadRoom(id)]);
+    if (who.status === "rejected") throw who.reason;
+    const caller = who.value;
+    if (!caller) throw new RoomError("Log in first", 401);
+    if (loaded.status === "rejected") throw loaded.reason;
+    const { room, players } = loaded.value;
     const me = players.find((row) => row.profile_id === caller);
     if (!me) throw new RoomError("This game was not found", 404);
 

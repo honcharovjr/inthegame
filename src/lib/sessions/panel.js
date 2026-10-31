@@ -4,7 +4,7 @@
 export const PANEL_PAGE_SIZE = 10;
 
 const COLUMNS =
-  "id, played_at, created_by, games(name, created_by, type, emoji), session_participants(place, profile_id, profiles(nickname), guests(name))";
+  "id, played_at, created_by, games(name, created_by, type, emoji), session_participants(place, profile_id, guest_id, profiles(nickname), guests(name))";
 
 // supabase: the logged-in client. Give teamId for a team, or personal with
 // the player's profile id. page starts at 1.

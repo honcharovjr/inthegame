@@ -44,6 +44,11 @@ export default function SessionHistory({ title, sessions, profileId, page, total
                     items={[
                       dateFormat.format(new Date(session.played_at)),
                       names.length > 0 && <UserText>{names.slice(0, 3).join(", ")}</UserText>,
+                      session.session_participants.some((p) => p.guest_id) && (
+                        <span key="unrated" data-tip="Sessions with a guest do not change ratings">
+                          unrated
+                        </span>
+                      ),
                       winner && session.session_participants.length > 1 && (
                         <span className={styles.winner}>
                           <UserText>{winner.profiles?.nickname ?? winner.guests?.name}</UserText> won

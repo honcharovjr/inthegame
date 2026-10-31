@@ -5,7 +5,7 @@ import Skeleton from "@/components/Skeleton/Skeleton";
 import { checkPlayer } from "@/lib/achievements/award";
 import { getProfile } from "@/lib/auth/session";
 import { activityCalendar } from "@/lib/stats/activity";
-import { averageRating } from "@/lib/stats/average";
+import { countedGames, overallRating } from "@/lib/stats/average";
 import { monthStats, resultLabel } from "@/lib/stats/month";
 import { loadResults } from "@/lib/stats/results";
 import { headToHead } from "@/lib/stats/rivals";
@@ -82,14 +82,19 @@ async function HomeContent({ searchParams }) {
       .limit(RIVAL_SESSIONS),
     supabase
       .from("ratings")
-      .select("game_id, rating, games(name, created_by, type, emoji)")
+      .select("game_id, rating, games_count, games(name, created_by, type, emoji)")
       .eq("profile_id", profile.id)
       .order("games_count", { ascending: false }),
   ]);
 
-  // One rating for the player: the plain average over every rated game.
+  // One rating for the player: the weighted average over games with enough
+  // rated sessions (change C23).
   const ratingRows = ratingResult.data ?? [];
-  const rating = { games: ratingRows, average: averageRating(ratingRows) };
+  const rating = {
+    games: ratingRows,
+    average: overallRating(ratingRows),
+    counted: countedGames(ratingRows).length,
+  };
 
   const totals = monthStats(results.rows);
   const streak = winStreaks(results.rows);
