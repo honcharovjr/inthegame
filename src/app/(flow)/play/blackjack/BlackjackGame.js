@@ -205,7 +205,7 @@ export default function BlackjackGame({ profile, initialGuests, teams, maxPlayer
             })}
           </ol>
 
-          <p className={ui.note}>In-app games are not saved to your history yet.</p>
+          <p className={ui.note}>Games on one device are not saved to your history.</p>
 
           <div className={ui.endActions}>
             <button type="button" className={`${ui.primary} ${ui.big}`} onClick={rematch}>
