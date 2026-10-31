@@ -22,11 +22,19 @@ Acceptance: a guest needs only a name; guests are selectable when adding partici
 
 **US-A5** (FR-04, P4, Could)
 As a player, I want to link a guest profile to a friend's real account, so that their past games are not lost when they register.
-Acceptance: history of the guest moves to the account; ratings are recalculated; the action asks for confirmation.
+Acceptance: history of the guest moves to the account and shows the account name with a guest mark; old sessions are not re-rated, ratings start with the next session; the action asks for confirmation.
 
-**US-A6** (FR-05, Pilot, Should)
+**US-A6** (FR-05, Pilot, Must)
 As a player, I want to delete my account, so that my personal data is removed.
 Acceptance: confirmation required; personal data is removed or anonymized; sessions with other players stay consistent.
+
+**US-A7** (FR-53, P4, Should)
+As a guest's creator or a team owner, I want to delete a guest, so that the list of participants stays clean.
+Acceptance: the creator, or the owner of any team the guest played in, can delete; confirmation required; the guest's sessions stay in history as "deleted guest".
+
+**US-A8** (FR-55, P4, Should)
+As a player, I want my days counted in my time zone, so that streaks and activity match my calendar.
+Acceptance: the time zone is detected from the browser and can be changed in settings.
 
 ## Epic B: Game catalog
 
@@ -41,6 +49,10 @@ Acceptance: shows description, player count, typical duration, my games played a
 **US-B3** (FR-09, P1, Should)
 As a player, I want to add a custom game, so that I can record a session even if the game is missing from the catalog.
 Acceptance: requires name and player range; the game is immediately selectable; duplicates by name are warned about.
+
+**US-B4** (FR-54, P4, Should)
+As a custom game's author or a team owner, I want to delete a custom game, so that unused or wrong games disappear.
+Acceptance: the author, or the owner of a team that used the game, can delete; confirmation says that ratings, wins and games played of this game are removed; its sessions stay in history marked as a deleted game; earned achievements stay.
 
 ## Epic C: Sessions
 
@@ -126,7 +138,11 @@ Acceptance: link joins the team after login; the owner can disable the link.
 
 **US-G3** (FR-26, P2, Must)
 As a player, I want to leave a team, so that I control which teams I belong to.
-Acceptance: leaving keeps my past sessions; an owner cannot leave while other members remain (Assumption).
+Acceptance: leaving keeps my past sessions; an owner cannot leave while other members remain, but can transfer ownership first (US-G10).
+
+**US-G10** (FR-52, P4, Should)
+As a team owner, I want to pass ownership to another member, so that I can leave without breaking the team.
+Acceptance: the owner picks a member and confirms; the new owner gets all owner rights; the old owner becomes a member and can leave.
 
 **US-G4** (FR-28, P4, Must)
 As a team member, I want a feed of team activity, so that I see what my friends played and earned.
@@ -154,7 +170,7 @@ Acceptance: the owner chooses "only me" or "any member"; members who may not log
 
 **US-G9** (FR-50, P4, Should)
 As a player in a team-managed team, I want to approve sessions I played before they count, so that nobody records a wrong result for me.
-Acceptance: a new or edited team session waits for every registered teammate who played; the logger counts as approved; pending sessions show in history but do not count in ratings, stats or achievements; an edit keeps the old version counting until approved; a rejection with an optional reason goes back to the logger, who edits and resends or deletes it.
+Acceptance: a new or edited team session waits for every registered teammate who played; the logger counts as approved; pending sessions show in history with the time left until automatic confirmation after 48 hours, and do not count in ratings, stats or achievements; sessions with a guest need no approval; an edit keeps the old version counting until approved; a rejection with an optional reason goes back to the logger, who edits and resends or deletes it.
 
 ## Epic H: Table tools
 
@@ -182,11 +198,11 @@ Acceptance: two choices on the first screen; Track opens the catalog; Play opens
 
 **US-K2** (FR-44, P4, Should)
 As a player, I want to play Yahtzee in the app alone or with friends on one phone, so that we need no dice or paper.
-Acceptance: choose Solo or With friends; with friends, choose On this phone (2 to 6 players: you, teammates, guests) or Invite friends (shown as coming soon); roll up to three times and hold dice; the sheet shows the points every open box would give; standard bonuses and joker rule; the phone is passed with a clear "whose turn" screen; a reload keeps the game; results are shown but not saved.
+Acceptance: choose Solo or With friends; with friends, choose On this phone (2 to 6 players: you, teammates, guests) or Invite friends (US-K3); roll up to three times and hold dice; the sheet shows the points every open box would give; standard bonuses and joker rule; the phone is passed with a clear "whose turn" screen; a reload keeps the game; results are shown but not saved.
 
-**US-K3** (FR-45, Backlog, Could)
-As a player, I want to invite a friend to my game, so that we can play from our own phones.
-Acceptance: the friend gets a notification, joins the game and takes turns from their phone.
+**US-K3** (FR-45, P4, Should)
+As a player, I want to invite friends to my game, so that we can play from our own devices.
+Acceptance: the host picks 1 to 5 teammates; each sees the invite on Home and in Play without reloading, and accepts or declines; the invite expires after 15 minutes or when the host cancels, and both sides see the time left; each turn has a time limit, after which the host can wait for the player or remove them, and the turn is skipped if the host does nothing; if the host's own turn runs past a third 60-second timer, the game is dismissed; a game that ends early, dismissed or with one player left, has no winner and records nothing; the host starts the game when at least one friend has joined; dice and turns are the same on every device, desktop or phone; only the player whose turn it is can roll or score; after a reload or on another device the player returns to the same game; the host can cancel a game that has not started; results are shown but not saved.
 
 ## Epic L: Administration
 

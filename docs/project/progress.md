@@ -61,8 +61,8 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-12 | Sides result type | Should | P2 | Open | |
 | FR-15 | Session note | Could | P2 | Open | Database field exists |
 | FR-16 | Personal stats overall and per game | Must | P2 | Done | All-time numbers on Profile and History, a "your stats" card per game on Profile, this month on Home |
-| FR-17 | Rating per player per game | Must | P2 | Done | Elo-style, tests on synthetic data |
-| FR-18 | Team leaderboard per game and overall | Must | P2 | Done | Team stats page |
+| FR-17 | Rating per player per game | Must | P2 | Partial | Elo-style, tests on synthetic data; sessions with a guest must stop being rated, then all ratings rebuilt once (change C23) |
+| FR-18 | Team leaderboard per game and overall | Must | P2 | Partial | Team stats page; overall must rank by weighted average Elo (change C23) |
 | FR-19 | Head to head | Should | P2 | Open | |
 | FR-20 | Progress charts | Should | P2 | Open | Rating history is stored |
 | FR-26 | Teams: create, invite link, join, leave | Must | P2 | Done | |
@@ -74,17 +74,21 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-25 | Items unlocked by achievements | Should | P3 | Partial | Backgrounds unlock; earned outfits and accessory art pending |
 | FR-04 | Link a guest to an account | Could | P4 | Open | |
 | FR-27 | Owner removes members | Must | P4 | Open | |
-| FR-48 to FR-50 | Team management modes, logging setting, approvals | Should | P4 | Open | Designed, change C17 |
+| FR-48 to FR-50 | Team management modes, logging setting, approvals | Should | P4 | Open | Designed, changes C17, C27 |
+| FR-52 | Team ownership transfer | Should | P4 | Open | Change C26 |
+| FR-53 | Delete a guest | Should | P4 | Open | Change C24 |
+| FR-54 | Delete a custom game | Should | P4 | Open | Change C24 |
+| FR-55 | Time zone per profile | Should | P4 | Open | Change C25 |
 | FR-28 | Social feed | Must | P4 | Open | |
 | FR-29 | Reactions | Could | P4 | Open | |
 | FR-30 to FR-33 | Table tools | Should | P4 | Open | |
 | FR-43 | Games tab: Play or Track | Should | P4 | Done | Change C13 |
 | FR-44 | Yahtzee solo and on one device | Should | P4 | Done | Changes C13, C14; 22 rule tests |
 | FR-51 | Blackjack solo and on one device | Should | P4 | Done | Change C19; 19 rule tests |
-| FR-45 | Play with friends by invite | Could | Backlog | Open | Placeholder in the game |
+| FR-45 | Online Yahtzee by invite | Should | P4 | Open | Designed, change C22; placeholder in the game |
 | FR-46 | In-app results saved to history and ratings | Could | Backlog | Open | |
 | FR-47 | Admin panel: overview, catalog, players | Should | P4 | Done | Change C15 |
-| FR-05 | Account deletion | Should | Pilot | Open | |
+| FR-05 | Account deletion | Must | Pilot | Open | Raised by change C28 |
 | FR-36 | Feedback link | Could | Pilot | Open | |
 | FR-37 | Pilot with seed data and a tournament | Must | Pilot | Open | |
 

@@ -12,11 +12,11 @@ Version 0.1, draft for review. Thresholds are starting values and can be tuned o
 
 ## 2. Rules for all achievements
 
-- Only registered players earn achievements. Guests do not (Assumption)
+- Only registered players earn achievements. Guests do not. Sessions with a guest count toward achievements, even though they are not rated
 - A "win" is place 1 in a session with at least 2 participants, as in docs/rating.md section 6
 - "In a row" means consecutive sessions of the player with at least 2 participants, ordered by `played_at`
-- Days are counted in UTC (Assumption: the app does not store a time zone)
-- Achievements are checked after a session is saved. Once earned, an achievement is never taken back, even if the session is deleted later (Assumption)
+- Days are counted in the player's time zone (`profiles.time_zone`, FR-55)
+- Achievements are checked after a session is saved. Once earned, an achievement is never taken back, even if the session or its custom game is deleted later
 - Progress toward a locked achievement is computed on demand from the history, for example "7 of 10 wins" (FR-22)
 - The first check for an existing player counts the whole history, so nobody loses progress
 

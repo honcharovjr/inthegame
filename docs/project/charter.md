@@ -28,7 +28,7 @@ In the Game is a web platform for logging board and card game sessions. Any sess
 | Economic | No budget beyond the author's own funds; free tiers for up to about 50 users | Notional labour cost; stay on free tiers, keep the move to paid tiers possible without code changes |
 | Social | Board game nights among students, friends and clubs are common; interest in personal stats ("Wrapped"-style summaries) | Mobile-first, fast logging, visual stats and achievements |
 | Competitive | Existing apps for logging plays (for example BG Stats, BoardGameGeek play logging) focus on collectors and bookkeeping | Focus on what they lack: zero-setup classic games, team rivalry, a character that grows with wins, free of charge |
-| Legal | Personal data of users (email, nickname); users may be in the EU | Minimal data, Row Level Security on every table, account deletion, privacy policy before public launch (open question) |
+| Legal | Personal data of users (email, nickname); users may be in the EU | Minimal data, Row Level Security on every table, account deletion, privacy policy before public launch (users in the US, the EU and elsewhere; change C28) |
 | Organizational | The project is coursework at NTU "Dnipro Polytechnic", FIT; one developer during a semester | Fixed defence date at the final class; documentation must map to the 20 report elements |
 
 ## 2. Systems view of the real-world object

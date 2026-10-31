@@ -23,6 +23,7 @@ teams 1─* team_members ─> profiles
 teams 1─* sessions            (optional link, for team history)
 games + player 1─1 ratings
 sessions + player 1─* rating_history
+game_rooms 1─* game_room_players ─> profiles   (online games, FR-45)
 ```
 
 A participant is either a registered player or a guest, never both.
@@ -40,10 +41,11 @@ One row per registered user. Created by a trigger on sign-up (Assumption: trigge
 | nickname | text, not null | 2 to 30 characters |
 | avatar_url | text | Optional, points to Storage |
 | character | jsonb | Optional. The chosen item codes of the character, see docs/character.md. Null means no character yet. Must be a JSON object |
-| is_super_admin | boolean, not null | Default false. Opens the admin panel (FR-47). Set by the maintainer in the database, never by the player: players may update only `nickname`, `avatar_url` and `character` (column grants) |
+| is_super_admin | boolean, not null | Default false. Opens the admin panel (FR-47). Set by the maintainer in the database, never by the player: players may update only `nickname`, `avatar_url`, `character` and `time_zone` (column grants) |
+| time_zone | text, not null | IANA name, for example `Europe/Kyiv`. Default `UTC`. Set from the browser on login while still `UTC`, editable by the player (FR-55, change C25) |
 | created_at | timestamptz, not null | Default `now()` |
 
-Account deletion (FR-05, Pilot): the auth user is deleted, `user_id` becomes null, and the row is anonymized (placeholder nickname, no avatar) instead of removed, so sessions of other players stay consistent.
+Account deletion (FR-05, Pilot, Must): the auth user is deleted, `user_id` becomes null, and the row is anonymized (placeholder nickname, no avatar) instead of removed, so sessions of other players stay consistent.
 
 ### 3.2 guests
 
@@ -54,9 +56,10 @@ A participant with a name only (FR-03).
 | id | uuid, PK | |
 | owner_id | uuid, not null | References `profiles(id)` |
 | name | text, not null | 1 to 30 characters |
+| deleted_at | timestamptz | Set when the guest is deleted (FR-53, change C24). Hidden from pickers; history shows "deleted guest" |
 | created_at | timestamptz, not null | Default `now()` |
 
-Linking a guest to an account (FR-04) is P4 and not modelled now.
+Guests have no ratings (change C23). Linking a guest to an account (FR-04) is P4 and not modelled now; old sessions are not re-rated when it comes.
 
 ### 3.3 games
 
@@ -67,13 +70,14 @@ The catalog (FR-06) and custom games (FR-09).
 | id | uuid, PK | |
 | name | text, not null | |
 | description | text | |
-| type | text, not null | Check constraint on a fixed list, for example `board`, `card`, `dice`, `dominoes`, `party`, `other` (Assumption: list to be agreed) |
+| type | text, not null | Check constraint on a fixed list, for example `board`, `card`, `dice`, `tile`, `party`, `other`. `tile` replaces `dominoes` (change C28); needs a migration |
 | is_classic | boolean, not null | Default false. True for games that need no box |
 | min_players | smallint, not null | |
 | max_players | smallint, not null | Check: not less than `min_players` |
 | typical_duration_min | smallint | Optional |
 | emoji | text | Optional. One emoji for the game tile, up to 8 characters. Null means the app uses a default for the type |
 | created_by | uuid | Null for catalog games, otherwise the author. References `profiles(id)` |
+| deleted_at | timestamptz | Custom games only. Set when the game is deleted (FR-54, change C24): hidden from the catalog and log flow, its ratings and rating history are removed and it no longer counts in stats; its sessions stay in history |
 | created_at | timestamptz, not null | Default `now()` |
 
 Catalog games are managed by super admins in the admin panel (FR-47). Duplicate names are warned about in the UI (US-B3), so there is no unique constraint on name.
@@ -131,7 +135,7 @@ Replay order for rating is `played_at`, then `created_at` (docs/rating.md sectio
 | guest_id | uuid | References `guests(id)` |
 | place | smallint, not null | 1 is best. Equal places mean a tie. For `winner`: winner 1, others 2. For `points`: derived from score on save |
 | score | numeric | Only for result type `points` |
-| side_no | smallint | Only for results by side (FR-12, P2, Should). Null otherwise (Assumption: plain number, no table for sides) |
+| side_no | smallint | Only for results by side (FR-12, P2, Should). Null otherwise. Decided: a plain number, no table for sides |
 
 Constraints:
 
@@ -142,7 +146,7 @@ Constraints:
 
 ### 3.8 ratings
 
-Current rating per player per game. Written server-side only.
+Current rating per player per game. Written server-side only. Only registered players are rated; sessions with a guest are not rated (change C23), so the `guest_id` columns here and in `rating_history` stay empty and can be dropped by a later migration.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -214,6 +218,36 @@ One row per admin action (FR-47). Written server-side only.
 
 Blocking a player uses the login ban of Supabase Auth, so no column stores it.
 
+### 3.13 game_rooms
+
+One online game of an in-app game (FR-45, change C22). Written server-side only.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid, PK | |
+| game_key | text, not null | In-app game, `yahtzee` (check constraint). Not a catalog game |
+| host_id | uuid, not null | References `profiles(id)` |
+| status | text, not null | `waiting`, `playing`, `finished` or `cancelled` (check constraint). Default `waiting` |
+| state | jsonb | The full game: seats, whose turn, dice, holds, rolls left, score sheets. Null while waiting |
+| version | integer, not null | Default 0. Raised by 1 on every change; a move names the version it was made on |
+| created_at | timestamptz, not null | Default `now()` |
+| updated_at | timestamptz, not null | Default `now()` |
+
+The state holds everything a device needs to draw the game, so desktop and phone layouts read the same data. It is safe to show to every player only because Yahtzee has no hidden information; a game with hidden cards needs a different design.
+
+### 3.14 game_room_players
+
+| Column | Type | Notes |
+|---|---|---|
+| room_id | uuid | References `game_rooms(id)` on delete cascade |
+| profile_id | uuid | References `profiles(id)` |
+| status | text, not null | `invited`, `joined`, `declined` or `left` (check constraint). The host gets a `joined` row |
+| seat | smallint | Turn order, set when the game starts. Null before |
+| invited_at | timestamptz, not null | Default `now()` |
+| responded_at | timestamptz | When the invite was accepted or declined |
+
+Primary key: (`room_id`, `profile_id`). The host can invite only players who share a team with them; at most 6 rows with status `invited` or `joined`.
+
 ## 4. Statistics
 
 No stored statistics tables in the MVP. Games played, wins and win rate (docs/rating.md section 6) are computed by queries or SQL views over `session_participants`. The overall team leaderboard is ranked by wins and games played (docs/rating.md section 9, proposal). Revisit if queries become slow.
@@ -227,9 +261,9 @@ Admin pages check `is_super_admin()` on the server and then read and write with 
 | Table | Read | Insert | Update | Delete |
 |---|---|---|---|---|
 | profiles | Self, members of a shared team, and co-participants of a session the caller can see | By sign-up trigger only | Self | None (anonymize, see section 8) |
-| guests | Owner, and members of teams where the guest took part in a session | Owner (`owner_id` = caller) | Owner | Owner, if the guest has no sessions (Assumption) |
-| games | Catalog games: any logged-in user. Custom games: author and members of the author's teams | Logged-in user, only as custom game with `created_by` = caller | Author, custom only | Author, custom only, if unused (Assumption) |
-| teams | Members | Logged-in user, with `owner_id` = caller | Owner | Owner |
+| guests | Owner, and members of teams where the guest took part in a session | Owner (`owner_id` = caller) | Owner | Server-side `delete_guest` only: the owner, or the owner of a team where the guest played. Sets `deleted_at` |
+| games | Catalog games: any logged-in user. Custom games: author and members of the author's teams; deleted ones stay readable for history | Logged-in user, only as custom game with `created_by` = caller | Author, custom only | Server-side `delete_custom_game` only: the author, or the owner of a team that used it. Sets `deleted_at` and removes its ratings |
+| teams | Members | Logged-in user, with `owner_id` = caller | Owner; ownership changes only through `transfer_team_ownership` (FR-52) | Owner |
 | team_members | Members of the same team | Server-side join function only | None | Server-side leave function only. It blocks the owner while other members remain (US-G3). Owner removing others is P4 (FR-27) |
 | sessions | Creator, participants, members of the session's team | Logged-in user, with `created_by` = caller | Creator | Creator |
 | session_participants | Same as the parent session | Creator of the parent session | Creator of the parent session | Creator of the parent session |
@@ -238,6 +272,8 @@ Admin pages check `is_super_admin()` on the server and then read and write with 
 | achievements | Any logged-in user | Migration only | Migration only | Migration only |
 | user_achievements | Same visibility as the player's profile | Server-side only | Server-side only | Server-side only |
 | admin_audit | Super admins (`is_super_admin()`) | Server-side only | None | None |
+| game_rooms | Players with a row in `game_room_players` (any status) | Server-side only | Server-side only | None |
+| game_room_players | Players of the same room | Server-side only | Server-side only | None |
 
 Notes:
 
@@ -245,6 +281,8 @@ Notes:
 - Teams go through server functions: `create_team`, `join_team`, `leave_team`, and `team_by_invite` for the preview before joining. A session saved to a team may include teammates as registered participants, checked inside `create_session`. Edits go through `update_session`, which only the creator may call, which never changes the session's team, and which replaces the participants in one step (FR-14). A session without a team is "personal": it belongs to its creator and is managed on the personal panel. Team management modes (FR-48 to FR-50) will need team settings, a pending status and an approvals table; they are designed in the spec but not modelled yet
 - Avatar files in Storage need their own bucket policies: anyone logged in can read, only the owner can write their own file
 - After a session is edited or deleted, ratings of that game are rebuilt (docs/rating.md section 5)
+- Online games go through server routes: create a room, invite, accept, decline, cancel, start and move. Each route checks the caller (browser session or a login token in the request header, so future store apps can use it), applies the rules from `src/lib/games/` and writes with the service role. The server rolls the dice. A move is saved only if the room's `version` still matches the one the device sent; otherwise the device reloads the state
+- Devices follow changes through Supabase Realtime: the open room by `id`, and the player's own invites in `game_room_players`. Both tables are added to the Realtime publication; Realtime respects the read policies above. No polling
 
 ## 6. Indexes
 
@@ -263,6 +301,7 @@ Added for the frequent queries. Everything else waits for evidence.
 | guests | (`owner_id`) | Participant picker |
 | ratings | (`game_id`, `rating` desc) | Per-game leaderboard |
 | rating_history | (`profile_id`, `game_id`, `created_at`) | Progress chart |
+| game_room_players | (`profile_id`, `status`) | Open invites and games on Home and Play (US-K3) |
 
 Suggestions for fast entry (FR-13), recent games and recent participants, are queries over `sessions` and `session_participants`. No extra table.
 
@@ -280,7 +319,7 @@ Listed so the MVP schema does not block them. Each needs its own approval and mi
 
 1. **Session and team link.** Decided: a session has one optional `team_id` chosen at creation. A session belongs to one team only
 2. **Account deletion.** Decided: `profiles` has its own `id` and a nullable `user_id` with `on delete set null`. Deleting an account anonymizes the profile and the row stays
-3. **Game types.** Confirm the list in 3.3, or give your own
-4. **Results by side (FR-12).** Is `side_no` on the participant enough for P2 (Assumption), or do you want a table for sides now?
-5. **Guest ratings.** Stored like any player (docs/rating.md, Assumption). Hiding them on leaderboards is a query filter, not a schema change
-6. **Guest deletion.** Allowed only if the guest has no sessions (Assumption)
+3. **Results by side (FR-12).** Decided: `side_no` on the participant
+4. **Guest ratings.** Decided: guests have no ratings and sessions with a guest are not rated (change C23)
+5. **Guest deletion.** Decided: by the creator or a team owner, at any time, as a soft delete (change C24)
+6. **Game types.** Decided: `board`, `card`, `dice`, `tile`, `party`, `other` (change C28)
