@@ -1,116 +1,55 @@
 # In the Game
 
-## Project
+Web platform for logging board and card game sessions. Every session becomes a record in the player's history, which grows into statistics, ratings, rivalries and achievements. The product sells interest in one's own history of wins, not bookkeeping.
 
-Web platform for logging board and card game sessions. Any session, even a casual card game in a kitchen, becomes a record in the player's history. From that history grow statistics, ratings, rivalries and achievements. The product sells interest in one's own history of wins, not bookkeeping.
+- Audience: friend groups, students, game clubs; 20 to 50 users at start. Free, English UI
+- One developer (project author) reviews every change
 
-- Audience: friend groups, students, game clubs; later a public service
-- Starting base: 20 to 50 users
-- Interface language: English
-- Free at launch, no monetization in scope
-- Developer: one person (project author), who reviews every change
+## Docs (read the relevant one before implementing; if docs and code conflict, ask)
 
-## Documentation
+- `docs/spec.md` requirements (FR-xx), phases, decisions
+- `docs/user-stories.md`, `docs/data-model.md` (tables, relations, access rules), `docs/rating.md`
+- `docs/achievements.md`, `docs/character.md`
+- `docs/project/`: university report elements. Update `progress.md` and the change log when scope, schedule or cost change
 
-Read the relevant file before implementing a feature. If docs and code conflict, ask before choosing.
-
-- `docs/spec.md`: technical specification, requirements (FR-xx), phases, decisions
-- `docs/user-stories.md`: user stories with acceptance criteria
-- `docs/data-model.md`: tables, relations, access rules
-- `docs/rating.md`: rating algorithm and test cases
-- `docs/achievements.md`, `docs/character.md`: achievements list, character parts and art pipeline
-- `docs/project/`: project management (charter, WBS, schedule, budget, risks, quality, changes, progress), mapped to the 20 elements of the university report. Update `progress.md` and the change log when scope, schedule or cost change
-
-Current scope: MVP, which is phases P1 and P2. Do not build features from later phases unless asked.
+Scope: MVP (phases P1 and P2). No later-phase features unless asked. Own games: stage 1 (one device) only, per change C13; no network multiplayer.
 
 ## Stack
 
-- Frontend: Next.js (React), JavaScript
-- Charts: Recharts
-- Backend: Supabase (PostgreSQL, Auth, Storage, Row Level Security)
-- Auth: email via Supabase Auth
-- Hosting: Vercel (frontend), Supabase (backend)
-- Python: helper scripts only (for example, synthetic data to test the rating logic). Not part of the runtime
-- CI/CD: GitHub Actions
-- Planned: Sentry (errors), PostHog (product analytics, needed to measure retention), Figma (prototypes)
+Next.js (React, JavaScript), CSS modules, Supabase (PostgreSQL, Auth, Storage, RLS), Vercel, GitHub Actions, Vitest. Python only for helper scripts. Planned: Sentry, PostHog.
 
-## Architecture principles
+## Architecture
 
-The goal is to stay on free tiers now and move to paid tiers later without rewriting code.
-
-- Use standard PostgreSQL features only. Avoid vendor-specific tricks
-- All schema changes go through migration files in `supabase/migrations/`. Never change the schema by hand in the dashboard
-- Every table has Row Level Security policies. No table is left open
-- Wrap the Supabase client in `src/lib/` so the rest of the code does not depend on it directly
-- Rating and statistics logic lives in pure functions in `src/lib/rating/`, separate from UI, and must have tests
-- All configuration through environment variables. Never commit secrets. The Supabase service role key is used server-side only
-- Be gentle with free-tier limits: paginate lists, add indexes for frequent queries, avoid polling
-
-## Domain (draft, to be finalized in docs/data-model.md)
-
-Profile, guest profile, game (catalog), session (a played match), session participant, team, team member, achievement, user achievement, rating.
+- Standard PostgreSQL only; schema changes only via `supabase/migrations/`; RLS on every table
+- Supabase client wrapped in `src/lib/`
+- Rating and statistics logic: pure functions in `src/lib/` with tests
+- Config via env vars; never commit secrets; service role key server-side only
+- Respect free tiers: paginate, index frequent queries, no polling
 
 ## Product constraints
 
-- Logging a session takes under 1 minute. This is the core UX target
-- Catalog of at least 30 games, including classic games that need no box
-- At least 30 achievements
-- Own games are phased: no multiplayer first, then simple multiplayer, then ranked. Stage 1 (one device) is in scope since change C13, starting with Yahtzee in `src/lib/games/yahtzee/`. Network multiplayer is not
-
-## Planned phases
-
-1. Initiation and requirements: charter, technical specification, prototype
-2. Development phase 1: session creation, start of the catalog
-3. Development phase 2: rating, statistics and minimal teams (create, invite link, join, leave, team history)
-4. Development phase 3: character customization and profile
-5. Development phase 4: team management, social feed, table tools (scoreboard, timers, dice, team generator)
-6. Pilot release: test tournament
-7. Final: report and improvement backlog
-
-## Repository structure (target)
-
-```
-src/app/          pages and routes
-src/components/   UI components
-src/lib/          Supabase wrapper, rating logic, helpers
-supabase/migrations/   database migrations
-docs/             specification, data model, decisions
-scripts/          helper scripts (Python or Node)
-```
+- Logging a session takes under 1 minute
+- Catalog of 30+ games including classics without a box; 30+ achievements
 
 ## Commands
 
-- `npm run dev`: dev server
-- `npm run build`: production build
-- `npm run lint`: lint
-- `npm test`: unit tests (Vitest)
+`npm run dev` · `npm run build` · `npm run lint` · `npm test`
 
-## Working rules for Claude
+## Working rules
 
-- For any non-trivial task, propose a plan first and wait for approval before changing files
-- Keep tasks small: one feature, one commit. Use a separate branch per feature, no direct commits to main
-- Do not add new dependencies without asking
-- Do not create tables or columns beyond docs/data-model.md without asking
-- Write tests for rating and statistics logic
-- Code, comments, commit messages and UI text are in English
-- UI text is all lowercase, even at the start of a sentence, including page titles. A global CSS rule lowercases the app; text a player typed (nicknames, guest and team names, custom game names, emails) keeps its case: wrap it in `UserText`, or use `GameName` for game names
-- If requirements are unclear or a decision is missing, ask instead of guessing. State uncertainty explicitly
-- Do not claim that free-tier limits or prices are current. They must be checked on the service websites
+- Non-trivial task: propose a plan and wait for approval
+- One feature per branch, one commit; never commit to main
+- Ask before new dependencies, or tables/columns beyond `docs/data-model.md`
+- Code, comments, commits and UI in English
+- UI text is lowercase (a global CSS rule does it). Text a player typed keeps its case: wrap in `UserText`, game names in `GameName`
+- Unclear requirement: ask, don't guess. Never claim free-tier limits or prices are current
 
 ## Response format
 
-- Lead with the answer or the next action. No preamble, no recap
-- Anything I need to do is a numbered list, one action per step, each step at most two lines. Commands go in code blocks
-- At most 7 steps at once. If more are needed, give the first part and say what comes next
-- No long explanations. Explain why only when I ask
+- Lead with the answer. No preamble or recap; explain why only when asked
+- My actions: numbered steps, max 7, each max 2 lines, commands in code blocks
 - Bold only the one thing I must not miss
-- After code changes, give at most 5 bullets: what changed and what to check
-- When I must decide, give at most 3 options and put the recommended one first
-- State uncertainty in one short line
+- After code changes: max 5 bullets, what changed and what to check
+- Decisions: max 3 options, recommended first
+- Uncertainty in one short line
 - End with exactly one question or one "Next:" line
-
-## Open decisions
-
-- Styling approach (plain CSS, CSS modules or Tailwind)
-- TypeScript or JavaScript only (JavaScript is the current choice)
-- The achievements list is in docs/achievements.md. The rating algorithm is drafted in docs/rating.md
