@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { ONLINE_GAMES } from "@/lib/games/online/adapters";
 import {
   RoomError,
@@ -9,6 +9,7 @@ import {
   requestEnd,
   startState,
 } from "@/lib/games/online/room";
+import { saveOnlineResult } from "@/lib/games/online/results";
 import {
   errorResponse,
   loadRoom,
@@ -134,6 +135,20 @@ async function saveState(adapter, room, state) {
   const left = new Set(adapter.players(state.game));
   const removed = adapter.players(room.state.game).filter((id) => !left.has(id));
   await setPlayerStatus(room.id, removed, "left");
+
+  // A finished game goes to history once the answer is sent (FR-46). Only
+  // the request that saved the finish gets here, so it is saved once. The
+  // session id reaches the players through Realtime.
+  if (state.end?.status === "finished") {
+    after(async () => {
+      const sessionId = await saveOnlineResult({ ...room, state });
+      if (sessionId) {
+        await saveRoom(saved, { state: { ...state, end: { ...state.end, sessionId } } }).catch((error) =>
+          console.error("saving the session id failed", error),
+        );
+      }
+    });
+  }
   return saved;
 }
 

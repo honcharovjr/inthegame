@@ -132,7 +132,12 @@ export default function OnlineYahtzee({ me, roomState, offset }) {
   if (state.end?.status === "finished") {
     return (
       <main className={ui.page}>
-        <YahtzeeResults game={game} participants={people} meKey={me}>
+        <YahtzeeResults
+          game={game}
+          participants={people}
+          meKey={me}
+          note={state.end.sessionId ? "Saved to your history and ratings." : "Saving to your history…"}
+        >
           <Recap game={game} nameOf={nameOf} />
           <div className={ui.endActions}>
             {isHost && <Rematch others={game.players.filter((key) => key !== me)} router={router} />}
