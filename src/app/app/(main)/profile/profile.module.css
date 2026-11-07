@@ -515,6 +515,23 @@
   --btn-bg: var(--color-pink-tint);
 }
 
+/* Quiet on purpose: a text button under log out, red only in its pop-up */
+.deleteAccount {
+  align-self: center;
+  margin-top: -8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 700;
+  --btn-bg: transparent;
+  --btn-ink: var(--color-muted);
+}
+
+.deleteAccount:hover {
+  --btn-ink: var(--color-danger-ink);
+}
+
 @media (min-width: 640px) {
   .numbers {
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Character from "@/components/Character/Character";
+import Toast from "@/components/Toast/Toast";
 import UserText from "@/components/UserText/UserText";
 import { LINE_PATH, easeOut, ratingAt, seasonActivity, seasonAt } from "@/lib/landing/growth";
 import styles from "./landing.module.css";
@@ -111,6 +112,17 @@ function useReducedMotion() {
   return useSyncExternalStore(subscribeMotion, () => window.matchMedia(MOTION_QUERY).matches, () => false);
 }
 
+// True right after an account was deleted (the profile sends the browser to
+// "/?account=deleted"). Read in the browser, so the page itself stays static.
+const noSubscribe = () => () => {};
+function useAccountDeleted() {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => new URLSearchParams(window.location.search).get("account") === "deleted",
+    () => false,
+  );
+}
+
 // Runs fn every ms while active is true.
 function useEvery(ms, active, fn) {
   const saved = useRef(fn);
@@ -126,6 +138,7 @@ function useEvery(ms, active, fn) {
 
 export default function Landing({ contactEmail }) {
   const reduce = useReducedMotion();
+  const accountDeleted = useAccountDeleted();
   const root = useRef(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -159,6 +172,7 @@ export default function Landing({ contactEmail }) {
 
   return (
     <div ref={root} className={styles.page}>
+      {accountDeleted && <Toast message="Your account is deleted. Thanks for playing." dismissTo="/" />}
       <header className={styles.header}>
         <div className={`${styles.headerBar} ${scrolled ? styles.scrolled : ""}`}>
           <span className={styles.brand}>in the game</span>

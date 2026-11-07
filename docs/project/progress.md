@@ -39,7 +39,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 29 | #48 | Redesign of Home and Profile: page names as titles, character card, activity, rivals, gear stage with mock gear (C20) |
 | Oct 29 | (this branch) | Redesign fixes: trading card, tooltips, fancy font, average rating, games blocks (C21) |
 | Nov 1 | #60 | Landing page, privacy policy, site settings in the admin panel (C31) |
-| Nov 1 | (this branch) | App moved under /app; landing page at / for everyone (C32) |
+| Nov 1 | #61 | App moved under /app; landing page at / for everyone (C32) |
+| Nov 7 | (this branch) | Account deletion (FR-05) |
 
 ## 3. Requirements status
 
@@ -90,7 +91,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-45 | Online Yahtzee by invite | Should | P4 | Partial | Change C22. Built: database, room engine with tests, server routes, invites on Home and Play, lobby, online game with timers and host actions, ending a game, presence and reactions (C29). Waiting for a two-device test |
 | FR-46 | Online results saved to history and ratings | Should | P4 | Done | Online Yahtzee only (C30) |
 | FR-47 | Admin panel: overview, catalog, players | Should | P4 | Done | Change C15 |
-| FR-05 | Account deletion | Must | Pilot | Open | Raised by change C28 |
+| FR-05 | Account deletion | Must | Pilot | Done | Raised by change C28. Profile › Delete account: the login is removed, the profile stays as "deleted player" without personal data |
 | FR-36 | Feedback link | Could | Pilot | Open | |
 | FR-37 | Pilot with seed data and a tournament | Must | Pilot | Open | |
 

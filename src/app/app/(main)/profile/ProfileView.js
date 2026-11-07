@@ -6,7 +6,7 @@ import UserText, { GameName } from "@/components/UserText/UserText";
 import { ACHIEVEMENTS } from "@/lib/achievements/catalog";
 import { signOut } from "@/lib/auth/actions";
 import { OUTFITS, RACES, nameStyle, resolveCharacter } from "@/lib/character/items";
-import { deleteGuest } from "@/lib/profile/actions";
+import { deleteAccount, deleteGuest } from "@/lib/profile/actions";
 import { chartScale, sharedPaths } from "@/lib/stats/chart";
 import NicknameForm from "./NicknameForm";
 import Wardrobe from "./Wardrobe";
@@ -325,6 +325,15 @@ export default function ProfileView({ profile, startOnLook, totals, bestStreak, 
         triggerLabel="Log out"
         triggerClassName={styles.signOut}
         action={signOut}
+      />
+
+      <ConfirmButton
+        title="Delete your account?"
+        message="Your email and login are removed for good. In your friends' games you stay as a deleted player, so their history and ratings stay correct. This cannot be undone."
+        confirmLabel="Delete my account"
+        triggerLabel="Delete account"
+        triggerClassName={styles.deleteAccount}
+        action={deleteAccount}
       />
     </>
   );
