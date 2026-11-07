@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Email links (confirm account, reset password) land here.
+// Email links sent before the switch to /auth/confirm (Nov 2026) land here.
+// They only work in the browser the player signed up in.
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");

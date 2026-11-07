@@ -51,7 +51,8 @@ export async function signUp(previousState, formData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${await readOrigin()}/auth/callback?next=${encodeURIComponent(readNext(formData))}`,
+      // Where the confirmation link continues to, after /auth/confirm.
+      emailRedirectTo: `${await readOrigin()}${readNext(formData)}`,
     },
   });
 
@@ -96,7 +97,7 @@ export async function requestPasswordReset(previousState, formData) {
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${await readOrigin()}/auth/callback?next=/reset-password`,
+    redirectTo: `${await readOrigin()}/reset-password`,
   });
 
   // Same answer whether or not the email has an account.
