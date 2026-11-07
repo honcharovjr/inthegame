@@ -14,7 +14,7 @@ import { playerColor } from "@/lib/sessions/colors";
 import { loadPanelSessions, readPage } from "@/lib/sessions/panel";
 import { memberRatings } from "@/lib/stats/average";
 import { teamLeaderboard } from "@/lib/stats/leaderboard";
-import { leaveTeam } from "@/lib/teams/actions";
+import { leaveTeam, removeMember } from "@/lib/teams/actions";
 import { createClient } from "@/lib/supabase/server";
 import SessionHistory from "../SessionHistory";
 import CopyLink from "./CopyLink";
@@ -134,6 +134,15 @@ async function TeamContent({ params, searchParams }) {
                 <Chip size="s" tone="pink">
                   Owner
                 </Chip>
+              )}
+              {isOwner && member.role !== "owner" && (
+                <ConfirmButton
+                  title={<>Remove <UserText>{member.name}</UserText>?</>}
+                  message="They leave the team. Their past games stay in its history, and they can only come back through the invite link."
+                  confirmLabel="Remove member"
+                  ariaLabel={`Remove ${member.name}`}
+                  action={removeMember.bind(null, team.id, member.id)}
+                />
               )}
             </li>
           ))}

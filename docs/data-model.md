@@ -104,7 +104,7 @@ Minimal teams (FR-26).
 | role | text, not null | `owner` or `member` (check constraint) |
 | joined_at | timestamptz, not null | Default `now()` |
 
-Primary key: (`team_id`, `profile_id`). The owner also has a row with role `owner`. Joining by invite link goes through a server-side function that checks the code, so clients cannot insert themselves freely.
+Primary key: (`team_id`, `profile_id`). The owner also has a row with role `owner`. Joining by invite link goes through a server-side function that checks the code, so clients cannot insert themselves freely. The owner removes a member through `remove_team_member` (FR-27); the member's past sessions stay in the team's history.
 
 ### 3.6 sessions
 
