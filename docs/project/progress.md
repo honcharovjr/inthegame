@@ -42,7 +42,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Nov 1 | #61 | App moved under /app; landing page at / for everyone (C32) |
 | Nov 7 | #62 | Account deletion (FR-05) |
 | Nov 7 | #63 | Email links work in any browser (confirm account, reset password) |
-| Nov 7 | (this branch) | Owner removes team members (FR-27) |
+| Nov 7 | #64 | Owner removes team members (FR-27) |
+| Nov 7 | (this branch) | PostHog analytics (FR-34); fix: after logging a session the app returns to Home again |
 
 ## 3. Requirements status
 
@@ -60,7 +61,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-11 | Winner, places, points | Must | P1 | Done | |
 | FR-13 | Fast entry, recent games and players suggested | Must | P1 | **Partial** | "Same again" for the last session only; under-1-minute not measured yet |
 | FR-14 | History; creator edits and deletes | Must | P1 | Done | History is read-only; edit and delete in the team or personal panel; the date is not editable |
-| FR-34 | PostHog analytics | Must | P1 | **Open** | Needs a dependency and an account |
+| FR-34 | PostHog analytics | Must | P1 | Done | Cookieless, EU region; page views and 5 events: sign_up, session_logged, team_created, game_played, account_deleted |
 | FR-35 | Sentry | Should | P1 | Open | |
 | FR-08 | Game page with own stats | Should | P2 | Open | |
 | FR-12 | Sides result type | Should | P2 | Open | |

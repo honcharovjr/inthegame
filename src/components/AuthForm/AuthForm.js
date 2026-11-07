@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { AlertIcon } from "@/components/icons";
 import Toast from "@/components/Toast/Toast";
+import { track } from "@/lib/analytics";
 import styles from "./AuthForm.module.css";
 
 // A form that runs a server action and shows its error or notice.
 // fields: [{ name, label, type, autoComplete, placeholder }]
 // links: [{ href, label, muted }]
+// noticeEvent: an analytics event to count when the action ends with a notice,
+// such as sign_up when the confirmation email is on its way.
 export default function AuthForm({
   action,
   fields,
@@ -16,10 +19,15 @@ export default function AuthForm({
   links = [],
   initialError = null,
   hidden = {},
+  noticeEvent,
 }) {
   const [state, formAction, pending] = useActionState(action, {
     error: initialError,
   });
+
+  useEffect(() => {
+    if (noticeEvent && state?.notice) track(noticeEvent);
+  }, [noticeEvent, state?.notice, state?.at]);
 
   return (
     <>

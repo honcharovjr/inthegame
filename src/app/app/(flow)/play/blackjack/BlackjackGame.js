@@ -5,6 +5,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import PlayingCard from "@/components/PlayingCard/PlayingCard";
 import UserText from "@/components/UserText/UserText";
+import { track } from "@/lib/analytics";
 import {
   BETS,
   activeHand,
@@ -119,7 +120,10 @@ export default function BlackjackGame({ profile, initialGuests, teams, maxPlayer
   function newRound() {
     const next = nextRound(game);
     setGame(next);
-    if (isOver(next)) setStage("over");
+    if (isOver(next)) {
+      setStage("over");
+      track("game_played", { game: "blackjack", players: participants.length });
+    }
   }
 
   if (stage === "mode") {
