@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Character from "@/components/Character/Character";
 import Toast from "@/components/Toast/Toast";
+import { track } from "@/lib/analytics";
 import UserText from "@/components/UserText/UserText";
 import { LINE_PATH, easeOut, ratingAt, seasonActivity, seasonAt } from "@/lib/landing/growth";
 import styles from "./landing.module.css";
@@ -140,6 +141,10 @@ export default function Landing({ contactEmail }) {
   const reduce = useReducedMotion();
   const accountDeleted = useAccountDeleted();
   const root = useRef(null);
+
+  useEffect(() => {
+    if (accountDeleted) track("account_deleted");
+  }, [accountDeleted]);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {

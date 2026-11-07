@@ -92,8 +92,7 @@ export default async function PrivacyPage() {
           <h2>Why we store it</h2>
           <p className={styles.text}>
             Only to run the service you signed up for: saving your games and showing your history, ratings, rivals
-            and achievements. We do not sell your data, show ads or use it for profiling. We do not use analytics
-            tools.
+            and achievements. We do not sell your data, show ads or use it for profiling.
           </p>
         </section>
 
@@ -116,13 +115,26 @@ export default async function PrivacyPage() {
               <strong>Vercel</strong> hosts the website. The parts that read your data run in Dublin (EU). Vercel is a
               US company.
             </li>
+            <li>
+              <strong>PostHog</strong> counts how the app is used, on servers in Frankfurt (EU). See below.
+            </li>
           </ul>
+        </section>
+
+        <section className={styles.section}>
+          <h2>Usage statistics</h2>
+          <p className={styles.text}>
+            To see which parts of the app help, we count visits to pages and a few moments: creating an account,
+            logging a session, creating a team, finishing a game in the app and deleting an account. We do not count
+            your clicks, record your screen or attach any of this to your name or email. PostHog runs without cookies
+            and stores nothing on your device; it tells visits apart with an anonymous code made on its servers.
+          </p>
         </section>
 
         <section className={styles.section}>
           <h2>Cookies and your browser</h2>
           <p className={styles.text}>
-            We use one kind of cookie: the one that keeps you logged in. Your browser also remembers a few settings
+            We use one kind of cookie: the one that keeps you logged in. Usage statistics use no cookies. Your browser also remembers a few settings
             on your device only, such as sound on or off and a game in progress. They never leave your device.
           </p>
         </section>

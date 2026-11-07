@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import Avatar from "@/components/Avatar/Avatar";
 import Die from "@/components/Die/Die";
 import UserText from "@/components/UserText/UserText";
+import { track } from "@/lib/analytics";
 import { finalScores, totals } from "@/lib/games/yahtzee/rules";
 import { placesFromScores } from "@/lib/sessions/places";
 import TopBar from "../shared/TopBar";
@@ -26,6 +28,12 @@ export default function YahtzeeResults({
     .filter((item) => item.key in scores)
     .sort((a, b) => places[a.key] - places[b.key]);
   const winners = ranked.filter((item) => places[item.key] === 1);
+  const players = ranked.length;
+
+  // Counted once, when the results first show.
+  useEffect(() => {
+    track("game_played", { game: "yahtzee", players });
+  }, [players]);
   const headline =
     ranked.length === 1
       ? `You scored ${scores[meKey]}!`

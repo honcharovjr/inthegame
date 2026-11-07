@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { track } from "@/lib/analytics";
 import { createTeam } from "@/lib/teams/actions";
 import styles from "./teams.module.css";
 
@@ -8,7 +9,8 @@ export default function CreateTeamForm() {
   const [state, formAction, pending] = useActionState(createTeam, {});
 
   return (
-    <form action={formAction} className={styles.createForm}>
+    // Counted on submit: on success the server moves straight to the new team.
+    <form action={formAction} onSubmit={() => track("team_created")} className={styles.createForm}>
       <label className={styles.label} htmlFor="team-name">
         Start a team
       </label>

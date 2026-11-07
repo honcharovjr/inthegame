@@ -13,6 +13,7 @@ import { PlusIcon } from "@/components/icons";
 import { gameEmoji } from "@/lib/games/emoji";
 import { findGameType } from "@/lib/games/types";
 import { playerColor } from "@/lib/sessions/colors";
+import { track } from "@/lib/analytics";
 import { createGuest, saveSession, updateSession } from "@/lib/sessions/actions";
 import { placesFromOrder } from "@/lib/sessions/places";
 import RankingList from "./RankingList";
@@ -298,8 +299,9 @@ export default function LogFlow({
         memberIds: chosenMembers.map((m) => m.id),
         guestIds: chosenGuests.map((g) => g.id),
       });
+      if (!editing) track("session_logged", { players: participants.length, team: Boolean(teamId) });
       setPhase("done");
-      router.push(editing ? editing.returnTo : "/?saved=1");
+      router.push(editing ? editing.returnTo : "/app?saved=1");
       // Fallback if the page stays alive: start over once Home has opened.
       setTimeout(resetFlow, 1500);
     });

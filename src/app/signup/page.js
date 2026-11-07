@@ -27,6 +27,7 @@ async function SignUpForm({ searchParams }) {
     <AuthForm
       action={signUp}
       submitLabel="Create account"
+      noticeEvent="sign_up"
       hidden={safeNext ? { next: safeNext } : {}}
       fields={[
         {
