@@ -58,6 +58,32 @@ export async function leaveTeam(teamId) {
   redirect("/app/teams");
 }
 
+// The owner removes a member (FR-27). Their past sessions stay in the team's
+// history; they can only come back through the invite link.
+export async function removeMember(teamId, profileId) {
+  if (!UUID.test(String(teamId)) || !UUID.test(String(profileId))) {
+    return { error: "Unknown member." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("remove_team_member", {
+    p_team_id: teamId,
+    p_profile_id: profileId,
+  });
+  if (error) {
+    console.error("removeMember failed", error.message);
+    return {
+      error: error.message.includes("Only the owner")
+        ? "Only the owner can remove members."
+        : "Could not remove this member. Try again.",
+    };
+  }
+
+  revalidatePath(`/app/teams/${teamId}`);
+  revalidatePath("/app/teams");
+  return { ok: true };
+}
+
 // The owner can switch the invite link off and on.
 export async function setInviteEnabled(teamId, enabled) {
   if (!UUID.test(String(teamId))) {

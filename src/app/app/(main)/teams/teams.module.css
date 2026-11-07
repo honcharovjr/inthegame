@@ -231,6 +231,11 @@
   font-weight: 800;
 }
 
+/* The owner's remove button sits at the chip's end, inside its curve */
+.member:has(button) {
+  padding-right: 3px;
+}
+
 .invite {
   display: flex;
   align-items: center;

@@ -41,7 +41,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Nov 1 | #60 | Landing page, privacy policy, site settings in the admin panel (C31) |
 | Nov 1 | #61 | App moved under /app; landing page at / for everyone (C32) |
 | Nov 7 | #62 | Account deletion (FR-05) |
-| Nov 7 | (this branch) | Email links work in any browser (confirm account, reset password) |
+| Nov 7 | #63 | Email links work in any browser (confirm account, reset password) |
+| Nov 7 | (this branch) | Owner removes team members (FR-27) |
 
 ## 3. Requirements status
 
@@ -77,7 +78,7 @@ Done: accepted in production. Partial: some acceptance criteria open. Open: not 
 | FR-24 | Customizable character | Must | P3 | Done | 5 races, 10 outfits, customizer |
 | FR-25 | Items unlocked by achievements | Should | P3 | Partial | Backgrounds unlock; earned outfits and accessory art pending |
 | FR-04 | Link a guest to an account | Could | P4 | Open | |
-| FR-27 | Owner removes members | Must | P4 | Open | |
+| FR-27 | Owner removes members | Must | P4 | Done | On the team page; past sessions stay in history |
 | FR-48 to FR-50 | Team management modes, logging setting, approvals | Should | P4 | Open | Designed, changes C17, C27 |
 | FR-52 | Team ownership transfer | Should | P4 | Open | Change C26 |
 | FR-53 | Delete a guest | Should | P4 | Open | Change C24 |
