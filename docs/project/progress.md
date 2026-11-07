@@ -40,7 +40,8 @@ Version 1.0, status date Oct 28, 2026. Covers report element 20 and the actual s
 | Oct 29 | (this branch) | Redesign fixes: trading card, tooltips, fancy font, average rating, games blocks (C21) |
 | Nov 1 | #60 | Landing page, privacy policy, site settings in the admin panel (C31) |
 | Nov 1 | #61 | App moved under /app; landing page at / for everyone (C32) |
-| Nov 7 | (this branch) | Account deletion (FR-05) |
+| Nov 7 | #62 | Account deletion (FR-05) |
+| Nov 7 | (this branch) | Email links work in any browser (confirm account, reset password) |
 
 ## 3. Requirements status
 
