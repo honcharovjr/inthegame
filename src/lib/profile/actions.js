@@ -1,8 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth/session";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+
+// The name a deleted account leaves behind in other players' history.
+const DELETED_NAME = "deleted player";
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -61,4 +66,40 @@ export async function deleteGuest(guestId) {
 
   revalidatePath("/app/profile");
   return { ok: true };
+}
+
+// Deletes the player's account (FR-05), as the privacy policy describes: the
+// email and login are removed, and the profile stays as a nameless "deleted
+// player", so sessions, ratings and leaderboards of friends stay correct.
+// The profile row keeps no personal data: no nickname, character or avatar.
+export async function deleteAccount() {
+  const { profile } = await getProfile();
+  if (!profile) return { error: "Your profile is missing." };
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  const userId = claims?.claims?.sub;
+  if (!userId) return { error: "Log in again, then try once more." };
+
+  const admin = createAdminClient();
+  const { error: anonymizeError } = await admin
+    .from("profiles")
+    .update({ nickname: DELETED_NAME, character: null, avatar_url: null })
+    .eq("id", profile.id);
+  if (anonymizeError) {
+    console.error("deleteAccount anonymize failed", anonymizeError);
+    return { error: "Could not delete your account. Try again." };
+  }
+
+  // Deleting the login also sets the profile's user_id to null (foreign key).
+  const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
+  if (deleteError) {
+    console.error("deleteAccount failed", deleteError);
+    return { error: "Could not delete your account. Try again." };
+  }
+
+  // The login no longer exists; this only clears its cookies in this browser.
+  await supabase.auth.signOut({ scope: "local" });
+  revalidatePath("/", "layout");
+  redirect("/?account=deleted");
 }
