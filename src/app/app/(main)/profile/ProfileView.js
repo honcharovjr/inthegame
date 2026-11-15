@@ -19,50 +19,12 @@ const MEDALS_SHOWN = 12;
 // The size of the rating chart, in the units of its paths.
 const CHART = { width: 400, height: 160, pad: 8 };
 
-const DiceArt = (
-  <svg width="38" height="38" viewBox="0 0 24 24">
-    <rect x="3" y="3" width="18" height="18" rx="5" fill="#fff" stroke="#120a1a" strokeWidth="2" />
-    <circle cx="8.5" cy="8.5" r="1.6" fill="#120a1a" />
-    <circle cx="12" cy="12" r="1.6" fill="#120a1a" />
-    <circle cx="15.5" cy="15.5" r="1.6" fill="#120a1a" />
-  </svg>
-);
-const CupArt = (
-  <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#120a1a" strokeWidth="2" strokeLinecap="round">
-    <path d="M7 4h10v5a5 5 0 0 1-10 0z" fill="#ffc928" />
-    <path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8" />
-  </svg>
-);
-const TargetArt = (
-  <svg width="38" height="38" viewBox="0 0 24 24" stroke="#120a1a" strokeWidth="2">
-    <circle cx="12" cy="12" r="9" fill="#ff4fa3" />
-    <circle cx="12" cy="12" r="4" fill="#fff" />
-  </svg>
-);
-const FlameArt = (
-  <svg width="38" height="38" viewBox="0 0 24 24" stroke="#120a1a" strokeWidth="2" strokeLinejoin="round">
-    <path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-7 1 2 2 3 3 3 0-3-1-5 0-7z" fill="#ff8a3d" />
-  </svg>
-);
-const BoardArt = (
-  <svg width="38" height="38" viewBox="0 0 24 24" stroke="#120a1a" strokeWidth="2" strokeLinejoin="round">
-    <rect x="3" y="5" width="12" height="15" rx="2" fill="#2fd6d6" transform="rotate(-8 9 12)" />
-    <rect x="9" y="4" width="12" height="15" rx="2" fill="#fff" transform="rotate(6 15 11)" />
-  </svg>
-);
-const MedalArt = (
-  <svg width="38" height="38" viewBox="0 0 24 24" stroke="#120a1a" strokeWidth="2" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9" fill="#ffc928" />
-    <path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1L12 14.6l-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z" fill="#fff" />
-  </svg>
-);
-
 const signed = (n) => (n > 0 ? `+${n}` : `${n}`);
 
 // The profile below its title, from data read by the page. series: the
 // rating steps of the games played most, [{ game, rating, values }].
 // ratingOf: the current rating by game id. earned: achievement codes.
-export default function ProfileView({ profile, startOnLook, totals, bestStreak, gameStats, statsError, ratingOf, earned, series, guests }) {
+export default function ProfileView({ profile, startOnGear, totals, bestStreak, gameStats, statsError, ratingOf, earned, series, guests }) {
   const earnedSet = new Set(earned);
   const paths = sharedPaths(series, CHART.width, CHART.height, CHART.pad);
   const scale = chartScale(series, CHART.height, CHART.pad);
@@ -84,7 +46,7 @@ export default function ProfileView({ profile, startOnLook, totals, bestStreak, 
         name={profile.nickname}
         initial={profile.character}
         earned={earned}
-        startOnLook={startOnLook}
+        startOnGear={startOnGear}
         identity={<NicknameForm nickname={profile.nickname} nameClass={nameStyle(profile.character)} />}
         kind={kind}
         aside={
@@ -94,12 +56,12 @@ export default function ProfileView({ profile, startOnLook, totals, bestStreak, 
             </div>
             <ul className={styles.numbers}>
               {[
-                { label: "Sessions", value: totals.played, icon: DiceArt },
-                { label: "Wins", value: totals.wins, icon: CupArt },
-                { label: "Win rate", value: totals.winRate === null ? "–" : `${totals.winRate}%`, icon: TargetArt },
-                { label: "Best streak", value: bestStreak, icon: FlameArt },
-                { label: "Games", value: gameStats.length, icon: BoardArt },
-                { label: "Medals", value: `${earned.length} / ${ACHIEVEMENTS.length}`, icon: MedalArt },
+                { label: "Sessions", value: totals.played, icon: "🎲" },
+                { label: "Wins", value: totals.wins, icon: "🏆" },
+                { label: "Win rate", value: totals.winRate === null ? "–" : `${totals.winRate}%`, icon: "🎯" },
+                { label: "Best streak", value: bestStreak, icon: "🔥" },
+                { label: "Games", value: gameStats.length, icon: "🎮" },
+                { label: "Medals", value: `${earned.length} / ${ACHIEVEMENTS.length}`, icon: "🏅" },
               ].map((item) => (
                 <li key={item.label} className={styles.number}>
                   <span className={styles.numberIcon} aria-hidden="true">

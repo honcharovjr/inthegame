@@ -82,6 +82,30 @@ export function playYahtzee() {
   );
 }
 
+// A card sliding onto the felt: one soft, low tick.
+export function playCard() {
+  const ctx = context();
+  if (!ctx) return;
+  tone(ctx, { freq: 320, length: 0.06, type: "triangle", gain: 0.08 });
+}
+
+// Chips stacking on a bet: two quick high clicks.
+export function playChip() {
+  const ctx = context();
+  if (!ctx) return;
+  tone(ctx, { freq: 1400, length: 0.04, type: "square", gain: 0.03 });
+  tone(ctx, { freq: 1700, start: 0.05, length: 0.04, type: "square", gain: 0.03 });
+}
+
+// A blackjack: the Yahtzee fanfare one step higher.
+export function playBlackjack() {
+  const ctx = context();
+  if (!ctx) return;
+  [587, 740, 880, 1175].forEach((freq, index) =>
+    tone(ctx, { freq, start: index * 0.11, length: 0.25, type: "triangle", gain: 0.1 }),
+  );
+}
+
 // Your turn: a soft double ping and a short buzz on phones that can.
 export function playYourTurn() {
   if (!read()) return;

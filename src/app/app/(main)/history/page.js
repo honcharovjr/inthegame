@@ -4,9 +4,9 @@ import AllTimeStats from "@/components/AllTimeStats/AllTimeStats";
 import PageFrame, { PageTop } from "@/components/PageFrame/PageFrame";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { FilterBody, FilterLoading } from "@/components/FilterLoading/FilterLoading";
-import MetaLine from "@/components/MetaLine/MetaLine";
 import Pager from "@/components/Pager/Pager";
 import ScrollIntoView from "@/components/ScrollIntoView/ScrollIntoView";
+import SessionRow from "@/components/SessionRow/SessionRow";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import { getProfile } from "@/lib/auth/session";
 import { gameEmoji } from "@/lib/games/emoji";
@@ -167,17 +167,15 @@ async function HistoryList({ searchParams }) {
 
       <ul className={`${styles.list} stagger`}>
         {sessions.map((session) => (
-          <li
+          <SessionRow
             key={session.id}
-            id={`session-${session.id}`}
-            className={`${styles.row} ${session.id === picked ? styles.picked : ""}`}
-          >
-            <span className={`${styles.tile} ${styles[`tile_${session.tone}`]}`}>
-              {session.emoji}
-            </span>
-            <span className={styles.text}>
-              <span className={styles.name}>{session.game}</span>
-              <span className={styles.chips}>
+            id={session.id}
+            emoji={session.emoji}
+            tone={session.tone}
+            name={session.game}
+            picked={session.id === picked}
+            chips={
+              <>
                 {!session.teamId ? (
                   <Chip size="s" tone="yellow" href="/app/teams/personal">
                     Personal
@@ -194,20 +192,19 @@ async function HistoryList({ searchParams }) {
                     <Chip size="s">Unrated</Chip>
                   </span>
                 )}
-              </span>
-              <MetaLine
-                items={[
-                  dateFormat.format(new Date(session.playedAt)),
-                  session.others.filter(Boolean).length > 0 && (
-                    <>
-                      with <UserText>{session.others.filter(Boolean).join(", ")}</UserText>
-                    </>
-                  ),
-                ]}
-              />
-            </span>
-            <span className={`${styles.result} ${session.won ? styles.resultWon : ""}`}>{session.result}</span>
-          </li>
+              </>
+            }
+            meta={[
+              dateFormat.format(new Date(session.playedAt)),
+              session.others.filter(Boolean).length > 0 && (
+                <>
+                  with <UserText>{session.others.filter(Boolean).join(", ")}</UserText>
+                </>
+              ),
+            ]}
+            result={session.result}
+            won={session.won}
+          />
         ))}
       </ul>
 

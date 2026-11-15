@@ -111,9 +111,11 @@ async function TeamContent({ params, searchParams }) {
   const link = `${protocol}://${host}/join/${team.invite_code}`;
 
   return (
-    <div className={`${styles.body} stagger`}>
+    <div className={`${styles.body} ${styles.full} stagger`}>
       <h1 className={`${styles.title} keep-case`}>{team.name}</h1>
 
+      <div className={styles.teamTop}>
+      <div className={styles.teamSide}>
       <section className={styles.card} aria-label="Members">
         <div className={styles.cardHead}>
           <span className={styles.cardTitle}>Members</span>
@@ -166,6 +168,8 @@ async function TeamContent({ params, searchParams }) {
         </div>
       </section>
 
+      </div>
+
       <section className={styles.card} aria-label="Leaderboard">
         <div className={styles.cardHead}>
           <span className={styles.cardTitle}>Leaderboard</span>
@@ -207,6 +211,7 @@ async function TeamContent({ params, searchParams }) {
           ))}
         </ol>
       </section>
+      </div>
 
       <SessionHistory
         title="Team history"
