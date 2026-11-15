@@ -241,10 +241,10 @@ function LookPanel({ tab, setTab, choice, owned, set, preview }) {
 // card with the gear slots around it, and a panel beside it that switches
 // between the gear and the look. identity: the name and its editor. aside:
 // what goes under the panel.
-export default function Wardrobe({ name, initial, earned, startOnLook, identity, kind, aside }) {
+export default function Wardrobe({ name, initial, earned, startOnGear, identity, kind, aside }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [mode, setMode] = useState(startOnLook ? "look" : "gear");
+  const [mode, setMode] = useState(startOnGear ? "gear" : "look");
   // The last two looks: the one fading out and the one now shown.
   const [frames, setFrames] = useState([{ id: 0, choice: resolveCharacter(initial) }]);
   const [tab, setTab] = useState(TABS[0]);
@@ -283,11 +283,10 @@ export default function Wardrobe({ name, initial, earned, startOnLook, identity,
         setError(result.error);
         return;
       }
-      // A short cheer, then back to the gear
+      // A short cheer
       setSaved(true);
       await new Promise((resolve) => setTimeout(resolve, 900));
       setSaved(false);
-      setMode("gear");
       router.replace("/app/profile", { scroll: false });
       router.refresh();
     });
@@ -368,8 +367,8 @@ export default function Wardrobe({ name, initial, earned, startOnLook, identity,
         <section className={styles.bag} aria-label={looking ? "Look" : "Gear"}>
           <div className={styles.switcher} role="tablist" aria-label="Wardrobe">
             {[
-              ["gear", "Gear"],
               ["look", "Look"],
+              ["gear", "Gear"],
             ].map(([code, label]) => (
               <button
                 key={code}

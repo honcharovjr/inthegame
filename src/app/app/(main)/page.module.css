@@ -137,6 +137,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* No rating yet: a question mark that explains itself on hover */
+.unrated {
+  align-self: flex-start;
+  font-size: 52px;
+  line-height: 1;
+  cursor: help;
+  border-radius: 12px;
+}
+
+.unrated:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 .marker {
   background: linear-gradient(transparent 58%, var(--color-yellow) 58%, var(--color-yellow) 92%, transparent 92%);
 }

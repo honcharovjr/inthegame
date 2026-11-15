@@ -130,6 +130,25 @@
   background: rgba(255, 255, 255, 0.65);
 }
 
+.sheetLine {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--l) * 50ms), width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--l) * 50ms);
+}
+
+/* The score lines slide in one after another, as if written down */
+@media (hover: hover) {
+  .log:hover .sheetLine {
+    width: calc(150px - var(--l) * 22px);
+    transform: translateX(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log:hover .sheetLine {
+    width: calc(130px - var(--l) * 26px);
+    transform: none;
+  }
+}
+
 .sheetLine::before {
   content: "";
   position: absolute;

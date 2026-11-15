@@ -20,12 +20,16 @@
   line-height: 0;
 }
 
-/* Sits on the bottom edge of the figure's window */
+/* Sits on the bottom edge of the figure's window. Centred with auto margins,
+   not a transform, because .btn-primary moves on hover with its own transform. */
 .customize {
   --btn-bg: var(--color-ink);
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: 0;
+  width: fit-content;
+  margin-inline: auto;
   display: inline-flex;
   align-items: center;
   height: 46px;
@@ -34,7 +38,6 @@
   font-size: 16px;
   font-weight: 800;
   white-space: nowrap;
-  transform: translateX(-50%);
 }
 
 .body {

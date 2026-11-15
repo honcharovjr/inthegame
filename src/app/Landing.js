@@ -407,14 +407,19 @@ function Accordion({ items, open, onToggle, className, number }) {
   });
 }
 
-// 01: game nights without a record and with one. Flips by itself until touched.
+// 01: game nights without a record and with one. Opens its three points one
+// after another, then flips to the other side, until touched.
 function WithoutWith({ reduce }) {
   const [mode, setMode] = useState(0);
   const [auto, setAuto] = useState(true);
   const [open, setOpen] = useState(0);
-  useEvery(6000, auto && !reduce, () => {
-    setMode((m) => 1 - m);
-    setOpen(0);
+  useEvery(3500, auto && !reduce, () => {
+    if (open < WITHOUT.length - 1) {
+      setOpen(open + 1);
+    } else {
+      setMode((m) => 1 - m);
+      setOpen(0);
+    }
   });
 
   const bars = Array.from({ length: 24 }, (_, i) => {

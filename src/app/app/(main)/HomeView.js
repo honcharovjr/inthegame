@@ -13,6 +13,7 @@ import styles from "./page.module.css";
 const RIVAL_COLORS = ["turquoise", "pink", "white"];
 // Games listed under the average rating
 const RATING_GAMES = 3;
+const NO_RATING = "Play 3 sessions without guests in one game to get a rating";
 
 // Home below its title, from data read by the page. rating: the overall
 // rating, how many games count toward it, and the rows behind it, played
@@ -33,17 +34,28 @@ export default function HomeView({ saved, profile, totals, streak, calendar, rat
             <section className={styles.section} aria-label="Rating">
               <div className={styles.head}>
                 <h2 className={styles.title}>Rating</h2>
-                {rating.counted > 0 ? (
+                {rating.counted > 0 && (
                   <span className={styles.note}>
                     across {rating.counted} {rating.counted === 1 ? "game" : "games"}
                   </span>
-                ) : (
-                  <span className={styles.note}>Play 3 sessions without guests in one game to get a rating</span>
                 )}
               </div>
-              <span className={styles.big}>
-                <span className={styles.marker}>{rating.average ?? "–"}</span>
-              </span>
+              {rating.average === null ? (
+                <span
+                  className={styles.unrated}
+                  tabIndex={0}
+                  role="img"
+                  aria-label={NO_RATING}
+                  data-tip={NO_RATING}
+                  data-tip-pos="below"
+                >
+                  ❓
+                </span>
+              ) : (
+                <span className={styles.big}>
+                  <span className={styles.marker}>{rating.average}</span>
+                </span>
+              )}
               {rating.games.length > 1 && (
                 <ul className={styles.ratings}>
                   {rating.games.slice(0, RATING_GAMES).map((row) => (

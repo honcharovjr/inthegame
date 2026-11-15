@@ -86,7 +86,7 @@ async function ProfileContent({ searchParams }) {
   return (
     <ProfileView
       profile={profile}
-      startOnLook={mode === "look"}
+      startOnGear={mode === "gear"}
       totals={totals}
       bestStreak={winStreaks(results.rows).best}
       gameStats={gameStats}

@@ -1,11 +1,14 @@
 import Link from "next/link";
 import ConfirmButton from "@/components/ConfirmButton/ConfirmButton";
 import { PenIcon } from "@/components/icons";
-import MetaLine from "@/components/MetaLine/MetaLine";
+import Chip from "@/components/Chip/Chip";
 import Pager from "@/components/Pager/Pager";
+import SessionRow from "@/components/SessionRow/SessionRow";
 import UserText, { GameName } from "@/components/UserText/UserText";
 import { gameEmoji } from "@/lib/games/emoji";
+import { findGameType } from "@/lib/games/types";
 import { deleteSession } from "@/lib/sessions/actions";
+import { resultLabel } from "@/lib/stats/month";
 import styles from "./teams.module.css";
 
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
@@ -13,77 +16,84 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
   month: "short",
 });
 
-// The session history of a panel (a team or personal). The player who
-// logged a session can edit or delete it here, and only here.
-// pageHref(page) gives the address of another page of the list.
+// The session history of a panel (a team or personal). Its rows are the same
+// as on History. The player who logged a session can edit or delete it here,
+// and only here. pageHref(page) gives the address of another page of the list.
 export default function SessionHistory({ title, sessions, profileId, page, totalPages, pageHref, empty }) {
   return (
-    <section className={styles.card} aria-label={title}>
-      <div className={styles.cardTitle}>{title}</div>
+    <section className={styles.history} aria-label={title}>
+      <h2 className={styles.cardTitle}>{title}</h2>
       {sessions.length === 0 ? (
         <p className={styles.empty}>{empty}</p>
       ) : (
-        <ul className={styles.sessions}>
+        <ul className={`${styles.sessions} stagger`}>
           {sessions.map((session) => {
-            const names = session.session_participants
-              .map((p) => p.profiles?.nickname ?? p.guests?.name)
-              .filter(Boolean);
-            const winner = session.session_participants.find((p) => p.place === 1);
+            const people = session.session_participants;
+            const nameOf = (p) => p.profiles?.nickname ?? p.guests?.name;
+            const mine = people.find((p) => p.profile_id === profileId);
+            const winner = people.find((p) => p.place === 1);
+            // The names of the others, or of everyone when the viewer did not play
+            const others = people.filter((p) => p !== mine).map(nameOf).filter(Boolean);
             const gameText = session.games?.name ?? "game";
-            const mine = session.created_by === profileId;
+            const date = dateFormat.format(new Date(session.played_at));
+            const unrated = people.length < 2 || people.some((p) => p.guest_id);
             return (
-              <li key={session.id} className={styles.sessionRow}>
-                <span className={styles.tile} aria-hidden="true">
-                  {gameEmoji(session.games)}
-                </span>
-                <span className={styles.sessionText}>
-                  <span className={styles.sessionName}>
-                    <GameName game={session.games} />
-                  </span>
-                  <MetaLine
-                    items={[
-                      dateFormat.format(new Date(session.played_at)),
-                      names.length > 0 && <UserText>{names.slice(0, 3).join(", ")}</UserText>,
-                      (session.session_participants.length < 2 || session.session_participants.some((p) => p.guest_id)) && (
-                        <span key="unrated" data-tip="Sessions with a guest or one player do not change ratings">
-                          unrated
-                        </span>
-                      ),
-                      winner && session.session_participants.length > 1 && (
-                        <span className={styles.winner}>
-                          <UserText>{winner.profiles?.nickname ?? winner.guests?.name}</UserText> won
-                        </span>
-                      ),
-                    ]}
-                  />
-                </span>
-                {mine && (
-                  <span className={styles.sessionActions}>
-                    <Link
-                      href={`/app/log?edit=${session.id}`}
-                      className={styles.edit}
-                      aria-label={`Edit the ${gameText} session`}
-                      data-tip="Edit"
-                      data-tip-align="end"
-                    >
-                      <PenIcon size={17} />
-                    </Link>
-                    <ConfirmButton
-                      title="Delete this session?"
-                      message={
-                        <>
-                          <GameName game={session.games} /> on{" "}
-                          {dateFormat.format(new Date(session.played_at))} will be removed and
-                          ratings will be recalculated.
-                        </>
-                      }
-                      confirmLabel="Delete session"
-                      ariaLabel={`Delete the ${gameText} session`}
-                      action={deleteSession.bind(null, session.id)}
-                    />
-                  </span>
-                )}
-              </li>
+              <SessionRow
+                key={session.id}
+                emoji={gameEmoji(session.games)}
+                tone={findGameType(session.games?.type).tone}
+                name={<GameName game={session.games} />}
+                chips={
+                  unrated && (
+                    <span data-tip="Sessions with a guest or one player do not change ratings">
+                      <Chip size="s">Unrated</Chip>
+                    </span>
+                  )
+                }
+                meta={[
+                  date,
+                  others.length > 0 && (
+                    <>
+                      {mine && "with "}
+                      <UserText>{others.slice(0, 3).join(", ")}</UserText>
+                    </>
+                  ),
+                  !mine && winner && people.length > 1 && (
+                    <>
+                      <UserText>{nameOf(winner)}</UserText> won
+                    </>
+                  ),
+                ]}
+                result={mine ? resultLabel(mine.place ?? 0, people.length) : null}
+                won={mine?.place === 1 && people.length >= 2}
+                actions={
+                  session.created_by === profileId && (
+                    <>
+                      <Link
+                        href={`/app/log?edit=${session.id}`}
+                        className={styles.edit}
+                        aria-label={`Edit the ${gameText} session`}
+                        data-tip="Edit"
+                        data-tip-align="end"
+                      >
+                        <PenIcon size={17} />
+                      </Link>
+                      <ConfirmButton
+                        title="Delete this session?"
+                        message={
+                          <>
+                            <GameName game={session.games} /> on {date} will be removed and ratings
+                            will be recalculated.
+                          </>
+                        }
+                        confirmLabel="Delete session"
+                        ariaLabel={`Delete the ${gameText} session`}
+                        action={deleteSession.bind(null, session.id)}
+                      />
+                    </>
+                  )
+                }
+              />
             );
           })}
         </ul>

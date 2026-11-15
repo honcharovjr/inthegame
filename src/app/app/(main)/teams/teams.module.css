@@ -330,37 +330,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The history under a team or personal page: its rows are SessionRow, the
+   same as on History, straight on the page. */
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history .cardTitle {
+  padding: 0 4px;
+}
+
 .sessions {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.sessionRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.sessionText {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.sessionName {
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.sessionActions {
-  flex: none;
-  display: flex;
-  align-items: center;
   gap: 8px;
 }
 
@@ -426,6 +411,18 @@
   outline-offset: 2px;
 }
 
+.teamSide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.teamTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
 @media (min-width: 900px) {
   .page {
     padding: 56px 56px 48px;
@@ -438,6 +435,18 @@
 
   .body {
     max-width: 720px;
+  }
+
+  /* The team page: the whole width, members and invite beside the leaderboard */
+  .body.full {
+    max-width: none;
+  }
+
+  .teamTop {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 16px;
+    align-items: start;
   }
 }
 
